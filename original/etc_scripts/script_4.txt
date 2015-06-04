@@ -1,0 +1,51 @@
+
+
+localwebroot='/home/linxiao/public_html/browser_al_test/'
+
+#create data
+scheme=['Primary','Relation','Secondary','1','2','3','4','5','Human','text+visual','visual','text'];
+data=list();
+count=0;
+for i in range(0,20000):
+	if str(i) in test:
+		t=list();
+		P=test[str(i)][0][0];
+		R=test[str(i)][0][1];
+		S=test[str(i)][0][2];
+		t.append(P);
+		t.append(R);
+		t.append(S);
+		for j in range(0,5):
+			if j<len(test_items['visual_test_items_imname'][count][0][0]):
+				t.append("<img src=\"image_data/%s\" alt=\"image0\" height=\"150\" width=\"262\">"%(test_items['visual_test_items_imname'][count][0][0][j][0]));
+			else:
+				t.append("");
+		
+		t.append(test[str(i)][2]);
+		t.append(ttt['ttt'][count][0]);
+		t.append(ttt['ttt'][count][1]);
+		t.append(ttt['ttt'][count][2]);
+		
+		data.append(t);
+		count=count+1;
+
+
+#create header
+headerfname=os.path.join(localwebroot,'data/header.json');
+headerf=open(headerfname,'w');
+json.dump(scheme,headerf);
+headerf.close();
+
+#create total
+totalfname=os.path.join(localwebroot,'data/total.json');
+totalf=open(totalfname,'w');
+json.dump(len(data),totalf);
+totalf.close();
+
+#create data
+for i in range(0,len(data)):
+	datafname=os.path.join(localwebroot,'data/%d.json'%(i));
+	dataf=open(datafname,'w');
+	json.dump(data[i],dataf);
+	dataf.close();
+

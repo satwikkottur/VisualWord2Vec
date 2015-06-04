@@ -1,0 +1,6 @@
+
+d=textread(fullfile('./al_vectors.txt'),'%s');
+
+t=reshape(d(3:end),[str2num(d{2})+1 str2num(d{1})]);
+tokens_word2vec=t(1,:);
+vectors_word2vec=cell2mat(cellfun(@str2num,t(2:end,:),'UniformOutput',false))';

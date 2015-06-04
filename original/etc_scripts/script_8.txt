@@ -1,0 +1,17 @@
+
+threshold=-1;
+visual_val_score=zeros(nval,1);
+for i=1:nval
+	disp(num2str(i));
+	visual_val_score(i,1)=mean(max(val_S_unique_score_embed(:,val_S_id(i))-threshold,0),1);
+end
+[prec,base]=precision(visual_val_score+rand(size(visual_val_score,1),1)*0.00000001,val_label)
+
+
+
+visual_test_score=zeros(ntest,1);
+for i=1:ntest
+	disp(num2str(i));
+	visual_test_score(i,1)=mean(max(test_S_unique_score_embed(:,test_S_id(i))-threshold,0),1);
+end
+[prec,base]=precision(visual_test_score+rand(size(visual_test_score,1),1)*0.00000001,test_label)

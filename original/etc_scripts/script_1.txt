@@ -1,0 +1,55 @@
+crossval_pred=zeros(4260,1);
+
+for i=1:5
+	R_A_1=reshape(R_model_crossval_embed{3,i}.w,[ndims,200]);
+	ind=i:5:4260;
+	R_score_val_embed_1=R_feat(ind,:)*R_A_1*val_R_embedding';
+	[~,crossval_pred(ind)]=max(R_score_val_embed_1,[],2);
+end
+
+
+R_crossval_pred=R_unique_label(crossval_pred);
+
+
+crossval_pred=zeros(4260,1);
+
+for i=1:5
+	P_A_1=reshape(P_model_crossval_embed{3,i}.w,[ndims,200]);
+	ind=i:5:4260;
+	P_score_val_embed_1=R_feat(ind,:)*P_A_1*P_embedding';
+	[~,crossval_pred(ind)]=max(P_score_val_embed_1,[],2);
+end
+
+
+P_crossval_pred=P_unique_label(crossval_pred);
+
+crossval_pred=zeros(4260,1);
+
+for i=1:5
+	S_A_1=reshape(S_model_crossval_embed{3,i}.w,[ndims,200]);
+	ind=i:5:4260;
+	S_score_val_embed_1=R_feat(ind,:)*S_A_1*S_embedding';
+	[~,crossval_pred(ind)]=max(S_score_val_embed_1,[],2);
+end
+
+
+S_crossval_pred=S_unique_label(crossval_pred);
+
+
+
+
+
+
+relation_coco_visual_crossval_confusion_matrix=confusionmat(R_id,crossval_pred);
+
+[~,pred]=max(R_feat*R_A*val_R_embedding',[],2);
+
+relation_coco_visual_cheat_confusion_matrix=confusionmat(R_id,pred);
+
+
+
+
+save('relation_coco_visual_confusion_matrix_ablation_norel.mat','relation_coco_visual_crossval_confusion_matrix','relation_coco_visual_cheat_confusion_matrix','val_R_unique_label');
+
+
+

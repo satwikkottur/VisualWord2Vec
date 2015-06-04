@@ -1,4 +1,4 @@
 # data folder
 data/*
-original/*
+#original/*
 *.mat
