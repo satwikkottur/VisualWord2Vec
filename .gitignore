@@ -1,4 +1,12 @@
 # data folder
 data/*
-#original/*
 *.mat
+
+# Ignoring files from python
+*.py[cod]
+
+# Ignoring big data files from relationshipModeling
+relationshipModeling/myTupleExtractor/SimpleSentences/
+relationshipModeling/myTupleExtractor/data/
+
+
