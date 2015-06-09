@@ -25,12 +25,11 @@ for i=1358:1:1358%length(listing)
     S_label{i}=data.secondaryName;
     R_label{i}=data.relationName;
     
-    %fprintf('%s  : %s : %s\n', P_label{i}, S_label{i}, R_label{i});
-    %feat=load(fname_feature);
-    %features{i}=feat.feat;
-    %fprintf('Iteration : %d\n', i);
+    fprintf('%s  : %s : %s\n', P_label{i}, S_label{i}, R_label{i});
+    feat=load(fname_feature);
+    features{i}=feat.feat;
+    fprintf('Iteration : %d\n', i);
 end
-return
 addpath(genpath('./'));
 %R labels
 nim=length(features);

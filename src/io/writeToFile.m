@@ -18,8 +18,6 @@ function writeToFile(dataPath, prsFeaturePath, numFeaturePath)
     listing = dir(fullfile(dataPath, 'rawdata', '*.mat'));
     noLines = length(listing);
 
-    fprintf(prsId, '%d\n', noLines);
-
     for i = 1:noLines
         filePath = fullfile(dataPath, 'rawdata', listing(i).name);
         data = load(filePath);

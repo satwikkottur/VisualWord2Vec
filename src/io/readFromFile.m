@@ -21,35 +21,31 @@ function[Plabel, Slabel, Rlabel, Rfeatures] =  readFromFile(psrFeaturePath, numF
     end
     fileId = fopen(psrFeaturePath, 'rb');
 
-    % Reading from the file
-    noLines = str2num(fgetl(fileId));
-
-    % Initializing the structures
-    Plabel = cell(noLines, 1);
-    Slabel = cell(noLines, 1);
-    Rlabel = cell(noLines, 1);
-    R_feature = cell(noLines, 1);
-
     % Match with any number of any characters which are not (<>,:)
     regExp = '[^<>:]*';
-    lineId = 1;
+    data = textscan(fileId, '%s', 'delimiter', '\n');
+    data = regexp(data{1}, regExp, 'match');
+    Plabel = data{1};
+    Slabel = data{2};
+    Rlabel = data{3};
+    %lineId = 1;
 
     % Reading the first line for PRS features
-    tline = fgetl(fileId);
-    while ischar(tline)
-        splitString = regexp(tline, regExp, 'match');
-        assert(length(splitString) == 3);
+    %tline = fgetl(fileId);
+    %while ischar(tline)
+    %    splitString = regexp(tline, regExp, 'match');
+    %    assert(length(splitString) == 3);
 
         % Reading the (P,S,R) labels
-        Plabel{lineId} = splitString{1};
-        Slabel{lineId} = splitString{2};
-        Rlabel{lineId} = splitString{3};
+    %    Plabel{lineId} = splitString{1};
+    %    Slabel{lineId} = splitString{2};
+    %    Rlabel{lineId} = splitString{3};
 
-        lineId = lineId + 1;
+    %    lineId = lineId + 1;
 
         % Read the next line
-        tline = fgetl(fileId);
-    end
+    %    tline = fgetl(fileId);
+    %end
 
     % Closing the file
     fclose(fileId);
@@ -58,7 +54,9 @@ function[Plabel, Slabel, Rlabel, Rfeatures] =  readFromFile(psrFeaturePath, numF
     if(~exist(numFeaturePath, 'file'))
         error('File does not exist\n')
     end
+
     Rfeatures = dlmread(numFeaturePath, ' ');
     % Ignore the last column as it is due to additional space at the end
     Rfeatures = Rfeatures(:, 1:end-1);
+    %Rfeatures = [];
 end
