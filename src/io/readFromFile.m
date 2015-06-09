@@ -25,9 +25,9 @@ function[Plabel, Slabel, Rlabel, Rfeatures] =  readFromFile(psrFeaturePath, numF
     regExp = '[^<>:]*';
     data = textscan(fileId, '%s', 'delimiter', '\n');
     data = regexp(data{1}, regExp, 'match');
-    Plabel = data{1};
-    Slabel = data{2};
-    Rlabel = data{3};
+    Plabel = cellfun(@(v) v(1), data);
+    Slabel = cellfun(@(v) v(2), data);
+    Rlabel = cellfun(@(v) v(3), data);
     %lineId = 1;
 
     % Reading the first line for PRS features

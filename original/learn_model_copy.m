@@ -1,35 +1,42 @@
+%
+%datapath = '/home/linxiao/public_html/browser_sentint_full4/image_json';
+%featpath = '/home/linxiao/public_html/browser_sentint_full4/image_features_tanmay';
+%%featpath_pairs = '/home/linxiao/public_html/browser_sentint_full4/image_features_pairs';
+%%word2vec model. change to enwiki9.mat for wikipedia word2vec
+%w2v_model='coco_w2v.mat';
+%%C values and thresholds need to be tuned manually, check "TODO"s
+%
+%
+%%Collect PRS and features
+%listing = dir(fullfile(datapath,'*.mat'));
+%R_label=cell(length(listing),1);
+%P_label=cell(length(listing),1);
+%S_label=cell(length(listing),1);
+%features=cell(length(listing),1);
+%
+%%for each image grab its PRS
+%for i=1:1:length(listing)
+%    fname_data = fullfile(datapath,listing(i).name);
+%    fname_feature=listing(i).name;
+%    fname_feature = fullfile(featpath,[fname_feature(1:end-5) '.mat']);
+%    
+%    data=load(fname_data);
+%    P_label{i}=data.primaryName;
+%    S_label{i}=data.secondaryName;
+%    R_label{i}=data.relationName;
+%    
+%    %fprintf('%s  : %s : %s\n', P_label{i}, S_label{i}, R_label{i});
+%    feat=load(fname_feature);
+%    features{i}=feat.feat;
+%    fprintf('Iteration : %d / %d\n', i, length(listing));
+%end
+%
+% Saving the MAT file
+%save('originalCode.mat');
 
-datapath = '/home/linxiao/public_html/browser_sentint_full4/image_json';
-featpath = '/home/linxiao/public_html/browser_sentint_full4/image_features_tanmay';
-%featpath_pairs = '/home/linxiao/public_html/browser_sentint_full4/image_features_pairs';
-%word2vec model. change to enwiki9.mat for wikipedia word2vec
-w2v_model='coco_w2v.mat';
-%C values and thresholds need to be tuned manually, check "TODO"s
+% Loading the MAT file
+load('originalCode.mat');
 
-
-%Collect PRS and features
-listing = dir(fullfile(datapath,'*.mat'));
-R_label=cell(length(listing),1);
-P_label=cell(length(listing),1);
-S_label=cell(length(listing),1);
-features=cell(length(listing),1);
-
-%for each image grab its PRS
-for i=1:1:length(listing)
-    fname_data = fullfile(datapath,listing(i).name);
-    fname_feature=listing(i).name;
-    fname_feature = fullfile(featpath,[fname_feature(1:end-5) '.mat']);
-    
-    data=load(fname_data);
-    P_label{i}=data.primaryName;
-    S_label{i}=data.secondaryName;
-    R_label{i}=data.relationName;
-    
-    %fprintf('%s  : %s : %s\n', P_label{i}, S_label{i}, R_label{i});
-    feat=load(fname_feature);
-    features{i}=feat.feat;
-    fprintf('Iteration : %d / %d\n', i, length(listing));
-end
 addpath(genpath('./'));
 %R labels
 nim=length(features);
@@ -68,6 +75,7 @@ for i=1:nim
 end
 R_feat=double(R_feat);
 
+save('originalCode.mat');
 return
 w2v=load(w2v_model);
 
