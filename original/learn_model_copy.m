@@ -35,48 +35,49 @@
 %save('originalCode.mat');
 
 % Loading the MAT file
+%load('originalCode.mat');
+%
+%addpath(genpath('./'));
+%%R labels
+%nim=length(features);
+%R_unique_label=unique(R_label);
+%[~ , R_id]=ismember(R_label,R_unique_label);
+%R_label_01=zeros(nim,length(R_unique_label));
+%for i=1:nim
+%    R_label_01(i,R_id(i))=1;
+%end
+%R_label_01=2*R_label_01-1;
+%%P labels
+%P_unique_label=unique(P_label);
+%P_embedding=cell(length(P_unique_label),1);
+%[~ , P_id]=ismember(P_label,P_unique_label);
+%P_label_01=zeros(nim,length(P_unique_label));
+%for i=1:nim
+%    P_label_01(i,P_id(i))=1;
+%end
+%P_label_01=2*P_label_01-1;
+%
+%%S labels
+%S_unique_label=unique(S_label);
+%S_embedding=cell(length(S_unique_label),1);
+%[~ , S_id]=ismember(S_label,S_unique_label);
+%S_label_01=zeros(nim,length(S_unique_label));
+%for i=1:nim
+%    S_label_01(i,S_id(i))=1;
+%end
+%S_label_01=2*S_label_01-1;
+%
+%%features
+%ndims=length(features{1});
+%R_feat=zeros(nim,ndims);
+%for i=1:nim
+%    R_feat(i,:)=features{i};
+%end
+%R_feat=double(R_feat);
+%
+%save('originalCode.mat');
+
 load('originalCode.mat');
-
-addpath(genpath('./'));
-%R labels
-nim=length(features);
-R_unique_label=unique(R_label);
-[~ , R_id]=ismember(R_label,R_unique_label);
-R_label_01=zeros(nim,length(R_unique_label));
-for i=1:nim
-    R_label_01(i,R_id(i))=1;
-end
-R_label_01=2*R_label_01-1;
-%P labels
-P_unique_label=unique(P_label);
-P_embedding=cell(length(P_unique_label),1);
-[~ , P_id]=ismember(P_label,P_unique_label);
-P_label_01=zeros(nim,length(P_unique_label));
-for i=1:nim
-    P_label_01(i,P_id(i))=1;
-end
-P_label_01=2*P_label_01-1;
-
-%S labels
-S_unique_label=unique(S_label);
-S_embedding=cell(length(S_unique_label),1);
-[~ , S_id]=ismember(S_label,S_unique_label);
-S_label_01=zeros(nim,length(S_unique_label));
-for i=1:nim
-    S_label_01(i,S_id(i))=1;
-end
-S_label_01=2*S_label_01-1;
-
-%features
-ndims=length(features{1});
-R_feat=zeros(nim,ndims);
-for i=1:nim
-    R_feat(i,:)=features{i};
-end
-R_feat=double(R_feat);
-
-save('originalCode.mat');
-return
 w2v=load(w2v_model);
 
 
@@ -84,23 +85,26 @@ w2v=load(w2v_model);
 R_unique_label=unique(R_label);
 R_embedding=cell(length(R_unique_label),1);
 for i=1:length(R_unique_label)
-    disp(num2str(i));
+    %disp(num2str(i));
     R_embedding{i}=embed_str(R_unique_label{i},w2v.tokens,w2v.fv);
 end
 R_embedding=cell2mat(R_embedding);
 for i=1:length(P_unique_label)
-    disp(num2str(i));
+    %disp(num2str(i));
     P_embedding{i}=embed_str(P_unique_label{i},w2v.tokens,w2v.fv);
 end
 P_embedding=cell2mat(P_embedding);
 S_unique_label=unique(S_label);
 S_embedding=cell(length(S_unique_label),1);
 for i=1:length(S_unique_label)
-    disp(num2str(i));
+    %disp(num2str(i));
     S_embedding{i}=embed_str(S_unique_label{i},w2v.tokens,w2v.fv);
 end
 S_embedding=cell2mat(S_embedding);
 
+% Saving the model
+save('originalCode.mat');
+return
 
 %model2: embedding models
 nfolds=5;
