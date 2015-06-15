@@ -46,4 +46,6 @@ Rembed = embedLabels(Rdict, w2vModel);
 
 % Debugging the word2vec embedding
 %debugEmbedding;
+
+
 toc
