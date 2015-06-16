@@ -3,7 +3,7 @@
 %featpath = '/home/linxiao/public_html/browser_sentint_full4/image_features_tanmay';
 %%featpath_pairs = '/home/linxiao/public_html/browser_sentint_full4/image_features_pairs';
 %%word2vec model. change to enwiki9.mat for wikipedia word2vec
-%w2v_model='coco_w2v.mat';
+w2v_model='coco_w2v.mat';
 %%C values and thresholds need to be tuned manually, check "TODO"s
 %
 %
@@ -77,42 +77,42 @@
 %
 %save('originalCode.mat');
 
-load('originalCode.mat');
+%load('originalCode.mat');
 w2v=load(w2v_model);
-
-
-%compute PRS word2vec embeddings
-R_unique_label=unique(R_label);
-R_embedding=cell(length(R_unique_label),1);
-for i=1:length(R_unique_label)
-    %disp(num2str(i));
-    R_embedding{i}=embed_str(R_unique_label{i},w2v.tokens,w2v.fv);
-end
-R_embedding=cell2mat(R_embedding);
-for i=1:length(P_unique_label)
-    %disp(num2str(i));
-    P_embedding{i}=embed_str(P_unique_label{i},w2v.tokens,w2v.fv);
-end
-P_embedding=cell2mat(P_embedding);
-S_unique_label=unique(S_label);
-S_embedding=cell(length(S_unique_label),1);
-for i=1:length(S_unique_label)
-    %disp(num2str(i));
-    S_embedding{i}=embed_str(S_unique_label{i},w2v.tokens,w2v.fv);
-end
-S_embedding=cell2mat(S_embedding);
-
-% Saving the model
-save('originalCode.mat');
-return
-
-%model2: embedding models
-nfolds=5;
-addpath(genpath('./'));
+%
+%
+%%compute PRS word2vec embeddings
+%R_unique_label=unique(R_label);
+%R_embedding=cell(length(R_unique_label),1);
+%for i=1:length(R_unique_label)
+%    %disp(num2str(i));
+%    R_embedding{i}=embed_str(R_unique_label{i},w2v.tokens,w2v.fv);
+%end
+%R_embedding=cell2mat(R_embedding);
+%for i=1:length(P_unique_label)
+%    %disp(num2str(i));
+%    P_embedding{i}=embed_str(P_unique_label{i},w2v.tokens,w2v.fv);
+%end
+%P_embedding=cell2mat(P_embedding);
+%S_unique_label=unique(S_label);
+%S_embedding=cell(length(S_unique_label),1);
+%for i=1:length(S_unique_label)
+%    %disp(num2str(i));
+%    S_embedding{i}=embed_str(S_unique_label{i},w2v.tokens,w2v.fv);
+%end
+%S_embedding=cell2mat(S_embedding);
+%
+%% Saving the model
+%save('originalCode.mat');
+%return
+%
+%%model2: embedding models
+%nfolds=5;
+%addpath(genpath('./'));
 
 %TODO: don't preload when you want to train your own model.
 if 1
-    load workspacedump_w_models_coco.mat;
+    %load workspacedump_w_models_coco.mat;
 else
     %train models
     [R_model_test_embed R_model_crossval_embed R_acc_crossval_embed R_random_crossval_embed]=embedding(R_label_01,R_embedding,R_feat,[0.0001 0.001 0.01 0.1],nfolds,12780,100)
@@ -165,7 +165,7 @@ val_R_unique_label=unique(val_R);
 val_R_embedding=cell(length(val_R_unique_label),1);
 [~ , val_R_id]=ismember(val_R,val_R_unique_label);
 for i=1:length(val_R_unique_label)
-    disp(num2str(i));
+    %disp(num2str(i));
     val_R_embedding{i}=embed_str(val_R_unique_label{i},w2v.tokens,w2v.fv);
 end
 val_R_embedding=cell2mat(val_R_embedding);
@@ -174,7 +174,7 @@ val_P_unique_label=unique(val_P);
 val_P_embedding=cell(length(val_P_unique_label),1);
 [~ , val_P_id]=ismember(val_P,val_P_unique_label);
 for i=1:length(val_P_unique_label)
-    disp(num2str(i));
+    %disp(num2str(i));
     val_P_embedding{i}=embed_str(val_P_unique_label{i},w2v.tokens,w2v.fv);
 end
 val_P_embedding=cell2mat(val_P_embedding);
@@ -183,7 +183,7 @@ val_S_unique_label=unique(val_S);
 val_S_embedding=cell(length(val_S_unique_label),1);
 [~ , val_S_id]=ismember(val_S,val_S_unique_label);
 for i=1:length(val_S_unique_label)
-    disp(num2str(i));
+    %disp(num2str(i));
     val_S_embedding{i}=embed_str(val_S_unique_label{i},w2v.tokens,w2v.fv);
 end
 val_S_embedding=cell2mat(val_S_embedding);
@@ -194,7 +194,7 @@ test_R_unique_label=unique(test_R);
 test_R_embedding=cell(length(test_R_unique_label),1);
 [~ , test_R_id]=ismember(test_R,test_R_unique_label);
 for i=1:length(test_R_unique_label)
-    disp(num2str(i));
+    %disp(num2str(i));
     test_R_embedding{i}=embed_str(test_R_unique_label{i},w2v.tokens,w2v.fv);
 end
 test_R_embedding=cell2mat(test_R_embedding);
@@ -203,7 +203,7 @@ test_P_unique_label=unique(test_P);
 test_P_embedding=cell(length(test_P_unique_label),1);
 [~ , test_P_id]=ismember(test_P,test_P_unique_label);
 for i=1:length(test_P_unique_label)
-    disp(num2str(i));
+    %disp(num2str(i));
     test_P_embedding{i}=embed_str(test_P_unique_label{i},w2v.tokens,w2v.fv);
 end
 test_P_embedding=cell2mat(test_P_embedding);
@@ -212,11 +212,13 @@ test_S_unique_label=unique(test_S);
 test_S_embedding=cell(length(test_S_unique_label),1);
 [~ , test_S_id]=ismember(test_S,test_S_unique_label);
 for i=1:length(test_S_unique_label)
-    disp(num2str(i));
+    %disp(num2str(i));
     test_S_embedding{i}=embed_str(test_S_unique_label{i},w2v.tokens,w2v.fv);
 end
 test_S_embedding=cell2mat(test_S_embedding);
 
+save('trainValLoad.mat');
+return
 %save('embedding_test.mat','test_R_embedding','test_P_embedding','test_S_embedding','test_R_id','test_P_id','test_S_id');
 
 %convert human scores to labels

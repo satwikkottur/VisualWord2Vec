@@ -51,7 +51,7 @@ Rembed = embedLabels(Rdict, w2vModel);
 %%%%%%%%%%%%%%%%%%%% Original code %%%%%%%%%%%%%%%%%%
 %TODO: don't preload when you want to train your own model.
 if 1
-    load workspacedump_w_models_coco.mat;
+    %load workspacedump_w_models_coco.mat;
 else
     % Cross validations
     noFolds = 5;
@@ -77,14 +77,35 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Load validation and test data
-val = load('val.mat');
-test = load('test.mat');
+val = load('/home/satwik/VisualWord2Vec/original/val.mat');
+test = load('/home/satwik/VisualWord2Vec/original/test.mat');
 
 % Cleaning strings
 [valP, valR, valS] = cleanStrings(val.data);
 [testP, testR, testS] = cleanStrings(test.data);
 
 % Index and get word2vec embedding for val and test PRS
-%[valRDict]
+% Validate set P, R, S
+[~, valRdict, valRlabels] = oneHotEncode(valR);
+valRembed = embedLabels(valRdict, w2vModel);
+
+[~, valPdict, valPlabels] = oneHotEncode(valP);
+valPembed = embedLabels(valPdict, w2vModel);
+
+[~, valSdict, valSlabels] = oneHotEncode(valS);
+valSembed = embedLabels(valSdict, w2vModel);
+
+% Test set P, R, S
+[~, testRdict, testRlabels] = oneHotEncode(testR);
+testRembed = embedLabels(testRdict, w2vModel);
+
+[~, testPdict, testPlabels] = oneHotEncode(testP);
+testPembed = embedLabels(testPdict, w2vModel);
+
+[~, testSdict, testSlabels] = oneHotEncode(testS);
+testSembed = embedLabels(testSdict, w2vModel);
+
+% Debugging validation and training set cleaning
+debugValTestSets;
 
 toc
