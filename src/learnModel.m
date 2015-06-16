@@ -30,9 +30,9 @@ word2vecModel = '/home/satwik/VisualWord2Vec/models/coco_w2v.mat'; % Model for w
 noImages = size(Rfeatures, 1);
 
 % Encoding P, R, S labels using one hot encoding(unique labels)
-[Pencoding, Pdict, Plabels] = oneHotEncode(Plabel);
-[Sencoding, Sdict, Slabels] = oneHotEncode(Slabel);
-[Rencoding, Rdict, Rlabels] = oneHotEncode(Rlabel);
+[Pencoding, Pdict, Pinds] = oneHotEncode(Plabel);
+[Sencoding, Sdict, Sinds] = oneHotEncode(Slabel);
+[Rencoding, Rdict, Rinds] = oneHotEncode(Rlabel);
 
 Rfeatures = double(Rfeatures);
 
@@ -80,6 +80,9 @@ end
 val = load('/home/satwik/VisualWord2Vec/original/val.mat');
 test = load('/home/satwik/VisualWord2Vec/original/test.mat');
 
+noTest = size(test.data, 1);
+noVal = size(val.data, 1);
+
 % Cleaning strings
 [valP, valR, valS] = cleanStrings(val.data);
 [testP, testR, testS] = cleanStrings(test.data);
@@ -106,6 +109,98 @@ testPembed = embedLabels(testPdict, w2vModel);
 testSembed = embedLabels(testSdict, w2vModel);
 
 % Debugging validation and training set cleaning
-debugValTestSets;
+%debugValTestSets;
 
+% Computing human scores for the labels
+valScore = cell2mat(val.data(:, 3));
+valLabel = valScore > 0;
+
+testScore = cell2mat(test.data(:, 3)) > 0;
+testLabel = testScore > 0 ;
+
+%%%%%%%%%%%%%%%%% Visual Model %%%%%%%%%%%%%%%%%%%
+% Compute x'A for each x
+Rscore = Rfeatures * R_A;
+Pscore = Rfeatures * P_A;
+Sscore = Rfeatures * S_A;
+
+% Compute x'Ay for each x, y in test
+testRscore = Rscore * testRembed;
+testSscore = Sscore * testSembed;
+testPscore = Pscore * testPembed;
+
+% Compute x'Ay for each x, y in val
+valRscore = Rscore * valRembed;
+valPscore = Pscore * valPembed;
+valSscore = Sscore * valSembed;
+
+% Manually change threshold until precVal is maximized.
+% Visual threshold usually around 0-1
+threshold = 0.6; % Empirically determined
+
+visualValScore = zeros(noVal, 1);
+for i = 1:noVal
+    visualValScore = mean(max(...
+                            valRscore(:, valRlabels(i)) + ...
+                            valPscore(:, valPlabels(i)) + ...
+                            valSscore(:, valSlabels(i)) - ...
+                            threshold, 0), 1);
+end
+[precVal, baseVal] = precision(visualValScore, valLabel);
+
+% Now check the performance on test dataset with this threshold
+visualTestScore = zeros(noTest, 1);
+for i = 1:noTest
+    visualTestScore = mean(max(...
+                            testRscore(:, testRlabels(i)) + ...
+                            testPscore(:, testPlabels(i)) + ...
+                            testSscore(:, testSlabels(i)) - ...
+                            threshold, 0), 1);
+end
+[precTest, baseTest] = precision(visualTestScore, testLabel);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%% Only Text features %%%%%%%%%%%%%%%%%%%%%%%%%
+% Compute cosine similarity - 1 for val 
+valRscoreText = - pdist2(Rembed(Rinds, :), valRembed, 'cosine');
+valPscoreText = - pdist2(Pembed(Pinds, :), valPembed, 'cosine');
+valSscoreText = - pdist2(Sembed(Sinds, :), valSembed, 'cosine');
+
+% Compute cosine similarity - 1 for test
+testRscoreText = - pdist2(Rembed(Rinds, :), testRembed, 'cosine');
+testPscoreText = - pdist2(Pembed(Pinds, :), testPembed, 'cosine');
+testSscoreText = - pdist2(Sembed(Sinds, :), testSembed, 'cosine');
+
+% Manually adjust the threshold until precVal is maximized
+% Threshold around -2 ~ 1
+threshold = -1.2;
+
+textValScore = zeros(noVal, 1);
+for i = 1:noVal
+    textValScore = mean(max(...
+                            valRscoreText(:, valRlabels(i)) + ...
+                            valPscoreText(:, valPlabels(i)) + ...
+                            valSscoreText(:, valSlabels(i)) - ...
+                            threshold, 0), 1);
+end
+[precVal, baseVal] = precision(valScoreText, valLabel);
+
+% Use the same threshold for test set
+textTestScore = zeros(noTest, 1);
+for i = 1:noTest
+    textTestScore = mean(max(...
+                            testRscoreText(:, testRlabels(i)) + ...
+                            testPscoreText(:, testPlabels(i)) + ...
+                            testSscoreText(:, testSlabels(i)) - ...
+                            threshold, 0), 1);
+end
+[precTest, baseTest] = precision(testScoreText, testLabel);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%% Visual + Text features %%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 toc

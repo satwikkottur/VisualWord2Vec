@@ -110,115 +110,117 @@ w2v=load(w2v_model);
 %nfolds=5;
 %addpath(genpath('./'));
 
-%TODO: don't preload when you want to train your own model.
-if 1
-    %load workspacedump_w_models_coco.mat;
-else
-    %train models
-    [R_model_test_embed R_model_crossval_embed R_acc_crossval_embed R_random_crossval_embed]=embedding(R_label_01,R_embedding,R_feat,[0.0001 0.001 0.01 0.1],nfolds,12780,100)
-    [P_model_test_embed P_model_crossval_embed P_acc_crossval_embed P_random_crossval_embed]=embedding(P_label_01,P_embedding,R_feat,[0.0001 0.001 0.01 0.1],nfolds,12780,100)
-    [S_model_test_embed S_model_crossval_embed S_acc_crossval_embed S_random_crossval_embed]=embedding(S_label_01,S_embedding,R_feat,[0.0001 0.001 0.01 0.1],nfolds,12780,100)
-    %find the best C based on *_acc_crossval_embed (Here I'm fixing to 0.01), and turn w into matrix for efficient score computation
-    R_A=reshape(R_model_test_embed{3}.w,[ndims,200]);
-    P_A=reshape(P_model_test_embed{3}.w,[ndims,200]);
-    S_A=reshape(S_model_test_embed{3}.w,[ndims,200]);
-end
+%%TODO: don't preload when you want to train your own model.
+%if 1
+%    %load workspacedump_w_models_coco.mat;
+%else
+%    %train models
+%    [R_model_test_embed R_model_crossval_embed R_acc_crossval_embed R_random_crossval_embed]=embedding(R_label_01,R_embedding,R_feat,[0.0001 0.001 0.01 0.1],nfolds,12780,100)
+%    [P_model_test_embed P_model_crossval_embed P_acc_crossval_embed P_random_crossval_embed]=embedding(P_label_01,P_embedding,R_feat,[0.0001 0.001 0.01 0.1],nfolds,12780,100)
+%    [S_model_test_embed S_model_crossval_embed S_acc_crossval_embed S_random_crossval_embed]=embedding(S_label_01,S_embedding,R_feat,[0.0001 0.001 0.01 0.1],nfolds,12780,100)
+%    %find the best C based on *_acc_crossval_embed (Here I'm fixing to 0.01), and turn w into matrix for efficient score computation
+%    R_A=reshape(R_model_test_embed{3}.w,[ndims,200]);
+%    P_A=reshape(P_model_test_embed{3}.w,[ndims,200]);
+%    S_A=reshape(S_model_test_embed{3}.w,[ndims,200]);
+%end
+%
+%%save('kron_models_new.mat','R_model_test_embed','R_model_crossval_embed', 'R_acc_crossval_embed', 'R_random_crossval_embed','P_model_test_embed', 'P_model_crossval_embed', 'P_acc_crossval_embed', 'P_random_crossval_embed','S_model_test_embed', 'S_model_crossval_embed', 'S_acc_crossval_embed', 'S_random_crossval_embed','R_A','P_A','S_A');
+%
+%%model1: directly classify. Not used here.
+%%nfolds=5;
+%%c=0.1;
+%%[R_model_test R_model_crossval R_acc_crossval R_random_crossval]=perclass(R_label_01,R_feat,c,nfolds)
+%%[P_model_test P_model_crossval P_acc_crossval P_random_crossval]=perclass(P_label_01,R_feat,c,nfolds)
+%%[S_model_test S_model_crossval S_acc_crossval S_random_crossval]=perclass(S_label_01,R_feat,c,nfolds)
+%
+%%load val and test data
+%
+%val=load('val.mat');
+%test=load('test.mat');
+%nval=size(val.data,1);
+%ntest=size(test.data,1);
+%
+%val_P=cell(nval,1);
+%val_R=cell(nval,1);
+%val_S=cell(nval,1);
+%for i=1:nval
+%    %trim off the strange spaces during python to matlab conversion
+%    val_P{i}=strtrim(val.data{i,1}(1,:));
+%    val_R{i}=strtrim(val.data{i,1}(2,:));
+%    val_S{i}=strtrim(val.data{i,1}(3,:));
+%end
+%
+%test_P=cell(ntest,1);
+%test_R=cell(ntest,1);
+%test_S=cell(ntest,1);
+%for i=1:ntest
+%    %trim off the strange spaces during python to matlab conversion
+%    test_P{i}=strtrim(test.data{i,1}(1,:));
+%    test_R{i}=strtrim(test.data{i,1}(2,:));
+%    test_S{i}=strtrim(test.data{i,1}(3,:));
+%end
+%
+%%index and get word2vec embeddings for val and test PRS
+%val_R_unique_label=unique(val_R);
+%val_R_embedding=cell(length(val_R_unique_label),1);
+%[~ , val_R_id]=ismember(val_R,val_R_unique_label);
+%for i=1:length(val_R_unique_label)
+%    %disp(num2str(i));
+%    val_R_embedding{i}=embed_str(val_R_unique_label{i},w2v.tokens,w2v.fv);
+%end
+%val_R_embedding=cell2mat(val_R_embedding);
+%
+%val_P_unique_label=unique(val_P);
+%val_P_embedding=cell(length(val_P_unique_label),1);
+%[~ , val_P_id]=ismember(val_P,val_P_unique_label);
+%for i=1:length(val_P_unique_label)
+%    %disp(num2str(i));
+%    val_P_embedding{i}=embed_str(val_P_unique_label{i},w2v.tokens,w2v.fv);
+%end
+%val_P_embedding=cell2mat(val_P_embedding);
+%
+%val_S_unique_label=unique(val_S);
+%val_S_embedding=cell(length(val_S_unique_label),1);
+%[~ , val_S_id]=ismember(val_S,val_S_unique_label);
+%for i=1:length(val_S_unique_label)
+%    %disp(num2str(i));
+%    val_S_embedding{i}=embed_str(val_S_unique_label{i},w2v.tokens,w2v.fv);
+%end
+%val_S_embedding=cell2mat(val_S_embedding);
+%
+%%save('embedding_val.mat','val_R_embedding','val_P_embedding','val_S_embedding','val_R_id','val_P_id','val_S_id');
+%
+%test_R_unique_label=unique(test_R);
+%test_R_embedding=cell(length(test_R_unique_label),1);
+%[~ , test_R_id]=ismember(test_R,test_R_unique_label);
+%for i=1:length(test_R_unique_label)
+%    %disp(num2str(i));
+%    test_R_embedding{i}=embed_str(test_R_unique_label{i},w2v.tokens,w2v.fv);
+%end
+%test_R_embedding=cell2mat(test_R_embedding);
+%
+%test_P_unique_label=unique(test_P);
+%test_P_embedding=cell(length(test_P_unique_label),1);
+%[~ , test_P_id]=ismember(test_P,test_P_unique_label);
+%for i=1:length(test_P_unique_label)
+%    %disp(num2str(i));
+%    test_P_embedding{i}=embed_str(test_P_unique_label{i},w2v.tokens,w2v.fv);
+%end
+%test_P_embedding=cell2mat(test_P_embedding);
+%
+%test_S_unique_label=unique(test_S);
+%test_S_embedding=cell(length(test_S_unique_label),1);
+%[~ , test_S_id]=ismember(test_S,test_S_unique_label);
+%for i=1:length(test_S_unique_label)
+%    %disp(num2str(i));
+%    test_S_embedding{i}=embed_str(test_S_unique_label{i},w2v.tokens,w2v.fv);
+%end
+%test_S_embedding=cell2mat(test_S_embedding);
 
-%save('kron_models_new.mat','R_model_test_embed','R_model_crossval_embed', 'R_acc_crossval_embed', 'R_random_crossval_embed','P_model_test_embed', 'P_model_crossval_embed', 'P_acc_crossval_embed', 'P_random_crossval_embed','S_model_test_embed', 'S_model_crossval_embed', 'S_acc_crossval_embed', 'S_random_crossval_embed','R_A','P_A','S_A');
-
-%model1: directly classify. Not used here.
-%nfolds=5;
-%c=0.1;
-%[R_model_test R_model_crossval R_acc_crossval R_random_crossval]=perclass(R_label_01,R_feat,c,nfolds)
-%[P_model_test P_model_crossval P_acc_crossval P_random_crossval]=perclass(P_label_01,R_feat,c,nfolds)
-%[S_model_test S_model_crossval S_acc_crossval S_random_crossval]=perclass(S_label_01,R_feat,c,nfolds)
-
-%load val and test data
-
-val=load('val.mat');
-test=load('test.mat');
-nval=size(val.data,1);
-ntest=size(test.data,1);
-
-val_P=cell(nval,1);
-val_R=cell(nval,1);
-val_S=cell(nval,1);
-for i=1:nval
-    %trim off the strange spaces during python to matlab conversion
-    val_P{i}=strtrim(val.data{i,1}(1,:));
-    val_R{i}=strtrim(val.data{i,1}(2,:));
-    val_S{i}=strtrim(val.data{i,1}(3,:));
-end
-
-test_P=cell(ntest,1);
-test_R=cell(ntest,1);
-test_S=cell(ntest,1);
-for i=1:ntest
-    %trim off the strange spaces during python to matlab conversion
-    test_P{i}=strtrim(test.data{i,1}(1,:));
-    test_R{i}=strtrim(test.data{i,1}(2,:));
-    test_S{i}=strtrim(test.data{i,1}(3,:));
-end
-
-%index and get word2vec embeddings for val and test PRS
-val_R_unique_label=unique(val_R);
-val_R_embedding=cell(length(val_R_unique_label),1);
-[~ , val_R_id]=ismember(val_R,val_R_unique_label);
-for i=1:length(val_R_unique_label)
-    %disp(num2str(i));
-    val_R_embedding{i}=embed_str(val_R_unique_label{i},w2v.tokens,w2v.fv);
-end
-val_R_embedding=cell2mat(val_R_embedding);
-
-val_P_unique_label=unique(val_P);
-val_P_embedding=cell(length(val_P_unique_label),1);
-[~ , val_P_id]=ismember(val_P,val_P_unique_label);
-for i=1:length(val_P_unique_label)
-    %disp(num2str(i));
-    val_P_embedding{i}=embed_str(val_P_unique_label{i},w2v.tokens,w2v.fv);
-end
-val_P_embedding=cell2mat(val_P_embedding);
-
-val_S_unique_label=unique(val_S);
-val_S_embedding=cell(length(val_S_unique_label),1);
-[~ , val_S_id]=ismember(val_S,val_S_unique_label);
-for i=1:length(val_S_unique_label)
-    %disp(num2str(i));
-    val_S_embedding{i}=embed_str(val_S_unique_label{i},w2v.tokens,w2v.fv);
-end
-val_S_embedding=cell2mat(val_S_embedding);
-
-%save('embedding_val.mat','val_R_embedding','val_P_embedding','val_S_embedding','val_R_id','val_P_id','val_S_id');
-
-test_R_unique_label=unique(test_R);
-test_R_embedding=cell(length(test_R_unique_label),1);
-[~ , test_R_id]=ismember(test_R,test_R_unique_label);
-for i=1:length(test_R_unique_label)
-    %disp(num2str(i));
-    test_R_embedding{i}=embed_str(test_R_unique_label{i},w2v.tokens,w2v.fv);
-end
-test_R_embedding=cell2mat(test_R_embedding);
-
-test_P_unique_label=unique(test_P);
-test_P_embedding=cell(length(test_P_unique_label),1);
-[~ , test_P_id]=ismember(test_P,test_P_unique_label);
-for i=1:length(test_P_unique_label)
-    %disp(num2str(i));
-    test_P_embedding{i}=embed_str(test_P_unique_label{i},w2v.tokens,w2v.fv);
-end
-test_P_embedding=cell2mat(test_P_embedding);
-
-test_S_unique_label=unique(test_S);
-test_S_embedding=cell(length(test_S_unique_label),1);
-[~ , test_S_id]=ismember(test_S,test_S_unique_label);
-for i=1:length(test_S_unique_label)
-    %disp(num2str(i));
-    test_S_embedding{i}=embed_str(test_S_unique_label{i},w2v.tokens,w2v.fv);
-end
-test_S_embedding=cell2mat(test_S_embedding);
-
-save('trainValLoad.mat');
-return
+%save('trainValLoad.mat');
+%return
+load workspacedump_w_models_coco.mat;
+load('trainValLoad.mat')
 %save('embedding_test.mat','test_R_embedding','test_P_embedding','test_S_embedding','test_R_id','test_P_id','test_S_id');
 
 %convert human scores to labels
