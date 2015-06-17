@@ -51,7 +51,7 @@ Rembed = embedLabels(Rdict, w2vModel);
 %%%%%%%%%%%%%%%%%%%% Original code %%%%%%%%%%%%%%%%%%
 %TODO: don't preload when you want to train your own model.
 if 1
-    %load workspacedump_w_models_coco.mat;
+    load(fullfile('/home/satwik/VisualWord2Vec/models/', 'workspacedump_w_models_coco.mat'));
 else
     % Cross validations
     noFolds = 5;
@@ -213,12 +213,12 @@ noFolds = 5;
 
 % Cross validation
 [hybridModelTest, hybridModelCrossval, hybridAccCrossval, hybridRandomCrossval] = ...
-            perclass(valLabels * 2 - 1, valHybridFeatures, c, noFolds);            
+            perclass(valLabel * 2 - 1, valHybridFeatures, c, noFolds);            
 hybridPerfCrossval = mean(hybridAccCrossval);
 
 % Testing
-[~, ~, hydridScoreTest] = predict(testLabel * 2 - 1, sparse(testHybridFeatures), hybridModelTest{1});
-[hybridPerfTest, baselineTest] = precision(hybridScoreTest, testLabels * 2 - 1);
+[~, ~, hybridScoreTest] = predict(testLabel * 2 - 1, sparse(testHybridFeatures), hybridModelTest{1});
+[hybridPerfTest, baselineTest] = precision(hybridScoreTest, testLabel * 2 - 1);
 corr(hybridScoreTest, testScore, 'type', 'Spearman');
 corr(hybridScoreTest, testScore, 'type', 'Kendall');
 
@@ -229,25 +229,28 @@ corr(hybridScoreTest, testScore, 'type', 'Kendall');
 %%%%%%%%%%%%%%%%%%% Bing baseline %%%%%%%%%%%%%%%%%%%%%%%
 bingVal = load('/home/satwik/VisualWord2Vec/models/bing_val.mat');
 bingVal = double(bingVal.data);
-bingTest = load('/home/satwik/VisualWord2Vec/models/bing_val.mat');
+bingTest = load('/home/satwik/VisualWord2Vec/models/bing_test.mat');
 bingTest = double(bingTest.data);
 
 % Fine tune c until optimum is obtained
 c = 0.0001;
+noFolds = 5;
+
 % Cross validation
-[bing_model_test bing_model_crossval bing_acc_crossval bing_random_crossval]=perclass(val_label*2-1,log(bing_val+1),c,nfolds)
-bing_perf_crossval=mean(bing_acc_crossval)
+[bing_model_test bing_model_crossval bing_acc_crossval bing_random_crossval] = ...
+                            perclass(valLabel * 2 - 1,log(bingVal+1), c, noFolds);
+bing_perf_crossval = mean(bing_acc_crossval);
 
 %test
-[~,~,bing_score_test]=predict(test_label*2-1,sparse(log(bing_test+1)),bing_model_test{1});
-[bing_perf_test,baseline_test]=precision(bing_score_test,test_label*2-1)
-corr(bing_score_test, test_score, 'type', 'Spearman')
-corr(bing_score_test, test_score, 'type', 'Kendall')
+[~, ~, bing_score_test] = predict(testLabel * 2 - 1, sparse(log(bingTest+1)), bing_model_test{1});
+[bing_perf_test,baseline_test] = precision(bing_score_test, testLabel * 2 - 1);
+corr(bing_score_test, test_score, 'type', 'Spearman');
+corr(bing_score_test, test_score, 'type', 'Kendall');
 
 %Get val score of bing, potentially for hybrid models
-[~, ~, bing_score_val]=predict(val_label*2-1,sparse(log(bing_val+1)),bing_model_test{1});
+[~, ~, bing_score_val] = predict(valLabel * 2 - 1, sparse(log(bingVal+1)), bing_model_test{1});
 
 % Debugging the visual + textual features
-%debugVisualTextFeatures;
+%debugBingFeatures;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 toc

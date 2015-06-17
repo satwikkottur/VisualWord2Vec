@@ -23,7 +23,6 @@ for i=1:size(label,2)
 	model_test{i}=train(label(:,i),sparse(data(:,:)),['-c ' num2str(c)]);
 end
 
-
-tmp=[mean(acc_crossval');mean(random_crossval')]
-tmp2=tmp(:,~isnan(tmp(1,:)))
-mean(tmp2')
+%tmp=[mean(acc_crossval');mean(random_crossval')]
+%tmp2=tmp(:,~isnan(tmp(1,:)))
+%mean(tmp2')

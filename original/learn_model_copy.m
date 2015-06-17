@@ -319,8 +319,6 @@ hybrid_perf_crossval=mean(hybrid_acc_crossval)
 corr(hybrid_score_test, test_score, 'type', 'Spearman')
 corr(hybrid_score_test, test_score, 'type', 'Kendall')
 
-
-
 %piece of script that deal with bing
 load bing_val;
 bing_val=double(data);
