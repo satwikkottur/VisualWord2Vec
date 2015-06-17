@@ -125,14 +125,14 @@ Pscore = Rfeatures * P_A;
 Sscore = Rfeatures * S_A;
 
 % Compute x'Ay for each x, y in test
-testRscore = Rscore * testRembed;
-testSscore = Sscore * testSembed;
-testPscore = Pscore * testPembed;
+testRscore = Rscore * testRembed';
+testSscore = Sscore * testSembed';
+testPscore = Pscore * testPembed';
 
 % Compute x'Ay for each x, y in val
-valRscore = Rscore * valRembed;
-valPscore = Pscore * valPembed;
-valSscore = Sscore * valSembed;
+valRscore = Rscore * valRembed';
+valPscore = Pscore * valPembed';
+valSscore = Sscore * valSembed';
 
 % Manually change threshold until precVal is maximized.
 % Visual threshold usually around 0-1
@@ -140,7 +140,7 @@ threshold = 0.6; % Empirically determined
 
 visualValScore = zeros(noVal, 1);
 for i = 1:noVal
-    visualValScore = mean(max(...
+    visualValScore(i) = mean(max(...
                             valRscore(:, valRlabels(i)) + ...
                             valPscore(:, valPlabels(i)) + ...
                             valSscore(:, valSlabels(i)) - ...
@@ -151,13 +151,16 @@ end
 % Now check the performance on test dataset with this threshold
 visualTestScore = zeros(noTest, 1);
 for i = 1:noTest
-    visualTestScore = mean(max(...
+    visualTestScore(i) = mean(max(...
                             testRscore(:, testRlabels(i)) + ...
                             testPscore(:, testPlabels(i)) + ...
                             testSscore(:, testSlabels(i)) - ...
                             threshold, 0), 1);
 end
 [precTest, baseTest] = precision(visualTestScore, testLabel);
+
+% Debugging the visual features
+% debugVisualFeatures;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%% Only Text features %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -177,24 +180,27 @@ threshold = -1.2;
 
 textValScore = zeros(noVal, 1);
 for i = 1:noVal
-    textValScore = mean(max(...
+    textValScore(i) = mean(max(...
                             valRscoreText(:, valRlabels(i)) + ...
                             valPscoreText(:, valPlabels(i)) + ...
                             valSscoreText(:, valSlabels(i)) - ...
                             threshold, 0), 1);
 end
-[precVal, baseVal] = precision(testValScore, valLabel);
+[precVal, baseVal] = precision(textValScore, valLabel);
 
 % Use the same threshold for test set
 textTestScore = zeros(noTest, 1);
 for i = 1:noTest
-    textTestScore = mean(max(...
+    textTestScore(i) = mean(max(...
                             testRscoreText(:, testRlabels(i)) + ...
                             testPscoreText(:, testPlabels(i)) + ...
                             testSscoreText(:, testSlabels(i)) - ...
                             threshold, 0), 1);
 end
 [precTest, baseTest] = precision(textTestScore, testLabel);
+
+% Debugging the textual features
+%debugTextualFeatures;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%% Visual + Text features %%%%%%%%%%%%%%%%%%%%
@@ -215,6 +221,9 @@ hybridPerfCrossval = mean(hybridAccCrossval);
 [hybridPerfTest, baselineTest] = precision(hybridScoreTest, testLabels * 2 - 1);
 corr(hybridScoreTest, testScore, 'type', 'Spearman');
 corr(hybridScoreTest, testScore, 'type', 'Kendall');
+
+% Debugging the visual + textual features
+%debugVisualTextFeatures;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%% Bing baseline %%%%%%%%%%%%%%%%%%%%%%%
@@ -236,6 +245,9 @@ corr(bing_score_test, test_score, 'type', 'Spearman')
 corr(bing_score_test, test_score, 'type', 'Kendall')
 
 %Get val score of bing, potentially for hybrid models
-[~,~,bing_score_val]=predict(val_label*2-1,sparse(log(bing_val+1)),bing_model_test{1});
+[~, ~, bing_score_val]=predict(val_label*2-1,sparse(log(bing_val+1)),bing_model_test{1});
+
+% Debugging the visual + textual features
+%debugVisualTextFeatures;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 toc

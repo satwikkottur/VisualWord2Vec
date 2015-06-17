@@ -37,7 +37,7 @@ w2v_model='coco_w2v.mat';
 % Loading the MAT file
 %load('originalCode.mat');
 %
-%addpath(genpath('./'));
+addpath(genpath('./'));
 %%R labels
 %nim=length(features);
 %R_unique_label=unique(R_label);
