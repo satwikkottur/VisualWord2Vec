@@ -218,9 +218,24 @@ corr(hybridScoreTest, testScore, 'type', 'Kendall');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%% Bing baseline %%%%%%%%%%%%%%%%%%%%%%%
+bingVal = load('/home/satwik/VisualWord2Vec/models/bing_val.mat');
+bingVal = double(bingVal.data);
+bingTest = load('/home/satwik/VisualWord2Vec/models/bing_val.mat');
+bingTest = double(bingTest.data);
 
+% Fine tune c until optimum is obtained
+c = 0.0001;
+% Cross validation
+[bing_model_test bing_model_crossval bing_acc_crossval bing_random_crossval]=perclass(val_label*2-1,log(bing_val+1),c,nfolds)
+bing_perf_crossval=mean(bing_acc_crossval)
 
+%test
+[~,~,bing_score_test]=predict(test_label*2-1,sparse(log(bing_test+1)),bing_model_test{1});
+[bing_perf_test,baseline_test]=precision(bing_score_test,test_label*2-1)
+corr(bing_score_test, test_score, 'type', 'Spearman')
+corr(bing_score_test, test_score, 'type', 'Kendall')
 
-
+%Get val score of bing, potentially for hybrid models
+[~,~,bing_score_val]=predict(val_label*2-1,sparse(log(bing_val+1)),bing_model_test{1});
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 toc
