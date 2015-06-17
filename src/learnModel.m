@@ -183,7 +183,7 @@ for i = 1:noVal
                             valSscoreText(:, valSlabels(i)) - ...
                             threshold, 0), 1);
 end
-[precVal, baseVal] = precision(valScoreText, valLabel);
+[precVal, baseVal] = precision(testValScore, valLabel);
 
 % Use the same threshold for test set
 textTestScore = zeros(noTest, 1);
@@ -194,10 +194,30 @@ for i = 1:noTest
                             testSscoreText(:, testSlabels(i)) - ...
                             threshold, 0), 1);
 end
-[precTest, baseTest] = precision(testScoreText, testLabel);
+[precTest, baseTest] = precision(textTestScore, testLabel);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%% Visual + Text features %%%%%%%%%%%%%%%%%%%%
+valHybridFeatures = [textValScore, visualValScore];
+testHybridFeatures = [textTestScore, visualTestScore];
+
+% Fine tune c until optimal is obtained
+c = 10000;
+noFolds = 5;
+
+% Cross validation
+[hybridModelTest, hybridModelCrossval, hybridAccCrossval, hybridRandomCrossval] = ...
+            perclass(valLabels * 2 - 1, valHybridFeatures, c, noFolds);            
+hybridPerfCrossval = mean(hybridAccCrossval);
+
+% Testing
+[~, ~, hydridScoreTest] = predict(testLabel * 2 - 1, sparse(testHybridFeatures), hybridModelTest{1});
+[hybridPerfTest, baselineTest] = precision(hybridScoreTest, testLabels * 2 - 1);
+corr(hybridScoreTest, testScore, 'type', 'Spearman');
+corr(hybridScoreTest, testScore, 'type', 'Kendall');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%% Bing baseline %%%%%%%%%%%%%%%%%%%%%%%
 
 
 
