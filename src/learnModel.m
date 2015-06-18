@@ -6,6 +6,13 @@
 % 2. One hot encoding based on the unique labels for all P,R,S/
 % 3. Computing the word embedding using a trained model
 % 4. Training the models for P,S,R words
+% 5. Evaluation for validation and testing sets. Fixing thresholds using validation set
+% 6. Considering all the cases:
+%       a. Visual features
+%       b. Textual features
+%       c. Textual + Visual features
+%       d. Bing baselines
+%
 
 % Reading the features from the files
 % First clause is read from : /home/satwik/VisualWord2Vec/data/rawdata
