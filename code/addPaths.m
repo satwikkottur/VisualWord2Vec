@@ -1,4 +1,5 @@
 % Adding the paths
+addpath('src/');
 addpath('io/');
 addpath('utils/');
 addpath('debug/');
