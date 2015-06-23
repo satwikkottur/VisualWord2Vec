@@ -23,6 +23,10 @@ for i=1:length(words3)
 	[a(i) b(i)]=ismember(words3{i},dict);
 end
 
+%if(~strcmp(word, words3{1}))
+%    fprintf('%s %s\n', word, words3{1});
+%end
+
 if sum(a)>0
 	vec=sum(vec_table(b(a>0),:),1);
 else
