@@ -9,6 +9,7 @@
 # Authors : Hao Fang <hfang@uw.edu> and Tsung-Yi Lin <tl483@cornell.edu>
 
 import os
+import json
 import sys
 import subprocess
 import tempfile
@@ -24,6 +25,7 @@ PUNCTUATIONS = ["''", "'", "``", "`", "-LRB-", "-RRB-", "-LCB-", "-RCB-", \
 class PTBTokenizer:
     """Python wrapper of Stanford PTBTokenizer"""
 
+    #def tokenize(self, captionsPath):
     def tokenize(self, captions_for_image):
         cmd = ['java', '-cp', STANFORD_CORENLP_3_4_1_JAR, \
                 'edu.stanford.nlp.process.PTBTokenizer', \
@@ -32,10 +34,10 @@ class PTBTokenizer:
         # ======================================================
         # prepare data for PTB Tokenizer
         # ======================================================
+
         final_tokenized_captions_for_image = {}
         image_id = [k for k, v in captions_for_image.items() for _ in range(len(v))]
-        sentences = '\n'.join([c['caption'].replace('\n', ' ') for k, v in captions_for_image.items() for c in v])
-
+        sentences = '\n'.join([c.replace('\n', ' ') for k, v in captions_for_image.items() for c in v])
         # ======================================================
         # save sentences to temporary file
         # ======================================================
