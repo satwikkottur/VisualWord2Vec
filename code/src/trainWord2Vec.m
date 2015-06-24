@@ -3,8 +3,10 @@
 % to basically you start with a corpus let's say word2vec_doc.txt, then you run word2vec (output as a text file)
 % compute word2vec
 rootPath = '/home/satwik/VisualWord2Vec';
-fileName = 'coco_train_minus_cs_test.txt';
-modelName = 'word2vecCOCO.bin';
+%fileName = 'coco_train_minus_cs_test.txt';
+fileName = 'coco_train_minus_cs_test_tokenized.txt';
+modelName = strrep(fileName, '.txt', '.bin');
+%modelName = 'word2vecCOCO.bin';
 
 srcPath = fullfile(rootPath, 'libs/word2vec', 'word2vec');
 filePath = fullfile(rootPath, 'data', fileName);
