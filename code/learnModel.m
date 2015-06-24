@@ -22,10 +22,13 @@ tic
 % Setting up the path
 %clearvars
 addPaths;
+rootPath = '/home/satwik/VisualWord2Vec/';
 dataPath = '/home/satwik/VisualWord2Vec/data';
 psrFeaturePath = fullfile(dataPath, 'PSR_features.txt');
 numFeaturePath = fullfile(dataPath, 'Num_features.txt');
-word2vecModel = '/home/satwik/VisualWord2Vec/models/coco_w2v.mat'; % Model for word2vec embedding
+% Model for word2vec embedding
+word2vecModel = fullfile(rootPath, 'models', 'coco_w2v_tokenized.mat'); 
+%word2vecModel = fullfile(rootPath, 'models', 'coco_w2v.mat'; 
 
 % Reading the labels
 [Plabel, Slabel, Rlabel, Rfeatures] = readFromFile(psrFeaturePath, numFeaturePath);
@@ -58,7 +61,7 @@ Rembed = embedLabels(Rdict, w2vModel);
 %%%%%%%%%%%%%%%%%%%% Original code %%%%%%%%%%%%%%%%%%
 %TODO: don't preload when you want to train your own model.
 if 1
-    load(fullfile('/home/satwik/VisualWord2Vec/models/', 'workspacedump_w_models_coco.mat'));
+    load(fullfile(rootPath, 'models', 'workspacedump_w_models_coco.mat'));
 else
     % Cross validations
     noFolds = 5;
@@ -161,6 +164,7 @@ visualTestScore = mean(max(...
                         testSscore(:, testSlabels) - ...
                         threshold, 0), 1)';
 [precTest, baseTest] = precision(visualTestScore, testLabel);
+fprintf('Test (visual) : %f\n', mean(precTest(:)));
 
 % Debugging the visual features
 % debugVisualFeatures;
@@ -197,6 +201,7 @@ textTestScore = mean(max(...
                     testSscoreText(:, testSlabels) - ...
                     threshold, 0), 1)';
 [precTest, baseTest] = precision(textTestScore, testLabel);
+fprintf('Test (textual) : %f\n', mean(precTest(:)));
 
 % Debugging the textual features
 %debugTextualFeatures;
@@ -218,6 +223,7 @@ hybridPerfCrossval = mean(hybridAccCrossval);
 % Testing
 [~, ~, hybridScoreTest] = predict(testLabel * 2 - 1, sparse(testHybridFeatures), hybridModelTest{1});
 [hybridPerfTest, baselineTest] = precision(hybridScoreTest, testLabel * 2 - 1);
+fprintf('Test (visual+textual) : %f\n', mean(hybridPerfTest(:)));
 corr(hybridScoreTest, testScore, 'type', 'Spearman');
 corr(hybridScoreTest, testScore, 'type', 'Kendall');
 
