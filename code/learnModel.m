@@ -27,8 +27,8 @@ dataPath = '/home/satwik/VisualWord2Vec/data';
 psrFeaturePath = fullfile(dataPath, 'PSR_features.txt');
 numFeaturePath = fullfile(dataPath, 'Num_features.txt');
 % Model for word2vec embedding
-%word2vecModel = fullfile(rootPath, 'models', 'coco_w2v_tokenized.mat'); 
-word2vecModel = fullfile(rootPath, 'models', 'coco_w2v.mat'); 
+word2vecModel = fullfile(rootPath, 'models', 'coco_w2v_tokenized.mat'); 
+%word2vecModel = fullfile(rootPath, 'models', 'coco_w2v.mat'); 
 
 % Reading the labels
 [Plabel, Slabel, Rlabel, Rfeatures] = readFromFile(psrFeaturePath, numFeaturePath);
@@ -60,12 +60,13 @@ Rembed = embedLabels(Rdict, w2vModel);
 
 %%%%%%%%%%%%%%%%%%%% Original code %%%%%%%%%%%%%%%%%%
 %TODO: don't preload when you want to train your own model.
-if 1
-    load(fullfile(rootPath, 'models', 'workspacedump_w_models_coco.mat'));
+if 0
+    %load(fullfile(rootPath, 'models', 'workspacedump_w_models_coco.mat'));
+    load(fullfile(rootPath, 'models', 'models_coco_tokenized.mat'));
 else
     % Cross validations
     noFolds = 5;
-    cRange = [0.0001, 0.001, 0.01, 0.1];
+    cRange = [0.0001, 0.0005, 0.001, 0.005, 0.01, 005, 0.1, 0.5, 1.0, 5.0, 10.0];
     noNegatives = 12780;
     rndSeed = 100;
 
@@ -83,7 +84,11 @@ else
     R_A = reshape(R_model_test_embed{3}.w, [ndims,200]);
     P_A = reshape(P_model_test_embed{3}.w, [ndims,200]);
     S_A = reshape(S_model_test_embed{3}.w, [ndims,200]);
+    % Dumping  variables
+    fprintf('Dumping model variables\n');
+    save(fullfile(rootPath, 'models', 'model_variables_coco_tokenized.mat'));
 end
+return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Load validation and test data
@@ -148,14 +153,20 @@ valSscore = Sscore * valSembed';
 % Visual threshold usually around 0-1
 threshold = 0.6; % Empirically determined
 
-% Faster implementation
-visualValScore = mean(max(...
-                    valRscore(:, valRlabels) + ...
-                    valPscore(:, valPlabels) + ...
-                    valSscore(:, valSlabels) - ...
-                    threshold, 0), 1)';
-[precVal, baseVal] = precision(visualValScore, valLabel);
- 
+%precValues = [];
+%for threshold = 0:0.05:1.5
+%    % Faster implementation
+%    visualValScore = mean(max(...
+%                        valRscore(:, valRlabels) + ...
+%                        valPscore(:, valPlabels) + ...
+%                        valSscore(:, valSlabels) - ...
+%                        threshold, 0), 1)';
+%    [precVal, baseVal] = precision(visualValScore, valLabel);
+%
+%    fprintf('Val(visual) %f : %f\n', threshold, mean(precVal(:)))
+%    precValues = [precValues, mean(precVal(:))];
+%end
+
 % Now check the performance on test dataset with this threshold
 % Faster implementation
 visualTestScore = mean(max(...
@@ -165,6 +176,7 @@ visualTestScore = mean(max(...
                         threshold, 0), 1)';
 [precTest, baseTest] = precision(visualTestScore, testLabel);
 fprintf('Test (visual) : %f\n', mean(precTest(:)));
+return
 
 % Debugging the visual features
 % debugVisualFeatures;
@@ -183,7 +195,8 @@ testSscoreText = - pdist2(Sembed(Sinds, :), testSembed, 'cosine');
 
 % Manually adjust the threshold until precVal is maximized
 % Threshold around -2 ~ 1
-threshold = -1.2;
+%threshold = -1.2;
+threshold = -1.4;
 
 % Faster implementation
 textValScore = mean(max(...
@@ -212,7 +225,8 @@ valHybridFeatures = [textValScore, visualValScore];
 testHybridFeatures = [textTestScore, visualTestScore];
 
 % Fine tune c until optimal is obtained
-c = 10000;
+%c = 10000;
+c = 1000;
 noFolds = 5;
 verbose = false;
 
