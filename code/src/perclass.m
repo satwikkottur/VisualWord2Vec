@@ -1,5 +1,5 @@
 
-function [model_test model_crossval acc_crossval random_crossval]=perclass(label,data,c,nfolds)
+function [model_test model_crossval acc_crossval random_crossval]=perclass(label,data,c,nfolds, verbose)
 %per-class SVM
 nim=size(label,1);
 acc_crossval=zeros(size(label,2),nfolds);
@@ -11,7 +11,11 @@ for i=1:size(label,2)
 		fold_ind=foldid:nfolds:nim;
 		fold_ind_inv=setdiff(1:nim,fold_ind);
 		
-		model_crossval{i,foldid}=train(label(fold_ind_inv,i),sparse(data(fold_ind_inv,:)),['-c ' num2str(c)]);
+        if(verbose)
+            model_crossval{i,foldid}=train(label(fold_ind_inv,i),sparse(data(fold_ind_inv,:)),['-c ' num2str(c)]);
+        else
+            model_crossval{i,foldid}=train(label(fold_ind_inv,i),sparse(data(fold_ind_inv,:)),['-c ' num2str(c) ' -q']);
+        end
 		if length(model_crossval{i,foldid}.Label)==2
 			[~,~,scores_cval]=predict(label(fold_ind,i),sparse(data(fold_ind,:)),model_crossval{i,foldid});
 			[acc_crossval(i,foldid),random_crossval(i,foldid)]=precision(scores_cval,label(fold_ind,i));
@@ -20,7 +24,11 @@ for i=1:size(label,2)
 			random_crossval(i,foldid)=0;
 		end
 	end
-	model_test{i}=train(label(:,i),sparse(data(:,:)),['-c ' num2str(c)]);
+    if(verbose)
+        model_test{i}=train(label(:,i),sparse(data(:,:)),['-c ' num2str(c)]);
+    else
+        model_test{i}=train(label(:,i),sparse(data(:,:)),['-c ' num2str(c) ' -q']);
+    end
 end
 
 %tmp=[mean(acc_crossval');mean(random_crossval')]

@@ -27,8 +27,8 @@ dataPath = '/home/satwik/VisualWord2Vec/data';
 psrFeaturePath = fullfile(dataPath, 'PSR_features.txt');
 numFeaturePath = fullfile(dataPath, 'Num_features.txt');
 % Model for word2vec embedding
-word2vecModel = fullfile(rootPath, 'models', 'coco_w2v_tokenized.mat'); 
-%word2vecModel = fullfile(rootPath, 'models', 'coco_w2v.mat'; 
+%word2vecModel = fullfile(rootPath, 'models', 'coco_w2v_tokenized.mat'); 
+word2vecModel = fullfile(rootPath, 'models', 'coco_w2v.mat'); 
 
 % Reading the labels
 [Plabel, Slabel, Rlabel, Rfeatures] = readFromFile(psrFeaturePath, numFeaturePath);
@@ -214,10 +214,11 @@ testHybridFeatures = [textTestScore, visualTestScore];
 % Fine tune c until optimal is obtained
 c = 10000;
 noFolds = 5;
+verbose = false;
 
 % Cross validation
 [hybridModelTest, hybridModelCrossval, hybridAccCrossval, hybridRandomCrossval] = ...
-            perclass(valLabel * 2 - 1, valHybridFeatures, c, noFolds);            
+            perclass(valLabel * 2 - 1, valHybridFeatures, c, noFolds, verbose);            
 hybridPerfCrossval = mean(hybridAccCrossval);
 
 % Testing
@@ -243,7 +244,7 @@ noFolds = 5;
 
 % Cross validation
 [bing_model_test bing_model_crossval bing_acc_crossval bing_random_crossval] = ...
-                            perclass(valLabel * 2 - 1,log(bingVal+1), c, noFolds);
+                            perclass(valLabel * 2 - 1,log(bingVal+1), c, noFolds, verbose);
 bing_perf_crossval = mean(bing_acc_crossval);
 
 %test
