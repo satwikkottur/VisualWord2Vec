@@ -10,7 +10,7 @@ import ptbtokenizer as pt
 rootPath = '/home/satwik/VisualWord2Vec';
 fileName = 'coco_train_minus_cs_test.json';
 inputPath = os.path.join(rootPath, 'data', fileName);
-dumpPath = os.path.join(rootPath, 'data', fileName.replace('.json', '_tokenized.json'));
+dumpPath = os.path.join(rootPath, 'data', fileName.replace('.json', '_tokenized_stops.json'));
 
 # Tokenizing using the PTBTokenizer (check : libs/ptbtokenizer/)
 tokenizer = pt.PTBTokenizer();
@@ -21,4 +21,4 @@ tokens = tokenizer.tokenize(jsonFile);
 dumpFile = open(dumpPath, 'w');
 json.dump(tokens, dumpFile);
 
-close(dumpFile);
+dumpFile.close();
