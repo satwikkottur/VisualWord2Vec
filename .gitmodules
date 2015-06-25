@@ -1,0 +1,3 @@
+[submodule "wordvec_image"]
+	path = wordvec_image
+	url = https://github.com/Jiasen/wordvec_image
