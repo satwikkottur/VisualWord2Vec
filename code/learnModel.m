@@ -87,8 +87,17 @@ Rembed = embedLabels(Rdict, w2vModel);
 %%%%%%%%%%%%%%%%%%%% Original code %%%%%%%%%%%%%%%%%%
 %TODO: don't preload when you want to train your own model.
 if ~trainModel
+    switch embeddingType
+        case 1
+            load(fullfile(rootPath, 'models', 'w_model_coco.mat'));
+
+        case 2
+            load(fullfile(rootPath, 'models', 'w_model_coco_tokenized.mat'));
+
+        case 3
+            load(fullfile(rootPath, 'models', 'w_model_coco_tokenized_stops.mat'));
+    end
     %load(fullfile(rootPath, 'models', 'workspacedump_w_models_coco.mat'));
-    load(fullfile(rootPath, 'models', 'models_coco_tokenized.mat'));
 else
     % Cross validations
     noFolds = 5;
@@ -196,23 +205,23 @@ switch embeddingType
     case 2
         threshold = 0.6; % Empirically determined
     case 3
-        threshold = 0.6; % Empirically determined
+        threshold = 0.5; % Empirically determined
 end
 
-precValues = [];
-for threshold = 0:0.05:1.5
-    % Faster implementation
+%precValues = [];
+%for threshold = 0:0.05:1.5
+%    % Faster implementation
     visualValScore = mean(max(...
                         valRscore(:, valRlabels) + ...
                         valPscore(:, valPlabels) + ...
                         valSscore(:, valSlabels) - ...
                         threshold, 0), 1)';
     [precVal, baseVal] = precision(visualValScore, valLabel);
-
-    fprintf('Val(visual) %f : %f\n', threshold, mean(precVal(:)))
-    pecValues = [precValues, mean(precVal(:))];
-end
-precValues
+%
+%    fprintf('Val(visual) %f : %f\n', threshold, mean(precVal(:)))
+%    pecValues = [precValues, mean(precVal(:))];
+%end
+%precValues
 
 % Now check the performance on test dataset with this threshold
 % Faster implementation
@@ -247,12 +256,12 @@ switch embeddingType
     case 2
         threshold = -1.4; % Empirically determined
     case 3
-        threshold = 0.6; % Empirically determined
+        threshold = -1.4; % Empirically determined
 end
 
-precValues = [];
-% Faster implementation
-for threshold = -2:0.1:1
+%precValues = [];
+%% Faster implementation
+%for threshold = -2:0.1:1
     textValScore = mean(max(...
                             valRscoreText(:, valRlabels) + ...
                             valPscoreText(:, valPlabels) + ...
@@ -260,10 +269,10 @@ for threshold = -2:0.1:1
                             threshold, 0), 1)';
     [precVal, baseVal] = precision(textValScore, valLabel);
     fprintf('Test (textual) %f : %f\n', threshold, mean(precVal(:)));
-
-    precValues = [precValues, mean(precVal(:))];
-end
-precValues
+%
+%    precValues = [precValues, mean(precVal(:))];
+%end
+%precValues
 
 % Use the same threshold for test set
 % Faster implementation
@@ -288,24 +297,23 @@ switch embeddingType
     case 1
         c = 10000; % Empirically determined
     case 2
-        c = 1000; % Empirically determined
+        c = 1; % Empirically determined
     case 3
-        c = 1000; % Empirically determined
+        c = 1; % Empirically determined
 end
 noFolds = 5;
 
 % Cross validation with C sweeping
-perfCross = [];
-for c = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0]
-    [hybridModelTest, hybridModelCrossval, hybridAccCrossval, hybridRandomCrossval] = ...
-                perclass(valLabel * 2 - 1, valHybridFeatures, c, noFolds, verboseSVM);
-    hybridPerfCrossval = mean(hybridAccCrossval);
-    fprintf('Val (visual+textual) %f : %f\n', c, mean(hybridPerfTest(:)));
-
-    perfCross = [perfCross, hybridPerfCrossval];
-end
-perfCross
-return
+%perfCross = [];
+%for c = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0]
+%    [hybridModelTest, hybridModelCrossval, hybridAccCrossval, hybridRandomCrossval] = ...
+%                perclass(valLabel * 2 - 1, valHybridFeatures, c, noFolds, verboseSVM);
+%    hybridPerfCrossval = mean(hybridAccCrossval);
+%    fprintf('Val (visual+textual) %f : %f\n', c, mean(hybridPerfCrossval(:)));
+%
+%    perfCross = [perfCross, mean(hybridPerfCrossval(:))];
+%end
+%perfCross
 
 % Cross validation
 [hybridModelTest, hybridModelCrossval, hybridAccCrossval, hybridRandomCrossval] = ...
@@ -316,9 +324,10 @@ hybridPerfCrossval = mean(hybridAccCrossval);
 [~, ~, hybridScoreTest] = predict(testLabel * 2 - 1, sparse(testHybridFeatures), hybridModelTest{1});
 [hybridPerfTest, baselineTest] = precision(hybridScoreTest, testLabel * 2 - 1);
 fprintf('Test (visual+textual) : %f\n', mean(hybridPerfTest(:)));
+
 corr(hybridScoreTest, testScore, 'type', 'Spearman');
 corr(hybridScoreTest, testScore, 'type', 'Kendall');
-
+return
 % Debugging the visual + textual features
 %debugVisualTextFeatures;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
