@@ -26,8 +26,10 @@ rootPath = '/home/satwik/VisualWord2Vec/';
 dataPath = '/home/satwik/VisualWord2Vec/data';
 psrFeaturePath = fullfile(dataPath, 'PSR_features.txt');
 numFeaturePath = fullfile(dataPath, 'Num_features.txt');
+
 % Model for word2vec embedding
-word2vecModel = fullfile(rootPath, 'models', 'coco_tokenized_stops_word2vec.mat'); 
+word2vecModel = fullfile(rootPath, 'models', 'coco_w2v_tokenized.mat'); 
+%word2vecModel = fullfile(rootPath, 'models', 'coco_tokenized_stops_word2vec.mat'); 
 %word2vecModel = fullfile(rootPath, 'models', 'coco_w2v.mat'); 
 
 % Reading the labels
@@ -74,19 +76,28 @@ else
     [R_model_test_embed R_model_crossval_embed R_acc_crossval_embed R_random_crossval_embed] = ...
                     embedding(Rencoding, Rembed, Rfeatures, cRange, noFolds, noNegatives, rndSeed);
 
+    save(fullfile(rootPath, 'models', 'model_variables_coco_tokenized_R.mat'), ...
+                                'R_model_test_embed', 'R_acc_crossval_embed');
+
     [P_model_test_embed P_model_crossval_embed P_acc_crossval_embed P_random_crossval_embed] = ...
                     embedding(Pencoding, Pembed, Rfeatures, cRange, noFolds, noNegatives, rndSeed);
+
+    save(fullfile(rootPath, 'models', 'model_variables_coco_tokenized_P.mat'), ...
+                                'P_model_test_embed', 'P_acc_crossval_embed');
 
     [S_model_test_embed S_model_crossval_embed S_acc_crossval_embed S_random_crossval_embed] = ...
                     embedding(Sencoding, Sembed, Rfeatures, cRange, noFolds, noNegatives, rndSeed);
 
+    save(fullfile(rootPath, 'models', 'model_variables_coco_tokenized_S.mat'), ...
+                                'S_model_test_embed', 'S_acc_crossval_embed');
+
     % Find the best C based on *_acc_crossval_embed (Here I'm fixing to 0.01), and turn w into matrix for efficient score computation
-    R_A = reshape(R_model_test_embed{3}.w, [ndims,200]);
-    P_A = reshape(P_model_test_embed{3}.w, [ndims,200]);
-    S_A = reshape(S_model_test_embed{3}.w, [ndims,200]);
+    %R_A = reshape(R_model_test_embed{3}.w, [ndims,200]);
+    %P_A = reshape(P_model_test_embed{3}.w, [ndims,200]);
+    %S_A = reshape(S_model_test_embed{3}.w, [ndims,200]);
     % Dumping  variables
     fprintf('Dumping model variables\n');
-    save(fullfile(rootPath, 'models', 'model_variables_coco_tokenized_stops.mat'));
+    %save(fullfile(rootPath, 'models', 'model_variables_coco_tokenized_stops.mat'));
     fprintf('Models dumped after sweeping c\n');
 end
 return
