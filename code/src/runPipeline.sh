@@ -15,7 +15,8 @@
 #/usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/src/trainWord2Vec.m')" < /dev/null > output_stops_w2v 2> errors_stops_w2v
 
 # Leaning the model learning script
-/usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModel.m')" < /dev/null > output_token 2> errors_token
+nohup /usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModel.m')" < /dev/null > dumps/output_stops 2> dumps/errors_stops &
 
+#/usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModel.m')" < /dev/null > dumps/output_token 2> dumps/errors_token
 
 

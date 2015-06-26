@@ -18,6 +18,25 @@
 % First clause is read from : /home/satwik/VisualWord2Vec/data/rawdata
 % Next clause is read from : /home/satwik/VisualWord2Vec/data/features
 
+%%%%%%% Parameters and flags %%%%%%%%
+% Select the embedding type
+% 1 - plain coco
+% 2 - coco with tokenization, sentences separated by space
+% 3 - coco with tokenization, sentences separated by newline
+embeddingType =  3;
+
+% Select true if you want to train the models, false to preload
+trainModel = false;
+
+% Saving the trained models
+% Given a name if trained model is to be saved, ignore else
+% Models will be save as <name>_P, <name>_R, <name>_S in models/ folder
+saveName = 'random';
+
+% Verbosity for SVM training
+verboseSVM = false;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 tic
 % Setting up the path
 %clearvars
@@ -28,9 +47,14 @@ psrFeaturePath = fullfile(dataPath, 'PSR_features.txt');
 numFeaturePath = fullfile(dataPath, 'Num_features.txt');
 
 % Model for word2vec embedding
-word2vecModel = fullfile(rootPath, 'models', 'coco_w2v_tokenized.mat'); 
-%word2vecModel = fullfile(rootPath, 'models', 'coco_tokenized_stops_word2vec.mat'); 
-%word2vecModel = fullfile(rootPath, 'models', 'coco_w2v.mat'); 
+switch embeddingType
+    case 1
+        word2vecModel = fullfile(rootPath, 'models', 'coco_w2v.mat'); 
+    case 2
+        word2vecModel = fullfile(rootPath, 'models', 'coco_w2v_tokenized.mat'); 
+    case 3
+        word2vecModel = fullfile(rootPath, 'models', 'coco_w2v_tokenized_stops.mat'); 
+end
 
 % Reading the labels
 [Plabel, Slabel, Rlabel, Rfeatures] = readFromFile(psrFeaturePath, numFeaturePath);
@@ -62,13 +86,15 @@ Rembed = embedLabels(Rdict, w2vModel);
 
 %%%%%%%%%%%%%%%%%%%% Original code %%%%%%%%%%%%%%%%%%
 %TODO: don't preload when you want to train your own model.
-if 0
+if ~trainModel
     %load(fullfile(rootPath, 'models', 'workspacedump_w_models_coco.mat'));
     load(fullfile(rootPath, 'models', 'models_coco_tokenized.mat'));
 else
     % Cross validations
     noFolds = 5;
-    cRange = [0.0001, 0.0005, 0.001, 0.005, 0.01, 005, 0.1, 0.5, 1.0, 5.0, 10.0];
+    % Smaller sweep of c
+    cRange = [0.001, 0.01, 0.1, 1.0];
+    %cRange = [0.0001, 0.0005, 0.001, 0.005, 0.01, 005, 0.1, 0.5, 1.0, 5.0, 10.0];
     noNegatives = 12780;
     rndSeed = 100;
 
@@ -76,31 +102,32 @@ else
     [R_model_test_embed R_model_crossval_embed R_acc_crossval_embed R_random_crossval_embed] = ...
                     embedding(Rencoding, Rembed, Rfeatures, cRange, noFolds, noNegatives, rndSeed);
 
-    save(fullfile(rootPath, 'models', 'model_variables_coco_tokenized_R.mat'), ...
+    save(fullfile(rootPath, 'models', ['model_variables_', saveName, '_R.mat']), ...
                                 'R_model_test_embed', 'R_acc_crossval_embed');
 
     [P_model_test_embed P_model_crossval_embed P_acc_crossval_embed P_random_crossval_embed] = ...
                     embedding(Pencoding, Pembed, Rfeatures, cRange, noFolds, noNegatives, rndSeed);
 
-    save(fullfile(rootPath, 'models', 'model_variables_coco_tokenized_P.mat'), ...
+    save(fullfile(rootPath, 'models', ['model_variables_', saveName, '_P.mat']), ...
                                 'P_model_test_embed', 'P_acc_crossval_embed');
 
     [S_model_test_embed S_model_crossval_embed S_acc_crossval_embed S_random_crossval_embed] = ...
                     embedding(Sencoding, Sembed, Rfeatures, cRange, noFolds, noNegatives, rndSeed);
 
-    save(fullfile(rootPath, 'models', 'model_variables_coco_tokenized_S.mat'), ...
+    save(fullfile(rootPath, 'models', ['model_variables_', saveName, '_S.mat']), ...
                                 'S_model_test_embed', 'S_acc_crossval_embed');
 
     % Find the best C based on *_acc_crossval_embed (Here I'm fixing to 0.01), and turn w into matrix for efficient score computation
-    %R_A = reshape(R_model_test_embed{3}.w, [ndims,200]);
-    %P_A = reshape(P_model_test_embed{3}.w, [ndims,200]);
-    %S_A = reshape(S_model_test_embed{3}.w, [ndims,200]);
+    bestInd = 3;
+    R_A = reshape(R_model_test_embed{bestInd}.w, [], 200);
+    P_A = reshape(P_model_test_embed{bestInd}.w, [], 200);
+    S_A = reshape(S_model_test_embed{bestInd}.w, [], 200);
+    
     % Dumping  variables
     fprintf('Dumping model variables\n');
-    %save(fullfile(rootPath, 'models', 'model_variables_coco_tokenized_stops.mat'));
+    save(fullfile(rootPath, 'models', ['w_model_', saveName, '.mat']));
     fprintf('Models dumped after sweeping c\n');
 end
-return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Load validation and test data
@@ -163,21 +190,29 @@ valSscore = Sscore * valSembed';
 
 % Manually change threshold until precVal is maximized.
 % Visual threshold usually around 0-1
-threshold = 0.6; % Empirically determined
+switch embeddingType
+    case 1
+        threshold = 0.6; % Empirically determined
+    case 2
+        threshold = 0.6; % Empirically determined
+    case 3
+        threshold = 0.6; % Empirically determined
+end
 
-%precValues = [];
-%for threshold = 0:0.05:1.5
-%    % Faster implementation
-%    visualValScore = mean(max(...
-%                        valRscore(:, valRlabels) + ...
-%                        valPscore(:, valPlabels) + ...
-%                        valSscore(:, valSlabels) - ...
-%                        threshold, 0), 1)';
-%    [precVal, baseVal] = precision(visualValScore, valLabel);
-%
-%    fprintf('Val(visual) %f : %f\n', threshold, mean(precVal(:)))
-%    precValues = [precValues, mean(precVal(:))];
-%end
+precValues = [];
+for threshold = 0:0.05:1.5
+    % Faster implementation
+    visualValScore = mean(max(...
+                        valRscore(:, valRlabels) + ...
+                        valPscore(:, valPlabels) + ...
+                        valSscore(:, valSlabels) - ...
+                        threshold, 0), 1)';
+    [precVal, baseVal] = precision(visualValScore, valLabel);
+
+    fprintf('Val(visual) %f : %f\n', threshold, mean(precVal(:)))
+    pecValues = [precValues, mean(precVal(:))];
+end
+precValues
 
 % Now check the performance on test dataset with this threshold
 % Faster implementation
@@ -188,7 +223,6 @@ visualTestScore = mean(max(...
                         threshold, 0), 1)';
 [precTest, baseTest] = precision(visualTestScore, testLabel);
 fprintf('Test (visual) : %f\n', mean(precTest(:)));
-return
 
 % Debugging the visual features
 % debugVisualFeatures;
@@ -207,16 +241,29 @@ testSscoreText = - pdist2(Sembed(Sinds, :), testSembed, 'cosine');
 
 % Manually adjust the threshold until precVal is maximized
 % Threshold around -2 ~ 1
-%threshold = -1.2;
-threshold = -1.4;
+switch embeddingType
+    case 1
+        threshold = -1.2; % Empirically determined
+    case 2
+        threshold = -1.4; % Empirically determined
+    case 3
+        threshold = 0.6; % Empirically determined
+end
 
+precValues = [];
 % Faster implementation
-textValScore = mean(max(...
-                        valRscoreText(:, valRlabels) + ...
-                        valPscoreText(:, valPlabels) + ...
-                        valSscoreText(:, valSlabels) - ...
-                        threshold, 0), 1)';
-[precVal, baseVal] = precision(textValScore, valLabel);
+for threshold = -2:0.1:1
+    textValScore = mean(max(...
+                            valRscoreText(:, valRlabels) + ...
+                            valPscoreText(:, valPlabels) + ...
+                            valSscoreText(:, valSlabels) - ...
+                            threshold, 0), 1)';
+    [precVal, baseVal] = precision(textValScore, valLabel);
+    fprintf('Test (textual) %f : %f\n', threshold, mean(precVal(:)));
+
+    precValues = [precValues, mean(precVal(:))];
+end
+precValues
 
 % Use the same threshold for test set
 % Faster implementation
@@ -237,14 +284,32 @@ valHybridFeatures = [textValScore, visualValScore];
 testHybridFeatures = [textTestScore, visualTestScore];
 
 % Fine tune c until optimal is obtained
-%c = 10000;
-c = 1000;
+switch embeddingType
+    case 1
+        c = 10000; % Empirically determined
+    case 2
+        c = 1000; % Empirically determined
+    case 3
+        c = 1000; % Empirically determined
+end
 noFolds = 5;
-verbose = false;
+
+% Cross validation with C sweeping
+perfCross = [];
+for c = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0]
+    [hybridModelTest, hybridModelCrossval, hybridAccCrossval, hybridRandomCrossval] = ...
+                perclass(valLabel * 2 - 1, valHybridFeatures, c, noFolds, verboseSVM);
+    hybridPerfCrossval = mean(hybridAccCrossval);
+    fprintf('Val (visual+textual) %f : %f\n', c, mean(hybridPerfTest(:)));
+
+    perfCross = [perfCross, hybridPerfCrossval];
+end
+perfCross
+return
 
 % Cross validation
 [hybridModelTest, hybridModelCrossval, hybridAccCrossval, hybridRandomCrossval] = ...
-            perclass(valLabel * 2 - 1, valHybridFeatures, c, noFolds, verbose);            
+            perclass(valLabel * 2 - 1, valHybridFeatures, c, noFolds, verboseSVM);
 hybridPerfCrossval = mean(hybridAccCrossval);
 
 % Testing
@@ -270,7 +335,7 @@ noFolds = 5;
 
 % Cross validation
 [bing_model_test bing_model_crossval bing_acc_crossval bing_random_crossval] = ...
-                            perclass(valLabel * 2 - 1,log(bingVal+1), c, noFolds, verbose);
+                            perclass(valLabel * 2 - 1,log(bingVal+1), c, noFolds, verboseSVM);
 bing_perf_crossval = mean(bing_acc_crossval);
 
 %test

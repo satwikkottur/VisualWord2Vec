@@ -12,4 +12,7 @@ models/*
 relationshipModeling/myTupleExtractor/SimpleSentences/
 relationshipModeling/myTupleExtractor/data/
 
+# Ignoring dumps in the code folder
+code/src/dumps/*
+
 
