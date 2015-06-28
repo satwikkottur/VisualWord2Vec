@@ -4,7 +4,7 @@
 
 ##############################################################################
 
-1. Word2vec embedding learnt from raw coco (ICCV submission)
+1. Word2vec embedding learnt from raw coco (ICCV submission) (using pre-trained model)
     Visual AP           : 68.28 %
     Textual AP          : 72.15 %
     Visual + Textual AP : 73.50 %
@@ -18,4 +18,19 @@ Word2vec embedding learnt from tokenized coco (sentences separated by newline)
     Visual AP           : 67.61 %
     Textual AP          : 74.66 %
     Visual + Textual AP : 70.22 %
+
+Word2vec embedding learnt from raw coco using c = 0.005(model)
+    Visual AP           : 67.61 %
+    Textual AP          : 72.91 %
+    Visual + Textual AP : 69.24 %
+
+Word2vec embedding learnt from tokenized coco using full stops
+    Visual AP           : 68.53 %
+    Textual AP          : 73.25 %
+    Visual + Textual AP : 70.47 %
+
+Word2vec embedding learnt from tokenized coco using c = 0.001(model)
+    Visual AP           : 68.53 %
+    Textual AP          : 73.25 %
+    Visual + Textual AP : 70.47 %
 -------------------------------------------------------------------------------

@@ -5,7 +5,7 @@
 import json
 
 # Input json path
-jsonPath = '/home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test_tokenized_stops.json';
+jsonPath = '/home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test_fs.json';
 content = json.load(open(jsonPath));
 
 # Output text path
@@ -16,7 +16,7 @@ txtFile = open(txtPath, 'wb');
 # Iterating and writing each line in the text path
 for i in content.keys():
     for j in content[i]:
-        txtFile.write(j.encode('ascii', 'ignore') + '\n');
+        txtFile.write(j.encode('ascii', 'ignore') + '. ');
         #txtFile.write(str(j) + ' ');
    
 txtFile.close();

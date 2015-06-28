@@ -12,11 +12,12 @@
 #python /home/satwik/VisualWord2Vec/code/utils/json2txt.py
 
 # Training google word2vec
-#/usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/src/trainWord2Vec.m')" < /dev/null > output_tokens_w2v 2> errors_tokens_w2v
+#/usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/src/trainWord2Vec.m')" < /dev/null > src/dumps/output_fs_w2v 2> src/dumps/errors_fs_w2v
 
 # Leaning the model learning script
-nohup /usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModel.m')" < /dev/null > src/dumps/output_stop_test 2> src/dumps/errors_stop_test &
-#nohup /usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModel.m')" < /dev/null > src/dumps/output_token_test 2> src/dumps/errors_token_test &
+nohup /usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModel.m')" < /dev/null > src/dumps/output_sweep 2> src/dumps/errors_sweep &
+#nohup /usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModel.m')" < /dev/null > src/dumps/output_raw_test 2> src/dumps/errors_raw_test &
+#nohup /usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModel.m')" < /dev/null > src/dumps/output_token_test 2> src/dumps/errors_token_test 
 #nohup /usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModel.m')" < /dev/null > src/dumps/output_test 2> src/dumps/errors_test &
 
 #/usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModel.m')" < /dev/null > dumps/output_token 2> dumps/errors_token
