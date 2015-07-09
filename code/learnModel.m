@@ -23,7 +23,9 @@
 % 1 - plain coco
 % 2 - coco with tokenization, sentences separated by space
 % 3 - coco with tokenization, sentences separated by newline
-embeddingType =  4;
+% 4 - coco with word2vec trained on raw text
+% 5 - coco with tokeniation, sentences separated by full stop
+embeddingType =  3;
 
 % Select true if you want to train the models, false to preload
 trainModel = false;
@@ -56,6 +58,7 @@ switch embeddingType
         word2vecModel = fullfile(rootPath, 'models', 'coco_w2v_tokenized_stops.mat'); 
     case 4
         word2vecModel = fullfile(rootPath, 'models', 'coco_w2v_raw.mat');
+
     case 5
         word2vecModel = fullfile(rootPath, 'models', 'coco_w2v_fs.mat');
 end
@@ -102,8 +105,8 @@ if ~trainModel
             load(fullfile(rootPath, 'models', 'w_model_coco_tokenized_stops.mat'));
 
         case 4
-            %load(fullfile(rootPath, 'models', 'w_model_coco_raw.mat'));
-            load(fullfile(rootPath, 'models', 'w_model_coco_raw_orig.mat'));
+            load(fullfile(rootPath, 'models', 'w_model_coco_raw.mat'));
+            %load(fullfile(rootPath, 'models', 'w_model_coco_raw_orig.mat'));
 
         case 5
             load(fullfile(rootPath, 'models', 'w_model_coco_fs.mat'));
@@ -218,8 +221,8 @@ switch embeddingType
     case 3
         threshold = 0.5; % Empirically determined
     case 4
-        %threshold = 0.4; % Empirically determined
-        threshold = 0.6; % Empirically determined
+        threshold = 0.4; % Empirically determined
+        %threshold = 0.6; % Empirically determined
     case 5
         threshold = 0.3; % Empirically determined
 end
@@ -273,8 +276,8 @@ switch embeddingType
     case 3
         threshold = -1.4; % Empirically determined
     case 4
-        %threshold = -1.3; % Empirically determined
-        threshold = -1.2; % Empirically determined
+        threshold = -1.3; % Empirically determined
+        %threshold = -1.2; % Empirically determined
     case 5
         threshold = -1.4; % Empirically determined
 

@@ -11,26 +11,22 @@
 
 Word2vec embedding learnt from tokenized coco (sentences separated by spaces)
     Visual AP           : 67.49 %
-    Textual AP          : 72.88 %
-    Visual + Textual AP : 70.89 %
+    Textual AP          : 72.89 %
+    Visual + Textual AP : 73.57 %
 
 Word2vec embedding learnt from tokenized coco (sentences separated by newline)
-    Visual AP           : 67.61 %
-    Textual AP          : 74.66 %
-    Visual + Textual AP : 70.22 %
+    Visual AP           : 67.58 %
+    Textual AP          : 73.09 %
+    Visual + Textual AP : 73.62 %
 
 Word2vec embedding learnt from raw coco using c = 0.005(model)
-    Visual AP           : 67.61 %
-    Textual AP          : 72.91 %
-    Visual + Textual AP : 69.24 %
+    Visual AP           : 67.60 %
+    Textual AP          : 73.00 %
+    Visual + Textual AP : 73.43 %
 
 Word2vec embedding learnt from tokenized coco using full stops
-    Visual AP           : 68.53 %
-    Textual AP          : 73.25 %
-    Visual + Textual AP : 70.47 %
+    Visual AP           : 68.56 %
+    Textual AP          : 73.29 %
+    Visual + Textual AP : 73.99 %
 
-Word2vec embedding learnt from tokenized coco using c = 0.001(model)
-    Visual AP           : 68.53 %
-    Textual AP          : 73.25 %
-    Visual + Textual AP : 70.47 %
 -------------------------------------------------------------------------------
