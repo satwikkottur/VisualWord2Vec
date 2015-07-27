@@ -15,7 +15,7 @@
 #/usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/src/trainWord2Vec.m')" < /dev/null > src/dumps/output_fs_w2v 2> src/dumps/errors_fs_w2v
 
 # Leaning the model learning script
-nohup /usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModelWrapper.m')" < /dev/null > src/dumps/output_sweep_traindata 2> src/dumps/errors_sweep_traindata &
+nohup /usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModelSweepWrapper.m')" < /dev/null > src/dumps/output_sweep_traindata_july27 2> src/dumps/errors_sweep_traindata_july27 &
 #nohup /usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModel.m')" < /dev/null > src/dumps/output_raw_test 2> src/dumps/errors_raw_test &
 #nohup /usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModel.m')" < /dev/null > src/dumps/output_token_test 2> src/dumps/errors_token_test 
 #nohup /usr/local/MATLAB/R2014a/bin/matlab -nodesktop -nodisplay -nosplash -r "run('/home/satwik/VisualWord2Vec/code/learnModel.m')" < /dev/null > src/dumps/output_test 2> src/dumps/errors_test &

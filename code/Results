@@ -30,3 +30,18 @@ Word2vec embedding learnt from tokenized coco using full stops
     Visual + Textual AP : 73.99 %
 
 -------------------------------------------------------------------------------
+Visual, Textual, Textual + Visual results for different amounts of training 
+data : {2,4,6,8,10,12,14,16,18,20}
+
+02 - 43.17  70.54  37.08 
+04 - 
+06 -
+08 - 
+10 - 
+12 - 
+14 -
+16 -
+18 -
+20 -
+
+-------------------------------------------------------------------------------
