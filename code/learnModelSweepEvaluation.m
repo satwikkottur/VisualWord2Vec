@@ -56,7 +56,7 @@ testScore = cell2mat(test.data(:, 3)) > 0;
 testLabel = testScore > 0 ;
 
 % Model evaluation for each model
-for noInst = 10
+for noInst = 20
 %for noInst = 2:2:20
     fprintf('Current iterations: %d\n', noInst);
     % Loading the corresponding model
