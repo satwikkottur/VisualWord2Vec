@@ -29,7 +29,14 @@ const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vo
 typedef float real;                    // Precision of float numbers
 
 struct vocab_word {
+  //vrama91 
+  // stores frequency of a word
   long long cn;
+  //vrama91 
+  // word -> characters in the word, code 
+  // code -> huffman code
+  // point -> pointer to previous word in the huffman tree
+  // codelen -> length of the huffman code
   int *point;
   char *word, *code, codelen;
 };
@@ -340,12 +347,16 @@ void InitNet() {
   unsigned long long next_random = 1;
   a = posix_memalign((void **)&syn0, 128, (long long)vocab_size * layer1_size * sizeof(real));
   if (syn0 == NULL) {printf("Memory allocation failed\n"); exit(1);}
+  //vrama91 
+  // hs is 1 for hierarchical softmax 
   if (hs) {
     a = posix_memalign((void **)&syn1, 128, (long long)vocab_size * layer1_size * sizeof(real));
     if (syn1 == NULL) {printf("Memory allocation failed\n"); exit(1);}
     for (a = 0; a < vocab_size; a++) for (b = 0; b < layer1_size; b++)
      syn1[a * layer1_size + b] = 0;
   }
+  //vrama91 
+  // for NEGATIVE Sampling
   if (negative>0) {
     a = posix_memalign((void **)&syn1neg, 128, (long long)vocab_size * layer1_size * sizeof(real));
     if (syn1neg == NULL) {printf("Memory allocation failed\n"); exit(1);}
@@ -356,6 +367,8 @@ void InitNet() {
     next_random = next_random * (unsigned long long)25214903917 + 11;
     syn0[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
   }
+  //vrama91 
+  //create a huffman binary tree based on word frequencies
   CreateBinaryTree();
 }
 
@@ -578,9 +591,14 @@ void TrainModel() {
   if (read_vocab_file[0] != 0) ReadVocab(); else LearnVocabFromTrainFile();
   if (save_vocab_file[0] != 0) SaveVocab();
   if (output_file[0] == 0) return;
+  //vrama91 
+  // Initialize the network, perform huffman coding for the words and construct the hierarchical softmax tree
   InitNet();
   if (negative > 0) InitUnigramTable();
   start = clock();
+  //vrama91 
+  // Perform training here on different threds and then join the threads
+  // Key Function to look at : TrainModelThread
   for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
   for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
   fo = fopen(output_file, "wb");
