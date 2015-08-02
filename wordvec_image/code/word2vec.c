@@ -36,6 +36,7 @@ struct vocab_word {
   // word -> characters in the word, code 
   // code -> huffman code
   // point -> pointer to previous word in the huffman tree
+  // [S]: point -> pointer to all the previous words in the huffman tree (check 
   // codelen -> length of the huffman code
   int *point;
   char *word, *code, codelen;
@@ -520,6 +521,8 @@ void *TrainModelThread(void *id) {
         }
       }
     } else {  //train skip-gram
+      // [S]
+      // b = (somerandom) % window i.e. < window
       for (a = b; a < window * 2 + 1 + sentence_vectors - b; a++) if (a != window) {
         c = sentence_position - window + a;
         if (sentence_vectors) if (a >= window * 2 + sentence_vectors - b) c = 0;
