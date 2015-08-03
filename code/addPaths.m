@@ -1,7 +1,8 @@
 % Adding the paths
-addpath('src/');
-addpath('io/');
-addpath('utils/');
-addpath('debug/');
+root = '/home/satwik/VisualWord2Vec/code';
+addpath(genpath(fullfile(root, 'src/')));
+addpath(genpath(fullfile(root, 'io/')));
+addpath(genpath(fullfile(root, 'utils/')));
+addpath(genpath(fullfile(root,  'debug/')));
 
-addpath(genpath('/home/satwik/VisualWord2Vec/libs'));
+addpath(genpath(fullfile(root , 'libs')));
