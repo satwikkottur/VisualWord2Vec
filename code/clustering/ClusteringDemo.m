@@ -14,12 +14,16 @@ numFeaturePath = fullfile(dataPath, 'Num_features.txt');
 [Plabel, Slabel, Rlabel, Rfeatures] = readFromFile(psrFeaturePath, numFeaturePath);
 
 % Assigning the cluster ids (each relation word is a cluster)
-[]
-
+[clusterR, ~, clusterIds] = unique(Rlabel);
 
 % Visualization
+noDims = 2;
+noInitDims = 50;
+perplexity = 30;
+tsnePts = tsne(Rfeatures, clusterIds, noDims, noInitDims, perplexity);
 
 % Clustering the features
+
 
 
 % Assigning the cluster ids after clustering
