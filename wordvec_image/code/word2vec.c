@@ -523,6 +523,9 @@ void *TrainModelThread(void *id) {
     } else {  //train skip-gram
       // [S]
       // b = (somerandom) % window i.e. < window
+      // A randomly sampled size context window is used for each word, instead of a fixed size window
+      // b is the size of window for the current word
+      // Not considering the current word (if  a !\ window)
       for (a = b; a < window * 2 + 1 + sentence_vectors - b; a++) if (a != window) {
         c = sentence_position - window + a;
         if (sentence_vectors) if (a >= window * 2 + sentence_vectors - b) c = 0;
@@ -530,11 +533,15 @@ void *TrainModelThread(void *id) {
         if (c >= sentence_length) continue;
         last_word = sen[c];
         if (last_word == -1) continue;
+        // [S]: Offsets to access the weights
+        // l1 = accessing input -> hidden weights
         l1 = last_word * layer1_size;
         for (c = 0; c < layer1_size; c++) neu1e[c] = 0;
         // HIERARCHICAL SOFTMAX
         if (hs) for (d = 0; d < vocab[word].codelen; d++) {
           f = 0;
+            // [S]: Offsets to access the weights
+            // l1 = accessing input -> hidden weights
           l2 = vocab[word].point[d] * layer1_size;
           // Propagate hidden -> output
           for (c = 0; c < layer1_size; c++) f += syn0[c + l1] * syn1[c + l2];
@@ -549,6 +556,8 @@ void *TrainModelThread(void *id) {
           for (c = 0; c < layer1_size; c++) syn1[c + l2] += g * syn0[c + l1];
         }
         // NEGATIVE SAMPLING
+        //[S] : Sampling negative number of instances as negative examples and 
+        //      current word as one positive example
         if (negative > 0) for (d = 0; d < negative + 1; d++) {
           if (d == 0) {
             target = word;
