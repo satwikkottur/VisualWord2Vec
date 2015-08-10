@@ -1,6 +1,7 @@
 # data folder
 data/*
 *.mat
+*.bin
 
 # Models folder
 models/*
