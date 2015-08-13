@@ -434,6 +434,7 @@ void *TrainModelThread(void *id) {
     b = next_random % window;
     if (cbow) {  //train the cbow architecture
       // in -> hidden
+      // [S] : cw - Stands for whole context window size ?
       cw = 0;
       for (a = b; a < window * 2 + 1 - b; a++) if (a != window) {
         c = sentence_position - window + a;
@@ -499,10 +500,14 @@ void *TrainModelThread(void *id) {
         if (c >= sentence_length) continue;
         last_word = sen[c];
         if (last_word == -1) continue;
+        // [S] : l1 - position in the layer one weights vector
+        // What do neu1e and neu1 contain ? 
         l1 = last_word * layer1_size;
         for (c = 0; c < layer1_size; c++) neu1e[c] = 0;
         // HIERARCHICAL SOFTMAX
         if (hs) for (d = 0; d < vocab[word].codelen; d++) {
+          // [S] : f evaluates the dot product of inner representation of the context word 
+          // and representation of the internal node
           f = 0;
           l2 = vocab[word].point[d] * layer1_size;
           // Propagate hidden -> output
@@ -564,9 +569,12 @@ void TrainModel() {
   if (save_vocab_file[0] != 0) SaveVocab();
   if (output_file[0] == 0) return;
   InitNet();
+  // [S] : Create a unigram distribution table for negative sampling
   if (negative > 0) InitUnigramTable();
   start = clock();
+  // [S] : Creates the threads for execution
   for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+  // [S] : Waits for the completion of execution of the threads
   for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
   fo = fopen(output_file, "wb");
   if (classes == 0) {

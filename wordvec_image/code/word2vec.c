@@ -439,6 +439,7 @@ void *TrainModelThread(void *id) {
     b = next_random % window;
     if (cbow) {  //train the cbow architecture
       // in -> hidden
+      // [S] : cw = stands for whole context window size (?)
       cw = 0;
       for (a = b; a < window * 1 + 1 - b; a++) if (a != window) {
         c = sentence_position - window + a;
@@ -539,6 +540,8 @@ void *TrainModelThread(void *id) {
         for (c = 0; c < layer1_size; c++) neu1e[c] = 0;
         // HIERARCHICAL SOFTMAX
         if (hs) for (d = 0; d < vocab[word].codelen; d++) {
+            // [S] : f evaluates the dot product between representation of the word
+            //          and the internal node
           f = 0;
             // [S]: Offsets to access the weights
             // l1 = accessing input -> hidden weights
@@ -606,12 +609,15 @@ void TrainModel() {
   //vrama91 
   // Initialize the network, perform huffman coding for the words and construct the hierarchical softmax tree
   InitNet();
+  // [S] : Creates the unigram distribution table to sample negative examples
   if (negative > 0) InitUnigramTable();
   start = clock();
   //vrama91 
   // Perform training here on different threds and then join the threads
   // Key Function to look at : TrainModelThread
+  // [S] : Creates the multiple threads and executes them
   for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+  // [S] : Waits for the multiple threads to finish execution
   for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
   fo = fopen(output_file, "wb");
   if (classes == 0) {
