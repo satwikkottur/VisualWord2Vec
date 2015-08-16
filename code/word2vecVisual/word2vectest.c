@@ -24,7 +24,9 @@
 #define MAX_SENTENCE_LENGTH 1000
 #define MAX_CODE_LENGTH 40
 
+// [S] added
 // time module to measure time
+#include "visualFeatures.h"
 #include "timer.h"
 clock_t startPoint;
 
@@ -559,6 +561,15 @@ void *TrainModelThread(void *id) {
   pthread_exit(NULL);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+// [S] : Most of the changes are made here
+// TODO:
+// 1. Train the word2vec through coco
+// 2. Change the last layer to include the number of clusters as last layer
+// 3. Read the training instance and corresponding P,R,S and cluster id
+//***************************************************************************************************
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void TrainModel() {
   long a, b, c, d;
   FILE *fo;
@@ -576,6 +587,13 @@ void TrainModel() {
   for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
   // [S] : Waits for the completion of execution of the threads
   for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+
+    // [S] added
+    // Reading the file for relation word
+    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    printf("\n\n%s\n", featurePath);
+    readFeatureFile(featurePath);
+
   fo = fopen(output_file, "wb");
   if (classes == 0) {
     // Save the word vectors

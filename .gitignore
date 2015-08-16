@@ -2,6 +2,7 @@
 data/*
 *.mat
 *.bin
+*.o
 
 # Models folder
 models/*
