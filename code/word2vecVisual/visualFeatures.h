@@ -4,8 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
-#define MAX_STRING_LENGTH 50
+#define MAX_STRING_LENGTH 100
 #define NUM_TRAINING 4260
 
 // Structure to hold the index information
@@ -39,5 +40,7 @@ void readFeatureFile(char*);
 // Reading the cluster id file
 void readClusterIdFile(char*);
 
+// Multi character spliting
+char* multi_tok(char*, char*);
 
 #endif
