@@ -102,7 +102,7 @@ void refineNetwork();
 void computeMultinomial(float*, int);
     
 // Updating the weights 
-void updateWeights(float* y, int wordId);
+void updateWeights(float*, int, int);
 
 /***********************************************************************************/
 void InitUnigramTable() {
@@ -934,7 +934,7 @@ struct featureWord findTupleIndex(char* word){
 
 // Refine the network through clusters
 void refineNetwork(){
-    long long a, b, i;
+    long long a, b, c, i;
     unsigned long long next_random = 1;
     float* y = (float*) malloc(sizeof(float) * NUM_CLUSTERS);
 
@@ -952,14 +952,42 @@ void refineNetwork(){
     }
 
     // Read each of the training instance
-    for(i = 0; i < 1; i++){
-    //for(i = 0; i < NUM_TRAINING; i++){
-        if(prs[i].p.count){
+    for(i = 260; i < NUM_TRAINING; i++){
+        printf("Training %lld instance ....\n", i);
+        // Updating the weights for P
+        for(c = 0; c < prs[i].p.count; c++){
+            // If not in vocab, continue
+            if(prs[i].p.index[c] == -1) continue;
+
             // Predict the cluster
-            computeMultinomial(y, prs[i].p.index[0]);
+            computeMultinomial(y, prs[i].p.index[c]);
 
             // Propage the error to the PRS features
-            updateWeights(y, prs[i].p.index[0]);
+            updateWeights(y, prs[i].p.index[c], prs[i].cId);
+        }
+
+        // Updating the weights for S
+        for(c = 0; c < prs[i].s.count; c++){
+            // If not in vocab, continue
+            if(prs[i].s.index[c] == -1) continue;
+
+            // Predict the cluster
+            computeMultinomial(y, prs[i].s.index[c]);
+
+            // Propage the error to the PRS features
+            updateWeights(y, prs[i].s.index[c], prs[i].cId);
+        }
+
+        // Updating the weights for R
+        for(c = 0; c < prs[i].r.count; c++){
+            // If not in vocab, continue
+            if(prs[i].r.index[c] == -1) continue;
+
+            // Predict the cluster
+            computeMultinomial(y, prs[i].r.index[c]);
+
+            // Propage the error to the PRS features
+            updateWeights(y, prs[i].r.index[c], prs[i].cId);
         }
     }
 }
@@ -996,15 +1024,44 @@ void computeMultinomial(float* y, int wordId){
         for(b = 0; b < NUM_CLUSTERS; b++) y[b] = y[b]/sum;
 }
 
-// Updating the weights 
-void updateWeights(float* y, int wordId){
-// compute error
-// compute gradient for outer layer weights
-// update outer layer weights
-// compute gradient for inner layer weights
-// update inner layer weights
+// Updating the weights given the multinomial prediction, word id and true cluster id
+void updateWeights(float* y, int wordId, int trueId){
+    // compute gradient for outer layer weights, gradient g
+    float* e = (float*) malloc(NUM_CLUSTERS * sizeof(float));
+    long long a, b, c, offset1, offset2;
+    float learningRate = 0.1;
 
-    
+    // Computing error
+    for(b = 0; b < NUM_CLUSTERS; b++){
+        if(b == trueId - 1) e[b] = y[b] - 1;
+        else e[b] = y[b];
+    }
+
+    // compute gradient for inner layer weights
+    // update inner layer weights
+    for(a = 0; a < vocab_size; a++){
+        // Offset for accessing inner weights
+        offset1 = layer1_size * a;
+        for(b = 0; b < NUM_CLUSTERS; b++){
+            // Offset for accesing outer weights
+            offset2 = layer1_size * b;
+            
+            for(c = 0; c < layer1_size; c++)
+                syn0[offset1 + c] -= learningRate * e[b] * syn1[offset2 + c];
+        }
+    }
+
+    // compute gradient for outer layer weights
+    // update outer layer weights
+    offset1 = layer1_size * wordId;
+    for(a = 0; a < NUM_CLUSTERS; a++){
+        offset2 = layer1_size * a;
+        for(b = 0; b < layer1_size; b++){
+            syn1[offset2 + b] -= learningRate * e[a] * syn0[offset1 + b];
+        }
+    }
+
+    free(e);
 }
 
 // Multiple character split
