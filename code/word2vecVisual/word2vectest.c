@@ -98,8 +98,13 @@ char* multi_tok(char*, char*);
 // Function to refine the network through clusters
 void refineNetwork();
 
-/***********************************************************************************/
+// Evaluate y_i for each output cluster
+void computeMultinomial(float*, int);
+    
+// Updating the weights 
+void updateWeights(float* y, int wordId);
 
+/***********************************************************************************/
 void InitUnigramTable() {
   int a, i;
   double train_words_pow = 0;
@@ -908,8 +913,8 @@ struct featureWord findTupleIndex(char* word){
            
             // Save the index
             feature.index[count] = SearchVocab(token);
-            if(feature.index[count] == -1)
-                printf("Word not found in dictionary => %s\t |  %s\n", token, word);
+            //if(feature.index[count] == -1)
+            //   printf("Word not found in dictionary => %s\t |  %s\n", token, word);
 
             //printf("%d \t", feature.index[count]);
             token = strtok(NULL, delim);
@@ -929,8 +934,10 @@ struct featureWord findTupleIndex(char* word){
 
 // Refine the network through clusters
 void refineNetwork(){
-    long long a, b;
+    long long a, b, i;
     unsigned long long next_random = 1;
+    float* y = (float*) malloc(sizeof(float) * NUM_CLUSTERS);
+
     // Setup the network 
     a = posix_memalign((void **)&syn1, 128, (long long)vocab_size * layer1_size * sizeof(real));
     if (syn1 == NULL) {
@@ -945,13 +952,59 @@ void refineNetwork(){
     }
 
     // Read each of the training instance
-    
-    // Predict the cluster
+    for(i = 0; i < 1; i++){
+    //for(i = 0; i < NUM_TRAINING; i++){
+        if(prs[i].p.count){
+            // Predict the cluster
+            computeMultinomial(y, prs[i].p.index[0]);
 
-    // Propage the error to the PRS features
-    
-    
+            // Propage the error to the PRS features
+            updateWeights(y, prs[i].p.index[0]);
+        }
+    }
+}
 
+// Evaluate y_i for each output cluster
+void computeMultinomial(float* y, int wordId){
+    // y stores the multinomial distribution
+    float dotProduct = 0, sum = 0;
+    long long a, b, offset1, offset2;
+
+    // Offset to access the outer layer weights
+    offset1 = wordId * layer1_size;
+    for (b = 0; b < NUM_CLUSTERS; b++){
+        dotProduct = 0;
+        // Offset to access the values of hidden layer weights
+        offset2 = b * layer1_size;
+
+        for (a = 0; a < layer1_size; a++){
+            dotProduct += syn0[offset1 + a] * syn1[offset2 + a];
+        }
+
+        // Exponential (clip if less or greater than the limit)
+        if (dotProduct <= - MAX_EXP) dotProduct = -MAX_EXP;
+        else if (dotProduct >= MAX_EXP) dotProduct = MAX_EXP;
+        else dotProduct = expTable[(int) ((dotProduct + MAX_EXP) * (EXP_TABLE_SIZE / MAX_EXP / 2))];
+
+        y[b] = dotProduct;
+    }
+
+    // Normalizing to create a probability measure
+    for(b = 0; b < NUM_CLUSTERS; b++) sum += y[b];
+
+    if(sum > 0)
+        for(b = 0; b < NUM_CLUSTERS; b++) y[b] = y[b]/sum;
+}
+
+// Updating the weights 
+void updateWeights(float* y, int wordId){
+// compute error
+// compute gradient for outer layer weights
+// update outer layer weights
+// compute gradient for inner layer weights
+// update inner layer weights
+
+    
 }
 
 // Multiple character split

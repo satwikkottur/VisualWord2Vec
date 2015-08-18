@@ -932,7 +932,7 @@ void refineNetwork(){
     long long a, b;
     unsigned long long next_random = 1;
     // Setup the network 
-    a = posix_memalign((void **)&syn1, 128, (long long)vocab_size * layer1_size * sizeof(real));
+    a = posix_memalign((void **)&syn1, 128, (long long)NUM_CLUSTERS * layer1_size * sizeof(real));
     if (syn1 == NULL) {
         printf("Memory allocation failed\n"); 
         exit(1);
