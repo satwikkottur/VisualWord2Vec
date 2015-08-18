@@ -1,4 +1,4 @@
-# include "functionSigns.h"
+# include "variables.h"
 # include "visualFeatures.h"
 
 // reading feature file
@@ -76,6 +76,7 @@ struct featureWord findTupleIndex(char* word){
     // Do something if not in vocab
     if(index == -1) {
         //printf("Not in vocab -> %s : %s\n", word, "") ;
+        int count=0, i;
 
         // Split based on 's
         char* token = (char*) malloc(MAX_STRING_LENGTH);
@@ -95,7 +96,6 @@ struct featureWord findTupleIndex(char* word){
         char* delim = " .,/!?\\";
         token = strtok(token, delim);
         // Going over the token to determine the number of parts
-        int count = 0;
         while(token != NULL){
             count++;
             token = strtok(NULL, delim);
@@ -109,7 +109,6 @@ struct featureWord findTupleIndex(char* word){
         count = 0;
         while(token != NULL){
             // Convert the token into lower case
-            int i;
             for(i = 0; token[i]; i++) token[i] = tolower(token[i]);
            
             // Save the index
@@ -131,6 +130,33 @@ struct featureWord findTupleIndex(char* word){
     }
 
     return feature;
+}
+
+// Refine the network through clusters
+void refineNetwork(){
+    long long a, b;
+    unsigned long long next_random = 1;
+    // Setup the network 
+    a = posix_memalign((void **)&syn1, 128, (long long)vocab_size * layer1_size * sizeof(real));
+    if (syn1 == NULL) {
+        printf("Memory allocation failed\n"); 
+        exit(1);
+    }
+
+    // Initialize the last layer of weights
+    for (a = 0; a < NUM_CLUSTERS; a++) for (b = 0; b < layer1_size; b++){
+        next_random = next_random * (unsigned long long)25214903917 + 11;
+        syn1[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
+    }
+
+    // Read each of the training instance
+    
+    // Predict the cluster
+
+    // Propage the error to the PRS features
+    
+    
+
 }
 
 // Multiple character split

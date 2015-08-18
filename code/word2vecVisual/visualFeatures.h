@@ -6,8 +6,11 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "functions.h"
+
 #define MAX_STRING_LENGTH 100
 #define NUM_TRAINING 4260
+#define NUM_CLUSTERS 10
 
 // Structure to hold the index information
 struct featureWord{
@@ -43,4 +46,6 @@ void readClusterIdFile(char*);
 // Multi character spliting
 char* multi_tok(char*, char*);
 
+// Function to refine the network through clusters
+void refineNetwork();
 #endif
