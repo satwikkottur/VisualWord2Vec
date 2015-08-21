@@ -854,7 +854,8 @@ void readClusterIdFile(char* clusterPath){
 
     int i = 0, clusterId;
     while(fscanf(filePt, "%d\n", &clusterId) != EOF){
-        if(prs[i].cId == -1) prs[i].cId = clusterId;
+        //if(prs[i].cId == -1) prs[i].cId = clusterId;
+        prs[i].cId = clusterId;
         i++;
     }
 
@@ -952,8 +953,17 @@ void refineNetwork(){
     }
 
     // Read each of the training instance
-    for(i = 260; i < NUM_TRAINING; i++){
+    for(i = 0; i < NUM_TRAINING; i++){
         printf("Training %lld instance ....\n", i);
+        
+        // Checking possible fields to avoid segmentation error
+        if(prs[i].cId < 1 || prs[i].cId > NUM_CLUSTERS) {
+            printf("\nCluster id (%d) for %lld instance invalid!\n", prs[i].cId, i);
+            exit(1);
+        }
+
+        //printf("Counts : %d %d %d\n", prs[i].p.count, prs[i].s.count, prs[i].r.count);
+
         // Updating the weights for P
         for(c = 0; c < prs[i].p.count; c++){
             // If not in vocab, continue
@@ -1029,26 +1039,23 @@ void updateWeights(float* y, int wordId, int trueId){
     // compute gradient for outer layer weights, gradient g
     float* e = (float*) malloc(NUM_CLUSTERS * sizeof(float));
     long long a, b, c, offset1, offset2;
-    float learningRate = 0.1;
+    float learningRate = 0.01;
 
     // Computing error
     for(b = 0; b < NUM_CLUSTERS; b++){
         if(b == trueId - 1) e[b] = y[b] - 1;
         else e[b] = y[b];
     }
-
     // compute gradient for inner layer weights
     // update inner layer weights
-    for(a = 0; a < vocab_size; a++){
-        // Offset for accessing inner weights
-        offset1 = layer1_size * a;
-        for(b = 0; b < NUM_CLUSTERS; b++){
-            // Offset for accesing outer weights
-            offset2 = layer1_size * b;
-            
-            for(c = 0; c < layer1_size; c++)
-                syn0[offset1 + c] -= learningRate * e[b] * syn1[offset2 + c];
-        }
+    // Offset for accessing inner weights
+    offset1 = layer1_size * wordId;
+    for(b = 0; b < NUM_CLUSTERS; b++){
+        // Offset for accesing outer weights
+        offset2 = layer1_size * b;
+        
+        for(c = 0; c < layer1_size; c++)
+            syn0[offset1 + c] -= learningRate * e[b] * syn1[offset2 + c];
     }
 
     // compute gradient for outer layer weights
