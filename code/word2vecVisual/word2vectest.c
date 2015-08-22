@@ -25,10 +25,6 @@
 #define MAX_SENTENCE_LENGTH 1000
 #define MAX_CODE_LENGTH 40
 
-#define MAX_STRING_LENGTH 100
-#define NUM_TRAINING 4260
-#define NUM_CLUSTERS 10
-
 // [S] added
 // time module to measure time
 #include "timer.h"
@@ -60,50 +56,7 @@ const int table_size = 1e8;
 int *table;
 // [S] added
 /**********************************************************************************/
-
-// Structure to hold the index information
-struct featureWord{
-    char* str;
-    int count;
-    int* index;
-};
-
-// Structure to hold information about P,R,S triplets
-struct prsTuple{
-    struct featureWord p, r, s;
-
-    // visual features for the instance 
-    float* feat;
-    // Cluster id assigned to the current instance
-    int cId; 
-    // Word embedding for the instance
-    float* embed; 
-};
-
-// Storing the triplets
-struct prsTuple prs[NUM_TRAINING];
-
-// getting the vocab indices
-struct featureWord findTupleIndex(char*);
-
-// Reading the feature file
-void readFeatureFile(char*);
-
-// Reading the cluster id file
-void readClusterIdFile(char*);
-
-// Multi character spliting
-char* multi_tok(char*, char*);
-
-// Function to refine the network through clusters
-void refineNetwork();
-
-// Evaluate y_i for each output cluster
-void computeMultinomial(float*, int);
-    
-// Updating the weights 
-void updateWeights(float*, int, int);
-
+#include "visualFeatures.h"
 /***********************************************************************************/
 void InitUnigramTable() {
   int a, i;
@@ -1069,6 +1022,55 @@ void updateWeights(float* y, int wordId, int trueId){
     }
 
     free(e);
+}
+
+// Saving the feature embeddings needed for comparing, at the given file name
+void saveEmbeddings(char* saveName){
+    FILE* filePt = fopen(saveName, "wb");
+
+    // Go through all the PRS tuples and write the embeddings
+    for(i = 0; i < 1; i++){
+    //for(i = 0; i < NUM_TRAINING; i++){
+        saveFeatureEmbedding(prs[i].p);
+        saveFeatureEmbedding(prs[i].s);
+        saveFeatureEmbedding(prs[i].r);
+    }
+
+    fclose(filePt);
+}
+
+// Save a particular embedding
+void saveFeatureEmbedding(struct featureWord feature, FILE* filePt){
+    // Go through the current feature and get the mean of components
+    int i, actualCount = 0;
+    long long offset;
+    float* mean;
+    mean = (float*)calloc(layer1_size, sizeof(float));
+
+    // Get the mean feature for the word
+    for(c = 0; c < feature.count; c++){
+        // If not in vocab, continue
+        if(feature.index[c] == -1) continue;
+
+        // Write the vector
+        offset = feature.index[c] * layer1_size;
+        for (i = 0; i < layer1_size; i++) 
+                mean[i] += syn0[offset + i];
+
+        // Increase the count
+        actualCount++;
+    }
+
+    // Normalizing if non-zero count
+    if(actualCount)
+        for (i = 0; i < layer1_size; i++)
+            mean[i] = mean[i]/actualCount;
+
+    // Saving to the file
+    printf("%s\n", feature.str);
+    for(i = 0; i < layer1_size; i++)
+        printf(filePt, "%f ", mean[i]);
+    printf("\n");
 }
 
 // Multiple character split

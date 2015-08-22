@@ -1,7 +1,13 @@
 #ifndef VISUAL_FEATURES
 #define VISUAL_FEATURES
 
-// Macros for the visual features
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#include "functions.h"
+
 #define MAX_STRING_LENGTH 100
 #define NUM_TRAINING 4260
 #define NUM_CLUSTERS 10
@@ -42,16 +48,4 @@ char* multi_tok(char*, char*);
 
 // Function to refine the network through clusters
 void refineNetwork();
-
-// Evaluate y_i for each output cluster
-void computeMultinomial(float*, int);
-    
-// Updating the weights 
-void updateWeights(float*, int, int);
-
-// save the embeddings
-void saveEmbeddings(char* saveName);
-// save a single feature
-void saveFeatureEmbeding(struct featureWord, FILE*);
-
 #endif
