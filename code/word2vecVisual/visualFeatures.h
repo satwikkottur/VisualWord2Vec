@@ -15,7 +15,8 @@ struct featureWord{
 
 // Structure to hold information about P,R,S triplets
 struct prsTuple{
-    struct featureWord p, r, s;
+    int p, r, s;
+    //struct featureWord p, r, s;
 
     // visual features for the instance 
     float* feat;
@@ -29,7 +30,11 @@ struct prsTuple{
 struct prsTuple prs[NUM_TRAINING];
 
 // getting the vocab indices
-struct featureWord findTupleIndex(char*);
+struct featureWord constructFeatureWord(char*);
+/********************************************************/
+
+// Initializing the refining of network
+void initRefining();
 
 // Reading the feature file
 void readFeatureFile(char*);
@@ -53,5 +58,19 @@ void updateWeights(float*, int, int);
 void saveEmbeddings(char* saveName);
 // save a single feature
 void saveFeatureEmbedding(struct featureWord, FILE*);
+
+/*****************************************/
+// Storing the feature hash
+struct featureWord* featHashWords;
+int* featHashInd;
+const int featHashSize = 100000;
+int featVocabSize = 1000;
+
+// Adding a feature word to the hash
+int addFeatureWord(char*);
+// Searching for a feature word
+int searchFeatureWord(char*);
+// Hash for the feature words
+int getFeatureWordHash(char*);
 
 #endif

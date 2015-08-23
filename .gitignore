@@ -6,6 +6,7 @@ data/*
 
 # Models folder
 models/*
+code/word2vecVisual/modelsNdata/*
 
 # Ignoring files from python
 *.py[cod]

@@ -600,12 +600,17 @@ void TrainModel() {
     // Reading the file for relation word
     char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
     char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
-    char savePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
+    char postPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
+    char prePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre.txt";
 
+    //initRefining();
     readFeatureFile(featurePath);
-    readClusterIdFile(clusterPath);
-    refineNetwork();
-    saveEmbeddings(savePath);
+    // readClusterIdFile(clusterPath);
+    // saving before the refining the network
+    // saveEmbeddings(prePath);
+    // refineNetwork();
+    // saving after the refining the network
+    // saveEmbeddings(postPath);
     //***************************************************************************************
     // skip writing to the file
     return;
@@ -776,9 +781,9 @@ void readFeatureFile(char* filePath){
         
         // Getting the indices for p, s, r
         // Get the indices, for the current tuple
-        prs[noTuples].p = findTupleIndex(pWord);
-        prs[noTuples].s = findTupleIndex(sWord);
-        prs[noTuples].r = findTupleIndex(rWord);
+        prs[noTuples].p = addFeatureWord(pWord);
+        prs[noTuples].r = addFeatureWord(pWord);
+        prs[noTuples].s = addFeatureWord(pWord);
         //printf("%s : %s : %s\n", prs[noTuples].p.str, prs[noTuples].s.str, prs[noTuples].r.str);
 
         noTuples++;
@@ -832,7 +837,7 @@ void readClusterIdFile(char* clusterPath){
 }
 
 // Finding the indices of words for P,R,S
-struct featureWord findTupleIndex(char* word){
+struct featureWord constructFeatureWord(char* word){
     int index = SearchVocab(word); 
 
     struct featureWord feature;
@@ -898,11 +903,10 @@ struct featureWord findTupleIndex(char* word){
     return feature;
 }
 
-// Refine the network through clusters
-void refineNetwork(){
-    long long a, b, c, i;
+// Initializing the refining
+void initRefining(){
+    long long a, b;
     unsigned long long next_random = 1;
-    float* y = (float*) malloc(sizeof(float) * NUM_CLUSTERS);
 
     // Setup the network 
     a = posix_memalign((void **)&syn1, 128, (long long)vocab_size * layer1_size * sizeof(real));
@@ -916,6 +920,16 @@ void refineNetwork(){
         next_random = next_random * (unsigned long long)25214903917 + 11;
         syn1[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
     }
+
+    // Setting up the hash
+    featHashWords = (struct featureWord *) malloc(sizeof(struct featureWord) * featVocabSize);
+}
+
+// Refine the network through clusters
+void refineNetwork(){}
+/*void refineNetwork(){
+    long long c, i;
+    float* y = (float*) malloc(sizeof(float) * NUM_CLUSTERS);
 
     // Read each of the training instance
     for(i = 0; i < NUM_TRAINING; i++){
@@ -965,7 +979,7 @@ void refineNetwork(){
             updateWeights(y, prs[i].r.index[c], prs[i].cId);
         }
     }
-}
+}*/
 
 // Evaluate y_i for each output cluster
 void computeMultinomial(float* y, int wordId){
@@ -1037,19 +1051,21 @@ void updateWeights(float* y, int wordId, int trueId){
 }
 
 // Saving the feature embeddings needed for comparing, at the given file name
-void saveEmbeddings(char* saveName){
+void saveEmbeddings(char* saveName);
+/*void saveEmbeddings(char* saveName){
     FILE* filePt = fopen(saveName, "wb");
     int i;
 
     // Go through all the PRS tuples and write the embeddings
     for(i = 0; i < NUM_TRAINING; i++){
+        // Check if the feature has already been saved
         saveFeatureEmbedding(prs[i].p, filePt);
         saveFeatureEmbedding(prs[i].s, filePt);
         saveFeatureEmbedding(prs[i].r, filePt);
     }
 
     fclose(filePt);
-}
+}*/
 
 // Save a particular embedding
 void saveFeatureEmbedding(struct featureWord feature, FILE* filePt){
@@ -1079,10 +1095,52 @@ void saveFeatureEmbedding(struct featureWord feature, FILE* filePt){
             mean[i] = mean[i]/actualCount;
 
     // Saving to the file
-    fprintf(filePt, "%s\n", feature.str);
-    for(i = 0; i < layer1_size; i++)
+    //fprintf(filePt, "%s\n", feature.str);
+    for(i = 0; i < layer1_size-1; i++)
         fprintf(filePt, "%f ", mean[i]);
-    fprintf(filePt, "\n");
+    fprintf(filePt, "%f\n", mean[layer1_size-1]);
+}
+
+// Searching a feature word
+int searchFeatureWord(char* word){
+
+}
+
+// Adding a feature word
+int addFeatureWord(char* word){
+    // search for feature if already exists
+    int featureInd = searchFeature(word);
+    
+    // If yes, ignore
+    if(featureInd != -1) 
+        return featureInd;
+    else{
+        // If no, add and re-adjust featVocabSize
+        // adding a new featureWord
+        unsigned int hash = getFeatureWordHash(word);
+        // Get the index where new feature word should be stored
+        while(1){
+            if(featHashInd[hash] != -1) 
+                hash = (hash + 1) % featHashSize;
+            else
+                break;
+        }
+
+        featHashWords[hash] = constructFeatureWord(word);
+
+        // TODO:
+        // Adjusting the size of vocab if needed
+        return hash;
+    }
+}
+
+// Hash function computation
+int getFeatureWordHash(char* word){
+    unsigned long long a, hash = 0;
+    for (a = 0; a < strlen(word); a++)
+        hash = hash * 257 + word[a];
+    hash = hash % featHashSize;
+    return hash;
 }
 
 // Multiple character split
