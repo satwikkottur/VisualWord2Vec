@@ -600,10 +600,12 @@ void TrainModel() {
     // Reading the file for relation word
     char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
     char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
+    char savePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
 
     readFeatureFile(featurePath);
     readClusterIdFile(clusterPath);
     refineNetwork();
+    saveEmbeddings(savePath);
     //***************************************************************************************
     // skip writing to the file
     return;
@@ -770,21 +772,24 @@ void readFeatureFile(char* filePath){
     // Read and store the contents
     int noTuples = 0;
     while(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]>\n", pWord, sWord, rWord) != EOF){
+        //printf("%s : %s : %s\n", pWord, sWord, rWord);
+        
         // Getting the indices for p, s, r
-        struct prsTuple newTuple;/* = {.p = {findTupleIndex(pWord)},
-                                    .r = {findTupleIndex(rWord)},
-                                    .s = {findTupleIndex(sWord)},
-                                    .cId = -1,
-                                    .feat = NULL,
-                                    .embed = NULL};*/
-        //printf("%s : %s : %s\n", p, s, r);
-        newTuple.p = findTupleIndex(pWord);
-        newTuple.s = findTupleIndex(sWord);
-        newTuple.r = findTupleIndex(rWord);
+        // Get the indices, for the current tuple
+        prs[noTuples].p = findTupleIndex(pWord);
+        prs[noTuples].s = findTupleIndex(sWord);
+        prs[noTuples].r = findTupleIndex(rWord);
+        //printf("%s : %s : %s\n", prs[noTuples].p.str, prs[noTuples].s.str, prs[noTuples].r.str);
 
-        prs[noTuples] = newTuple;
         noTuples++;
     }
+
+    // Debugging
+    /*int i;
+    for(i = 0; i < noTuples; i++){
+        printf("%s : %s : %s  ( ", prs[i].p.str, prs[i].s.str, prs[i].r.str);
+        printf("%d )\n", i);
+    }*/
 
     // Sanity check
     if(noTuples != NUM_TRAINING){
@@ -818,6 +823,11 @@ void readClusterIdFile(char* clusterPath){
         exit(1);
     }
 
+    // Debugging
+    /*for(i = 0; i < NUM_TRAINING; i++){
+        printf("%s : %s : %s : (%d)\n", prs[i].p.str, prs[i].s.str, prs[i].r.str, prs[i].cId);
+    }*/
+
     fclose(filePt);
 }
 
@@ -825,7 +835,9 @@ void readClusterIdFile(char* clusterPath){
 struct featureWord findTupleIndex(char* word){
     int index = SearchVocab(word); 
 
-    struct featureWord feature = {.str = word};
+    struct featureWord feature;
+    feature.str = (char*) malloc(MAX_STRING_LENGTH);
+    strcpy(feature.str, word);
     
     // Do something if not in vocab
     if(index == -1) {
@@ -1027,13 +1039,13 @@ void updateWeights(float* y, int wordId, int trueId){
 // Saving the feature embeddings needed for comparing, at the given file name
 void saveEmbeddings(char* saveName){
     FILE* filePt = fopen(saveName, "wb");
+    int i;
 
     // Go through all the PRS tuples and write the embeddings
-    for(i = 0; i < 1; i++){
-    //for(i = 0; i < NUM_TRAINING; i++){
-        saveFeatureEmbedding(prs[i].p);
-        saveFeatureEmbedding(prs[i].s);
-        saveFeatureEmbedding(prs[i].r);
+    for(i = 0; i < NUM_TRAINING; i++){
+        saveFeatureEmbedding(prs[i].p, filePt);
+        saveFeatureEmbedding(prs[i].s, filePt);
+        saveFeatureEmbedding(prs[i].r, filePt);
     }
 
     fclose(filePt);
@@ -1042,10 +1054,10 @@ void saveEmbeddings(char* saveName){
 // Save a particular embedding
 void saveFeatureEmbedding(struct featureWord feature, FILE* filePt){
     // Go through the current feature and get the mean of components
-    int i, actualCount = 0;
+    int i, c, actualCount = 0;
     long long offset;
     float* mean;
-    mean = (float*)calloc(layer1_size, sizeof(float));
+    mean = (float*) calloc(layer1_size, sizeof(float));
 
     // Get the mean feature for the word
     for(c = 0; c < feature.count; c++){
@@ -1055,7 +1067,7 @@ void saveFeatureEmbedding(struct featureWord feature, FILE* filePt){
         // Write the vector
         offset = feature.index[c] * layer1_size;
         for (i = 0; i < layer1_size; i++) 
-                mean[i] += syn0[offset + i];
+            mean[i] += syn0[offset + i];
 
         // Increase the count
         actualCount++;
@@ -1067,10 +1079,10 @@ void saveFeatureEmbedding(struct featureWord feature, FILE* filePt){
             mean[i] = mean[i]/actualCount;
 
     // Saving to the file
-    printf("%s\n", feature.str);
+    fprintf(filePt, "%s\n", feature.str);
     for(i = 0; i < layer1_size; i++)
-        printf(filePt, "%f ", mean[i]);
-    printf("\n");
+        fprintf(filePt, "%f ", mean[i]);
+    fprintf(filePt, "\n");
 }
 
 // Multiple character split

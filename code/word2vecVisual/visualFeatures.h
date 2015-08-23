@@ -52,6 +52,6 @@ void updateWeights(float*, int, int);
 // save the embeddings
 void saveEmbeddings(char* saveName);
 // save a single feature
-void saveFeatureEmbeding(struct featureWord, FILE*);
+void saveFeatureEmbedding(struct featureWord, FILE*);
 
 #endif
