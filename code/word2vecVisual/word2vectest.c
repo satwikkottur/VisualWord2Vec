@@ -602,15 +602,17 @@ void TrainModel() {
     char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
     char postPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
     char prePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre.txt";
+    char vocabPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_vocab.txt";
 
     initRefining();
     readFeatureFile(featurePath);
-    // readClusterIdFile(clusterPath);
+    readClusterIdFile(clusterPath);
     // saving before the refining the network
-    // saveEmbeddings(prePath);
-    // refineNetwork();
+    saveEmbeddings(prePath);
+    saveFeatureWordVocab(vocabPath);
+    refineNetwork();
     // saving after the refining the network
-    // saveEmbeddings(postPath);
+    saveEmbeddings(postPath);
     //***************************************************************************************
     // skip writing to the file
     return;
@@ -933,10 +935,10 @@ void initRefining(){
 }
 
 // Refine the network through clusters
-void refineNetwork(){}
-/*void refineNetwork(){
+void refineNetwork(){
     long long c, i;
     float* y = (float*) malloc(sizeof(float) * NUM_CLUSTERS);
+    struct featureWord p, s, r;
 
     // Read each of the training instance
     for(i = 0; i < NUM_TRAINING; i++){
@@ -951,42 +953,45 @@ void refineNetwork(){}
         //printf("Counts : %d %d %d\n", prs[i].p.count, prs[i].s.count, prs[i].r.count);
 
         // Updating the weights for P
-        for(c = 0; c < prs[i].p.count; c++){
+        p = featHashWords[prs[i].p];
+        for(c = 0; c < p.count; c++){
             // If not in vocab, continue
-            if(prs[i].p.index[c] == -1) continue;
+            if(p.index[c] == -1) continue;
+            //printf("p: %d %d\n", p.index[c], p.count);
 
             // Predict the cluster
-            computeMultinomial(y, prs[i].p.index[c]);
-
+            computeMultinomial(y, p.index[c]);
             // Propage the error to the PRS features
-            updateWeights(y, prs[i].p.index[c], prs[i].cId);
+            updateWeights(y, p.index[c], prs[i].cId);
         }
-
+        
         // Updating the weights for S
-        for(c = 0; c < prs[i].s.count; c++){
+        s = featHashWords[prs[i].s];
+        for(c = 0; c < s.count; c++){
             // If not in vocab, continue
-            if(prs[i].s.index[c] == -1) continue;
+            if(s.index[c] == -1) continue;
+            //printf("s: %d %d\n", s.index[c], s.count);
 
             // Predict the cluster
-            computeMultinomial(y, prs[i].s.index[c]);
-
+            computeMultinomial(y, s.index[c]);
             // Propage the error to the PRS features
-            updateWeights(y, prs[i].s.index[c], prs[i].cId);
+            updateWeights(y, s.index[c], prs[i].cId);
         }
 
         // Updating the weights for R
-        for(c = 0; c < prs[i].r.count; c++){
+        r = featHashWords[prs[i].r];
+        for(c = 0; c < r.count; c++){
             // If not in vocab, continue
-            if(prs[i].r.index[c] == -1) continue;
+            if(r.index[c] == -1) continue;
+            //printf("r: %d %d\n", r.index[c], r.count);
 
             // Predict the cluster
-            computeMultinomial(y, prs[i].r.index[c]);
-
+            computeMultinomial(y, r.index[c]);
             // Propage the error to the PRS features
-            updateWeights(y, prs[i].r.index[c], prs[i].cId);
+            updateWeights(y, r.index[c], prs[i].cId);
         }
     }
-}*/
+}
 
 // Evaluate y_i for each output cluster
 void computeMultinomial(float* y, int wordId){
@@ -1058,21 +1063,29 @@ void updateWeights(float* y, int wordId, int trueId){
 }
 
 // Saving the feature embeddings needed for comparing, at the given file name
-void saveEmbeddings(char* saveName);
-/*void saveEmbeddings(char* saveName){
+void saveEmbeddings(char* saveName){
     FILE* filePt = fopen(saveName, "wb");
     int i;
 
-    // Go through all the PRS tuples and write the embeddings
-    for(i = 0; i < NUM_TRAINING; i++){
-        // Check if the feature has already been saved
-        saveFeatureEmbedding(prs[i].p, filePt);
-        saveFeatureEmbedding(prs[i].s, filePt);
-        saveFeatureEmbedding(prs[i].r, filePt);
-    }
+    // Go through the vocab and save the embeddings
+    for(i = 0; i < featVocabSize; i++)
+        saveFeatureEmbedding(featHashWords[i], filePt);
 
     fclose(filePt);
-}*/
+}
+
+// Saving the feature vocab
+void saveFeatureWordVocab(char* fileName){
+    FILE* filePt = fopen(fileName, "wb");
+    int i;
+
+    // Go through the vocab and save the embeddings
+    for(i = 0; i < featVocabSize; i++)
+        fprintf(filePt, "%s\n", featHashWords[i].str);
+
+    fclose(filePt);
+
+}
 
 // Save a particular embedding
 void saveFeatureEmbedding(struct featureWord feature, FILE* filePt){

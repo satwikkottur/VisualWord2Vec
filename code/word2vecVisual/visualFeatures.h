@@ -55,10 +55,11 @@ void computeMultinomial(float*, int);
 void updateWeights(float*, int, int);
 
 // save the embeddings
-void saveEmbeddings(char* saveName);
+void saveEmbeddings(char*);
 // save a single feature
 void saveFeatureEmbedding(struct featureWord, FILE*);
-
+// Save the vocab for the feature word
+void saveFeatureWordVocab(char*);
 /*****************************************/
 // Storing the feature hash
 struct featureWord* featHashWords;
