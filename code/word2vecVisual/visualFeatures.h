@@ -64,7 +64,8 @@ void saveFeatureEmbedding(struct featureWord, FILE*);
 struct featureWord* featHashWords;
 int* featHashInd;
 const int featHashSize = 100000;
-int featVocabSize = 1000;
+int featVocabSize = 0;
+int featVocabMaxSize = 2000;
 
 // Adding a feature word to the hash
 int addFeatureWord(char*);

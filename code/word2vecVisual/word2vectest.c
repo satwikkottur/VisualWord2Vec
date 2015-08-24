@@ -603,7 +603,7 @@ void TrainModel() {
     char postPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
     char prePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre.txt";
 
-    //initRefining();
+    initRefining();
     readFeatureFile(featurePath);
     // readClusterIdFile(clusterPath);
     // saving before the refining the network
@@ -782,18 +782,22 @@ void readFeatureFile(char* filePath){
         // Getting the indices for p, s, r
         // Get the indices, for the current tuple
         prs[noTuples].p = addFeatureWord(pWord);
-        prs[noTuples].r = addFeatureWord(pWord);
-        prs[noTuples].s = addFeatureWord(pWord);
+        prs[noTuples].r = addFeatureWord(rWord);
+        prs[noTuples].s = addFeatureWord(sWord);
         //printf("%s : %s : %s\n", prs[noTuples].p.str, prs[noTuples].s.str, prs[noTuples].r.str);
-
+        
         noTuples++;
     }
 
     // Debugging
     /*int i;
     for(i = 0; i < noTuples; i++){
-        printf("%s : %s : %s  ( ", prs[i].p.str, prs[i].s.str, prs[i].r.str);
-        printf("%d )\n", i);
+        //printf("%s : %s : %s  ( ", prs[i].p.str, prs[i].s.str, prs[i].r.str);
+        //printf("%d )\n", i);
+        //printf("%d %d %d\n", prs[i].p, prs[i].s, prs[i].r);
+        printf("%s : %s : %s\n", featHashWords[prs[i].p].str, 
+                            featHashWords[prs[i].s].str,
+                            featHashWords[prs[i].r].str);
     }*/
 
     // Sanity check
@@ -922,7 +926,10 @@ void initRefining(){
     }
 
     // Setting up the hash
-    featHashWords = (struct featureWord *) malloc(sizeof(struct featureWord) * featVocabSize);
+    featHashWords = (struct featureWord *) malloc(sizeof(struct featureWord) * featVocabMaxSize);
+    featHashInd = (int*) malloc(sizeof(int) * featHashSize);
+    for(a = 0; a < featHashSize; a++)
+        featHashInd[a] = -1;
 }
 
 // Refine the network through clusters
@@ -1103,21 +1110,34 @@ void saveFeatureEmbedding(struct featureWord feature, FILE* filePt){
 
 // Searching a feature word
 int searchFeatureWord(char* word){
+    unsigned int hash = getFeatureWordHash(word);
 
+    while (1){
+        if (featHashInd[hash] == -1) {
+            return -1;
+        }
+        if (!strcmp(word, featHashWords[featHashInd[hash]].str)){
+            return featHashInd[hash];
+        }
+        hash = (hash + 1) % featHashSize;
+    }
+
+    return -1;
 }
 
 // Adding a feature word
 int addFeatureWord(char* word){
     // search for feature if already exists
-    int featureInd = searchFeature(word);
+    int featureInd = searchFeatureWord(word);
     
     // If yes, ignore
     if(featureInd != -1) 
         return featureInd;
     else{
-        // If no, add and re-adjust featVocabSize
+        // If no, add and re-adjust featVocabSize and featVocabMaxSize
         // adding a new featureWord
         unsigned int hash = getFeatureWordHash(word);
+
         // Get the index where new feature word should be stored
         while(1){
             if(featHashInd[hash] != -1) 
@@ -1125,12 +1145,19 @@ int addFeatureWord(char* word){
             else
                 break;
         }
+        // Add the word and increase vocab size
+        featHashInd[hash] = featVocabSize;
+        featHashWords[featVocabSize] = constructFeatureWord(word);
+        featVocabSize++;
 
-        featHashWords[hash] = constructFeatureWord(word);
-
-        // TODO:
         // Adjusting the size of vocab if needed
-        return hash;
+        if(featVocabSize + 2 > featVocabMaxSize){
+            featVocabMaxSize += 1000;
+            featHashWords = (struct featureWord *) realloc(featHashWords, 
+                                        featVocabMaxSize * sizeof(struct featureWord));
+        }
+
+        return featHashInd[hash];
     }
 }
 
