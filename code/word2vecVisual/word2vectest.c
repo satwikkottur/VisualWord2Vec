@@ -591,14 +591,14 @@ void TrainModel() {
   if (negative > 0) InitUnigramTable();
   start = clock();
   // [S] : Creates the threads for execution
-  //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+  for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
   // [S] : Waits for the completion of execution of the threads
-  //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+  for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     //***************************************************************************************
     // [S] added
     // Reading the file for relation word
-    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    /*char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
     char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
     char postPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
     char prePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre.txt";
@@ -613,9 +613,9 @@ void TrainModel() {
     refineNetwork();
     // saving after the refining the network
     saveEmbeddings(postPath);
-    //***************************************************************************************
+    /***************************************************************************************
     // skip writing to the file
-    return;
+    return;*/
   fo = fopen(output_file, "wb");
   if (classes == 0) {
     // Save the word vectors
