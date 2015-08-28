@@ -22,7 +22,7 @@ small:
 
 big:
 	make
-	./word2vectest -train modelsNdata/coco_train_minus_cs_test.txt -output modelsNdata/word2vec_output.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
+	./word2vectest -train modelsNdata/coco_train_minus_cs_test.txt -output modelsNdata/word2vec_after_refine.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 	#./word2vectest -train modelsNdata/coco_train_minus_cs_test.txt -output word2vec_output.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -read-vocab modelsNdata/large-vocab.txt
 
 newline:

@@ -1,16 +1,18 @@
 % Script that demonstrates the use of textual features for common sense
 % Used to compare before and after refining the network
 
+% Adding the paths
+run('/home/satwik/VisualWord2Vec/code/addPaths.m');
 %******************************************************
 rootPath = '/home/satwik/VisualWord2Vec';
 dataPath = '/home/satwik/VisualWord2Vec/data';
 
-w2vModelPath = fullfile(rootPath, 'code/word2vecVisual/modelsNdata', 'coco_w2v_pre.mat');
+w2vModelPath = fullfile(rootPath, 'code/word2vecVisual/modelsNdata', 'coco_w2v_after_refine.mat');
 psrFeaturePath = fullfile(dataPath, 'PSR_features.txt');
 numFeaturePath = fullfile(dataPath, 'Num_features.txt');
-resultPath = fullfile(rootPath, 'code/word2vecVisual/modelsNdata', 'word2vec_output.bin');
+resultPath = fullfile(rootPath, 'code/word2vecVisual/modelsNdata', 'word2vec_after_refine.bin');
 %******************************************************
-convertWord2VecResults(resultPath, w2vModelPath);
+%convertWord2VecResults(resultPath, w2vModelPath);
 w2vModel = load(w2vModelPath);
 fprintf('Loaded word2vec model succesfully!\n');
 % Reading the labels
