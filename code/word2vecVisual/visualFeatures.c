@@ -86,6 +86,36 @@ void readClusterIdFile(char* clusterPath){
     fclose(filePt);
 }
 
+// Reading the visual feature file
+void readVisualFeatureFile(char* fileName){
+    FILE* filePt = fopen(fileName, "rb");
+
+    if(filePt == NULL){
+        printf("File at %s doesnt exist!\n", filePt);
+        exit(1);
+    }
+
+    int feature, i, noLines = 0;
+    // Reading till EOF
+    while(fscanf(filePt, "%d", &feature) != EOF){
+        prs[noLines].feat = (int*) malloc(sizeof(int) * VISUAL_FEATURE_SIZE);
+        prs[noLines].feat[0] = feature;
+
+        for(i = 1; i < VISUAL_FEATURE_SIZE; i++){
+            //printf("%d ", feature);
+            fscanf(filePt, "%d", &feature);
+            prs[noLines].feat[i] = feature;
+        }
+        //printf("%d\n", feature);
+
+        //printf("Line : %d\n", noLines);
+        noLines++;
+    }
+
+    // Closing the file
+    fclose(filePt);
+}
+
 // Finding the indices of words for P,R,S
 struct featureWord constructFeatureWord(char* word){
     int index = SearchVocab(word); 
@@ -180,6 +210,15 @@ void initRefining(){
 
 // Refine the network through clusters
 void refineNetwork(){
+    // Reading the features for debugging
+    /*int x, z;
+    for(x = 0; x < NUM_TRAINING; x++){
+        for( z = 0; z < VISUAL_FEATURE_SIZE; z++){
+            printf("%d ", prs[x].feat[z]);
+        }
+        printf("\n");
+    }*/
+
     long long c, i;
     float* y = (float*) malloc(sizeof(float) * NUM_CLUSTERS);
     struct featureWord p, s, r;
@@ -449,4 +488,9 @@ char *multi_tok(char *input, char *delimiter) {
     *end = '\0';
     string = end + strlen(delimiter);
     return temp;
+}
+
+// Clustering kmeans wrapper
+void clusterVisualFeatures(int noClusters){
+
 }

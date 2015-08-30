@@ -19,6 +19,7 @@
 #define MAX_STRING_LENGTH 100
 #define NUM_TRAINING 4260
 #define NUM_CLUSTERS 10
+#define VISUAL_FEATURE_SIZE 1222
 
 // Declaring the extern variables allowing separation of code
 extern long long vocab_size, layer1_size;
@@ -35,15 +36,14 @@ struct featureWord{
 struct prsTuple{
     int p, r, s;
     //struct featureWord p, r, s;
-
+    
     // visual features for the instance 
-    float* feat;
+    int* feat;
     // Cluster id assigned to the current instance
     int cId; 
     // Word embedding for the instance
     float* embed; 
 };
-
 
 /************************************************************************/
 // Signatures of original functions
@@ -88,13 +88,18 @@ void saveFeatureEmbedding(struct featureWord, FILE*);
 // Save the vocab for the feature word
 void saveFeatureWordVocab(char*);
 /*****************************************/
-
 // Adding a feature word to the hash
 int addFeatureWord(char*);
 // Searching for a feature word
 int searchFeatureWord(char*);
 // Hash for the feature words
 int getFeatureWordHash(char*);
+/*****************************************/
+// Functions for kmeans clustering
+void readVisualFeatureFile(char*);
+
+// Wrapper for kmeans
+void clusterVisualFeatures(int);
 /*****************************************/
 
 #endif
