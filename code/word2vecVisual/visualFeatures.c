@@ -91,7 +91,7 @@ void readVisualFeatureFile(char* fileName){
     FILE* filePt = fopen(fileName, "rb");
 
     if(filePt == NULL){
-        printf("File at %s doesnt exist!\n", filePt);
+        printf("File at %s doesnt exist!\n", fileName);
         exit(1);
     }
 
@@ -491,6 +491,46 @@ char *multi_tok(char *input, char *delimiter) {
 }
 
 // Clustering kmeans wrapper
+// Source: http://yael.gforge.inria.fr/tutorial/tuto_kmeans.html
 void clusterVisualFeatures(int noClusters){
+    int k = noClusters;                           /* number of cluster to create */
+    int d = VISUAL_FEATURE_SIZE;                           /* dimensionality of the vectors */
+    int n = NUM_TRAINING;                         /* number of vectors */
+    int nt = 1;                           /* number of threads to use */
+    int niter = 0;                        /* number of iterations (0 for convergence)*/
+    int redo = 1;                         /* number of redo */
 
+    // Populate the features
+    float * v = fvec_new (d * n);    /* random set of vectors */
+    long i, j, offset;
+    for (i = 0; i < n; i++){
+        offset = i * d;
+        for(j = 0; j < d; j++)
+            v[offset + j] = (float) prs[i].feat[j];
+    }
+
+    /* variables are allocated externaly */
+    float * centroids = fvec_new (d * k); /* output: centroids */
+    float * dis = fvec_new (n);           /* point-to-cluster distance */
+    int * assign = ivec_new (n);          /* quantization index of each point */
+    int * nassign = ivec_new (k);         /* output: number of vectors assigned to each centroid */
+
+    double t1 = getmillisecs();
+    // Cluster the features
+    kmeans (d, n, k, niter, v, 1, 1, redo, centroids, dis, assign, nassign);
+    double t2 = getmillisecs();
+
+    printf ("kmeans performed in %.3fs\n\n", (t2 - t1)  / 1000);
+    //ivec_print (nassign, k);
+
+    // Write the cluster ids to the prsTuple structure
+    for (i = 0; i < n; i++)
+        prs[i].cId = assign[i];
+
+    // Debugging the cId for the prs tuples
+    /*for (i = 0; i < n; i++)
+        printf("%i\n", prs[i].cId);
+
+    // Free memory
+    free(v); free(centroids); free(dis); free(assign); free(nassign);
 }

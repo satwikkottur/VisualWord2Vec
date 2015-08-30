@@ -597,14 +597,18 @@ void TrainModel() {
     char vocabPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_vocab.txt";
     char visualPath[] = "/home/satwik/VisualWord2Vec/data/Num_features.txt";
 
+    // Initializing the refining
     initRefining();
+    // Reading for the word features, cluster ids and visual features
+    // ClusterId reading will be avoided when clustering is ported to C
     readFeatureFile(featurePath);
     readClusterIdFile(clusterPath);
     readVisualFeatureFile(visualPath);
     // saving before the refining the network
     //saveEmbeddings(prePath);
     //saveFeatureWordVocab(vocabPath);
-    refineNetwork();
+    //refineNetwork();
+    clusterVisualFeatures(NUM_CLUSTERS);
     // saving after the refining the network
     //saveEmbeddings(postPath);
     /***************************************************************************************/

@@ -9,6 +9,11 @@
 # include <pthread.h>
 # include <ctype.h>
 
+// For clustering
+# include <yael/vector.h>
+# include <yael/kmeans.h>
+# include <yael/machinedeps.h>
+
 // Macros for the visual features
 #define MAX_STRING 100
 #define EXP_TABLE_SIZE 1000

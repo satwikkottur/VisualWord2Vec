@@ -1,7 +1,10 @@
 CC = gcc
 #Using -Ofast instead of -O3 might result in faster code, but is supported only by newer GCC versions
 #CFLAGS = -lm -pthread -O3 -march=native -Wall -funroll-loops -Wno-unused-result
-CFLAGS = -lm -pthread -O3 -march=native -Wall -funroll-loops -Wno-unused-value
+YAEL = -I /home/satwik/VisualWord2Vec/libs/yael -L /home/satwik/VisualWord2Vec/libs/yael/yael -lyael
+
+CFLAGS = -lm -pthread -O3 -march=native -Wall -funroll-loops -Wno-unused-value $(YAEL)
+
 MOVE=mv *.o $(BIN)
 BIN = bin/
 
@@ -32,4 +35,4 @@ newline:
 	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test_tokenized_stops.txt -output word2vec_output_newline.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 
 clean:
-	rm -rf word2vec visualFeatures *.o bin/*
+	rm -rf word2vec visualFeatures *.o $(BIN)/*
