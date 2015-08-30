@@ -10,6 +10,8 @@ code/word2vecVisual/modelsNdata/*
 
 # Ignoring files from python
 *.py[cod]
+# Ignoring the swig folder
+libs/swig-3.0.7/
 
 # Ignoring big data files from relationshipModeling
 relationshipModeling/myTupleExtractor/SimpleSentences/
@@ -18,4 +20,35 @@ relationshipModeling/myTupleExtractor/data/
 # Ignoring dumps in the code folder
 code/src/dumps/*
 
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
 
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/

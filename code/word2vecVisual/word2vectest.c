@@ -608,14 +608,14 @@ void TrainModel() {
     readFeatureFile(featurePath);
     readClusterIdFile(clusterPath);
     // saving before the refining the network
-    //saveEmbeddings(prePath);
+    saveEmbeddings(prePath);
     //saveFeatureWordVocab(vocabPath);
     refineNetwork();
     // saving after the refining the network
-    //saveEmbeddings(postPath);
+    saveEmbeddings(postPath);
     /***************************************************************************************/
     // skip writing to the file
-    //return;*/
+    return;
   fo = fopen(output_file, "wb");
   if (classes == 0) {
     // Save the word vectors

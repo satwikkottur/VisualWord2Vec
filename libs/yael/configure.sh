@@ -94,13 +94,17 @@ EOF
 
 # Search latest python version (not 3.x !!!!)
 for pysubver in {7,6,5,4,x} ; do
-    if [ -f "/usr/include/python2.${pysubver}/Python.h" ] ; then
+    if [ -f "/usr/local/include/python2.${pysubver}/Python.h" ] ; then
+    # [S]:
+    #if [ -f "/usr/include/python2.${pysubver}/Python.h" ] ; then
 	echo "Found python development version 2.$pysubver"
 	break
     fi
 done
 
-pythoncflags=-I/usr/include/python2.$pysubver
+pythoncflags=-I/usr/local/include/python2.$pysubver
+#[S]: 
+#pythoncflags=-I/usr/include/python2.$pysubver
 
 if [ "$pysubver" == "x" ] ; then
     echo "# Warn: no python directory (python-dev) found"
