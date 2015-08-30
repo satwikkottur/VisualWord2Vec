@@ -19,24 +19,16 @@
 #include <pthread.h>
 #include <ctype.h>
 
-#define MAX_STRING 100
-#define EXP_TABLE_SIZE 1000
-#define MAX_EXP 6
-#define MAX_SENTENCE_LENGTH 1000
-#define MAX_CODE_LENGTH 40
 
-#define MAX_STRING_LENGTH 100
-#define NUM_TRAINING 4260
-#define NUM_CLUSTERS 10
-
+/**********************************************************************************/
 // [S] added
 // time module to measure time
 #include "timer.h"
 clock_t startPoint;
+#include "visualFeatures.h"
+/***********************************************************************************/
 
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
-
-typedef float real;                    // Precision of float numbers
 
 struct vocab_word {
   long long cn;
@@ -58,48 +50,6 @@ clock_t start;
 int hs = 0, negative = 5;
 const int table_size = 1e8;
 int *table;
-// [S] added
-/**********************************************************************************/
-
-// Structure to hold the index information
-struct featureWord{
-    char* str;
-    int count;
-    int* index;
-};
-
-// Structure to hold information about P,R,S triplets
-struct prsTuple{
-    struct featureWord p, r, s;
-
-    // visual features for the instance 
-    float* feat;
-    // Cluster id assigned to the current instance
-    int cId; 
-    // Word embedding for the instance
-    float* embed; 
-};
-
-// Storing the triplets
-struct prsTuple prs[NUM_TRAINING];
-
-// getting the vocab indices
-struct featureWord findTupleIndex(char*);
-
-// Reading the feature file
-void readFeatureFile(char*);
-
-// Reading the cluster id file
-void readClusterIdFile(char*);
-
-// Multi character spliting
-char* multi_tok(char*, char*);
-
-// Function to refine the network through clusters
-void refineNetwork();
-
-/***********************************************************************************/
-
 void InitUnigramTable() {
   int a, i;
   double train_words_pow = 0;
@@ -633,20 +583,29 @@ void TrainModel() {
   if (negative > 0) InitUnigramTable();
   start = clock();
   // [S] : Creates the threads for execution
-  //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+  for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
   // [S] : Waits for the completion of execution of the threads
-  //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+  for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     //***************************************************************************************
     // [S] added
     // Reading the file for relation word
     char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
     char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
+    char postPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
+    char prePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre.txt";
+    char vocabPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_vocab.txt";
 
+    initRefining();
     readFeatureFile(featurePath);
     readClusterIdFile(clusterPath);
+    // saving before the refining the network
+    saveEmbeddings(prePath);
+    //saveFeatureWordVocab(vocabPath);
     refineNetwork();
-    //***************************************************************************************
+    // saving after the refining the network
+    saveEmbeddings(postPath);
+    /***************************************************************************************/
     // skip writing to the file
     return;
   fo = fopen(output_file, "wb");
@@ -795,185 +754,3 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-/***************************************************************************/
-// reading feature file
-void readFeatureFile(char* filePath){
-    // Opening the file
-    FILE* filePt = fopen(filePath, "rb");
-
-    if(filePt == NULL){
-        printf("File at %s doesnt exist!\n", filePath);
-        exit(1);
-    }
-
-    printf("\nReading %s...\n", filePath);
-
-    char pWord[MAX_STRING_LENGTH], sWord[MAX_STRING_LENGTH], rWord[MAX_STRING_LENGTH];
-    // Read and store the contents
-    int noTuples = 0;
-    while(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]>\n", pWord, sWord, rWord) != EOF){
-        // Getting the indices for p, s, r
-        struct prsTuple newTuple;/* = {.p = {findTupleIndex(pWord)},
-                                    .r = {findTupleIndex(rWord)},
-                                    .s = {findTupleIndex(sWord)},
-                                    .cId = -1,
-                                    .feat = NULL,
-                                    .embed = NULL};*/
-        //printf("%s : %s : %s\n", p, s, r);
-        newTuple.p = findTupleIndex(pWord);
-        newTuple.s = findTupleIndex(sWord);
-        newTuple.r = findTupleIndex(rWord);
-
-        prs[noTuples] = newTuple;
-        noTuples++;
-    }
-
-    // Sanity check
-    if(noTuples != NUM_TRAINING){
-        printf("\nNumber of training instances dont match in feature file!\n");
-        exit(1);
-    }
-
-    fclose(filePt);
-    printf("File read with %d tuples\n\n", noTuples);
-}
-
-// Reading the cluster ids
-void readClusterIdFile(char* clusterPath){
-    FILE* filePt = fopen(clusterPath, "rb");
-
-    if(filePt == NULL){
-        printf("File at %s doesnt exist!\n", clusterPath);
-        exit(1);
-    }
-
-    int i = 0, clusterId;
-    while(fscanf(filePt, "%d\n", &clusterId) != EOF){
-        if(prs[i].cId == -1) prs[i].cId = clusterId;
-        i++;
-    }
-
-    // Sanity check
-    if(i != NUM_TRAINING){
-        printf("\nNumber of training instances dont match in cluster file!\n");
-        exit(1);
-    }
-
-    fclose(filePt);
-}
-
-// Finding the indices of words for P,R,S
-struct featureWord findTupleIndex(char* word){
-    int index = SearchVocab(word); 
-
-    struct featureWord feature = {.str = word};
-    
-    // Do something if not in vocab
-    if(index == -1) {
-        //printf("Not in vocab -> %s : %s\n", word, "") ;
-        int count=0, i;
-
-        // Split based on 's
-        char* token = (char*) malloc(MAX_STRING_LENGTH);
-        strcpy(token, word);
-
-        char* first = multi_tok(token, "'s");
-        char* second = multi_tok(NULL, "'s");
-
-        // Join both the parts without the 's
-        if(second != NULL) token = strcat(first, second);
-        else token = first;
-
-        char* temp = (char*) malloc(MAX_STRING_LENGTH);
-        strcpy(temp, token);
-        
-        // Remove ' ', ',', '.', '?', '!', '\', '/'
-        char* delim = " .,/!?\\";
-        token = strtok(token, delim);
-        // Going over the token to determine the number of parts
-        while(token != NULL){
-            count++;
-            token = strtok(NULL, delim);
-        }
-
-        // Nsmallow store the word components, looping over them
-        feature.index = (int*) malloc(count * sizeof(int));
-        feature.count = count;
-        
-        token = strtok(temp, delim);
-        count = 0;
-        while(token != NULL){
-            // Convert the token into lower case
-            for(i = 0; token[i]; i++) token[i] = tolower(token[i]);
-           
-            // Save the index
-            feature.index[count] = SearchVocab(token);
-            if(feature.index[count] == -1)
-                printf("Word not found in dictionary => %s\t |  %s\n", token, word);
-
-            //printf("%d \t", feature.index[count]);
-            token = strtok(NULL, delim);
-            count++;
-        }
-        //printf("\n");
-
-    } else{
-        //printf("In Vocab -> %s\n", word);
-        feature.count = 1;
-        feature.index = (int *) malloc(sizeof(int));
-        feature.index[0] = index;
-    }
-
-    return feature;
-}
-
-// Refine the network through clusters
-void refineNetwork(){
-    long long a, b;
-    unsigned long long next_random = 1;
-    // Setup the network 
-    a = posix_memalign((void **)&syn1, 128, (long long)NUM_CLUSTERS * layer1_size * sizeof(real));
-    if (syn1 == NULL) {
-        printf("Memory allocation failed\n"); 
-        exit(1);
-    }
-
-    // Initialize the last layer of weights
-    for (a = 0; a < NUM_CLUSTERS; a++) for (b = 0; b < layer1_size; b++){
-        next_random = next_random * (unsigned long long)25214903917 + 11;
-        syn1[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
-    }
-
-    // Read each of the training instance
-    
-    // Predict the cluster
-
-    // Propage the error to the PRS features
-    
-    
-
-}
-
-// Multiple character split
-// Source: http://stackoverflow.com/questions/29788983/split-char-string-with-multi-character-delimiter-in-c
-char *multi_tok(char *input, char *delimiter) {
-    static char *string;
-    if (input != NULL)
-        string = input;
-
-    if (string == NULL)
-        return string;
-
-    char *end = strstr(string, delimiter);
-    if (end == NULL) {
-        char *temp = string;
-        string = NULL;
-        return temp;
-    }
-
-    char *temp = string;
-
-    *end = '\0';
-    string = end + strlen(delimiter);
-    return temp;
-}

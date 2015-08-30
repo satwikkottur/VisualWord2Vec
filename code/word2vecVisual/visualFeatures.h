@@ -1,10 +1,28 @@
 #ifndef VISUAL_FEATURES
 #define VISUAL_FEATURES
 
+// Standard libraries
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+# include <math.h>
+# include <pthread.h>
+# include <ctype.h>
+
 // Macros for the visual features
+#define MAX_STRING 100
+#define EXP_TABLE_SIZE 1000
+#define MAX_EXP 6
+#define MAX_SENTENCE_LENGTH 1000
+#define MAX_CODE_LENGTH 40
+
 #define MAX_STRING_LENGTH 100
 #define NUM_TRAINING 4260
 #define NUM_CLUSTERS 10
+
+// Declaring the extern variables allowing separation of code
+extern long long vocab_size, layer1_size;
+extern float *syn0, *syn1, *expTable;
 
 // Structure to hold the index information
 struct featureWord{
@@ -26,6 +44,14 @@ struct prsTuple{
     float* embed; 
 };
 
+
+/************************************************************************/
+// Signatures of original functions
+/************************************************************************/
+typedef float real; // Re-naming float as real
+int SearchVocab(char* word);
+
+/************************************************************************/
 // Storing the triplets
 struct prsTuple prs[NUM_TRAINING];
 
@@ -56,17 +82,12 @@ void updateWeights(float*, int, int);
 
 // save the embeddings
 void saveEmbeddings(char*);
+
 // save a single feature
 void saveFeatureEmbedding(struct featureWord, FILE*);
 // Save the vocab for the feature word
 void saveFeatureWordVocab(char*);
 /*****************************************/
-// Storing the feature hash
-struct featureWord* featHashWords;
-int* featHashInd;
-const int featHashSize = 100000;
-int featVocabSize = 0;
-int featVocabMaxSize = 2000;
 
 // Adding a feature word to the hash
 int addFeatureWord(char*);
@@ -74,5 +95,6 @@ int addFeatureWord(char*);
 int searchFeatureWord(char*);
 // Hash for the feature words
 int getFeatureWordHash(char*);
+/*****************************************/
 
 #endif

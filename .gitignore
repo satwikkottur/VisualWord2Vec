@@ -12,6 +12,8 @@ code/word2vecVisual/modelsNdata/*
 *.py[cod]
 # Ignoring the swig folder
 libs/swig-3.0.7/
+# Ignoring the compiled binaries
+code/word2vecVisual/bin
 
 # Ignoring big data files from relationshipModeling
 relationshipModeling/myTupleExtractor/SimpleSentences/
