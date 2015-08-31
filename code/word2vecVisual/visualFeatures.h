@@ -59,6 +59,8 @@ int SearchVocab(char* word);
 /************************************************************************/
 // Storing the triplets
 struct prsTuple prs[NUM_TRAINING];
+struct prsTuple* test;
+struct prsTuple* val;
 
 // getting the vocab indices
 struct featureWord constructFeatureWord(char*);
@@ -106,5 +108,8 @@ void readVisualFeatureFile(char*);
 // Wrapper for kmeans
 void clusterVisualFeatures(int);
 /*****************************************/
-
+// Common sense task
+void performCommonSenseTask();
+// Reading the test and valudation files
+void readTestValFiles(char*, struct prsTuple*);
 #endif

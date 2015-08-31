@@ -525,12 +525,62 @@ void clusterVisualFeatures(int noClusters){
 
     // Write the cluster ids to the prsTuple structure
     for (i = 0; i < n; i++)
-        prs[i].cId = assign[i];
+        prs[i].cId = assign[i] + 1;
 
     // Debugging the cId for the prs tuples
     /*for (i = 0; i < n; i++)
-        printf("%i\n", prs[i].cId);
+        printf("%i\n", prs[i].cId);*/
 
     // Free memory
     free(v); free(centroids); free(dis); free(assign); free(nassign);
+}
+
+// Common sense evaluation
+void performCommonSenseTask(){
+    printf("Common sense task\n\n");
+    // Read the validation and test sets    
+    char testFile[] = "/home/satwik/VisualWord2Vec/data/test_features.txt";
+    char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
+
+    // Clean the strings for test and validation sets, store features
+    readTestValFiles(valFile, val);
+    readTestValFiles(testFile, test);
+
+    // Get the features for test and validation sets
+
+    // Evaluate the cosine distance
+
+    // ReLU
+
+    // Compute the accuracy
+}
+
+// Reading the test and validation files
+void readTestValFiles(char* fileName, struct prsTuple* holder){
+    // Read the file
+    FILE* filePt = fopen(fileName, "rb");
+    long noTuples = 0;
+    
+    // Counting the number of lines
+    char pWord[MAX_STRING_LENGTH], 
+         rWord[MAX_STRING_LENGTH], 
+         sWord[MAX_STRING_LENGTH];
+    int gTruth = -1;
+    while(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]> %d\n", pWord, rWord, sWord, &gTruth) != EOF)
+        noTuples++;
+
+    // Initialize and save the feature words
+    holder = (struct prsTuple*) malloc(sizeof(struct prsTuple) * noTuples);
+    long i;
+    for( i = 0; i < noTuples; i++){
+        holder[i].p = addFeatureWord(pWord);
+        holder[i].r = addFeatureWord(rWord);
+        holder[i].s = addFeatureWord(sWord);
+    
+        holder[i].cId = gTruth;
+    }
+    
+    printf("Found %ld tuples in %s...\n\n", noTuples, fileName);
+    // Close the file
+    fclose(filePt);
 }

@@ -152,7 +152,6 @@ else
     fprintf('Models dumped after sweeping c\n');
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % Load validation and test data
 val = load('/home/satwik/VisualWord2Vec/original/val.mat');
 test = load('/home/satwik/VisualWord2Vec/original/test.mat');
@@ -280,7 +279,6 @@ switch embeddingType
         %threshold = -1.2; % Empirically determined
     case 5
         threshold = -1.4; % Empirically determined
-
 end
 
 %precValues = [];

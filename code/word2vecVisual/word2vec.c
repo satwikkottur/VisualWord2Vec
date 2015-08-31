@@ -570,22 +570,22 @@ void *TrainModelThread(void *id) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void TrainModel() {
-  long a, b, c, d;
-  FILE *fo;
-  pthread_t *pt = (pthread_t *)malloc(num_threads * sizeof(pthread_t));
-  printf("Starting training using file %s\n", train_file);
-  starting_alpha = alpha;
-  if (read_vocab_file[0] != 0) ReadVocab(); else LearnVocabFromTrainFile();
-  if (save_vocab_file[0] != 0) SaveVocab();
-  if (output_file[0] == 0) return;
-  InitNet();
-  // [S] : Create a unigram distribution table for negative sampling
-  if (negative > 0) InitUnigramTable();
-  start = clock();
-  // [S] : Creates the threads for execution
-  //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
-  // [S] : Waits for the completion of execution of the threads
-  //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+    long a, b, c, d;
+    FILE *fo;
+    pthread_t *pt = (pthread_t *)malloc(num_threads * sizeof(pthread_t));
+    printf("Starting training using file %s\n", train_file);
+    starting_alpha = alpha;
+    if (read_vocab_file[0] != 0) ReadVocab(); else LearnVocabFromTrainFile();
+    if (save_vocab_file[0] != 0) SaveVocab();
+    if (output_file[0] == 0) return;
+    InitNet();
+    // [S] : Create a unigram distribution table for negative sampling
+    if (negative > 0) InitUnigramTable();
+    start = clock();
+    // [S] : Creates the threads for execution
+    //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+    // [S] : Waits for the completion of execution of the threads
+    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     //***************************************************************************************
     // [S] added
@@ -604,18 +604,23 @@ void TrainModel() {
     readFeatureFile(featurePath);
     readClusterIdFile(clusterPath);
     readVisualFeatureFile(visualPath);
+    //clusterVisualFeatures(NUM_CLUSTERS);
     // saving before the refining the network
     //saveEmbeddings(prePath);
     //saveFeatureWordVocab(vocabPath);
-    //refineNetwork();
-    clusterVisualFeatures(NUM_CLUSTERS);
+    refineNetwork();
+    //clusterVisualFeatures(NUM_CLUSTERS);
     // saving after the refining the network
     //saveEmbeddings(postPath);
+    
+    // common sense task
+    performCommonSenseTask();
     /***************************************************************************************/
     // skip writing to the file
-    return;
-  fo = fopen(output_file, "wb");
-  if (classes == 0) {
+    //return;
+    
+    fo = fopen(output_file, "wb");
+    if (classes == 0) {
     // Save the word vectors
     fprintf(fo, "%lld %lld\n", vocab_size, layer1_size);
     for (a = 0; a < vocab_size; a++) {
@@ -624,7 +629,7 @@ void TrainModel() {
       else for (b = 0; b < layer1_size; b++) fprintf(fo, "%lf ", syn0[a * layer1_size + b]);
       fprintf(fo, "\n");
     }
-  } else {
+    } else {
     // Run K-means on the word vectors
     int clcn = classes, iter = 10, closeid;
     int *centcn = (int *)malloc(classes * sizeof(int));
@@ -667,8 +672,8 @@ void TrainModel() {
     free(centcn);
     free(cent);
     free(cl);
-  }
-  fclose(fo);
+    }
+    fclose(fo);
 }
 
 int ArgPos(char *str, int argc, char **argv) {
