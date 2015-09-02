@@ -35,6 +35,8 @@ struct featureWord{
     char* str;
     int count;
     int* index;
+    // Word embedding for the instance
+    float* embed; 
 };
 
 // Structure to hold information about P,R,S triplets
@@ -46,8 +48,6 @@ struct prsTuple{
     int* feat;
     // Cluster id assigned to the current instance
     int cId; 
-    // Word embedding for the instance
-    float* embed; 
 };
 
 /************************************************************************/
@@ -90,10 +90,15 @@ void updateWeights(float*, int, int);
 // save the embeddings
 void saveEmbeddings(char*);
 
+// Compute the embeddings for all the words
+void computeEmbeddings();
+
 // save a single feature
 void saveFeatureEmbedding(struct featureWord, FILE*);
 // Save the vocab for the feature word
 void saveFeatureWordVocab(char*);
+// Computing the embedding for the feature word 
+void computeFeatureEmbedding(struct featureWord*);
 /*****************************************/
 // Adding a feature word to the hash
 int addFeatureWord(char*);
@@ -111,5 +116,5 @@ void clusterVisualFeatures(int);
 // Common sense task
 void performCommonSenseTask();
 // Reading the test and valudation files
-void readTestValFiles(char*, struct prsTuple*);
+long readTestValFiles(char*, struct prsTuple*);
 #endif

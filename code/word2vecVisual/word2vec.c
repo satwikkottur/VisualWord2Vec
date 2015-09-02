@@ -606,18 +606,23 @@ void TrainModel() {
     readVisualFeatureFile(visualPath);
     //clusterVisualFeatures(NUM_CLUSTERS);
     // saving before the refining the network
-    //saveEmbeddings(prePath);
+    saveEmbeddings(prePath);
     //saveFeatureWordVocab(vocabPath);
+
     refineNetwork();
     //clusterVisualFeatures(NUM_CLUSTERS);
+    
+    // Compute the embeddings for all the feature words
+    //computeEmbeddings();
+
     // saving after the refining the network
-    //saveEmbeddings(postPath);
+    saveEmbeddings(postPath);
     
     // common sense task
-    performCommonSenseTask();
+    //performCommonSenseTask();
     /***************************************************************************************/
     // skip writing to the file
-    //return;
+    return;
     
     fo = fopen(output_file, "wb");
     if (classes == 0) {

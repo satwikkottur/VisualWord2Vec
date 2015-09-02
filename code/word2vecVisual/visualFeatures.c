@@ -3,9 +3,10 @@
 // Storing the feature hash (globals)
 struct featureWord* featHashWords;
 int* featHashInd;
-const int featHashSize = 100000;
+const int featHashSize = 200000;
 int featVocabSize = 0;
-int featVocabMaxSize = 2000;
+int featVocabMaxSize = 5000;
+long noTest = 0, noVal = 0;
 /***************************************************************************/
 // reading feature file
 void readFeatureFile(char* filePath){
@@ -123,6 +124,9 @@ struct featureWord constructFeatureWord(char* word){
     struct featureWord feature;
     feature.str = (char*) malloc(MAX_STRING_LENGTH);
     strcpy(feature.str, word);
+
+    // Initialize the fature embedding
+    //feature.embed = (float*) malloc(layer1_size * sizeof(float));
     
     // Do something if not in vocab
     if(index == -1) {
@@ -225,7 +229,7 @@ void refineNetwork(){
 
     // Read each of the training instance
     for(i = 0; i < NUM_TRAINING; i++){
-        printf("Training %lld instance ....\n", i);
+        //printf("Training %lld instance ....\n", i);
         
         // Checking possible fields to avoid segmentation error
         if(prs[i].cId < 1 || prs[i].cId > NUM_CLUSTERS) {
@@ -350,11 +354,23 @@ void saveEmbeddings(char* saveName){
     FILE* filePt = fopen(saveName, "wb");
     int i;
 
+    // Re-compute the embeddings before saving
+    computeEmbeddings();
+    
     // Go through the vocab and save the embeddings
     for(i = 0; i < featVocabSize; i++)
         saveFeatureEmbedding(featHashWords[i], filePt);
-
+    
     fclose(filePt);
+}
+
+// Save a particular embedding
+void saveFeatureEmbedding(struct featureWord feature, FILE* filePt){
+    // Saving to the file
+    int i;
+    for(i = 0; i < layer1_size - 1; i++)
+        fprintf(filePt, "%f ", feature.embed[i]);
+    fprintf(filePt, "%f\n", feature.embed[layer1_size-1]);
 }
 
 // Saving the feature vocab
@@ -370,8 +386,22 @@ void saveFeatureWordVocab(char* fileName){
 
 }
 
-// Save a particular embedding
-void saveFeatureEmbedding(struct featureWord feature, FILE* filePt){
+// Compute embeddings
+void computeEmbeddings(){
+    long i;
+    // Computing the feature embeddings
+    for(i = 0; i < featVocabSize; i++){
+        if(featHashWords[i].embed == NULL)
+            // Allocate and then compute the feature embedding
+            featHashWords[i].embed = (float*) malloc(layer1_size * sizeof(float));
+
+        // Computing the feature embedding
+        computeFeatureEmbedding(&featHashWords[i]);
+    }
+}
+
+// Compute embedding for a feature word
+void computeFeatureEmbedding(struct featureWord* feature){
     // Go through the current feature and get the mean of components
     int i, c, actualCount = 0;
     long long offset;
@@ -379,12 +409,12 @@ void saveFeatureEmbedding(struct featureWord feature, FILE* filePt){
     mean = (float*) calloc(layer1_size, sizeof(float));
 
     // Get the mean feature for the word
-    for(c = 0; c < feature.count; c++){
+    for(c = 0; c < feature->count; c++){
         // If not in vocab, continue
-        if(feature.index[c] == -1) continue;
+        if(feature->index[c] == -1) continue;
 
         // Write the vector
-        offset = feature.index[c] * layer1_size;
+        offset = feature->index[c] * layer1_size;
         for (i = 0; i < layer1_size; i++) 
             mean[i] += syn0[offset + i];
 
@@ -397,11 +427,11 @@ void saveFeatureEmbedding(struct featureWord feature, FILE* filePt){
         for (i = 0; i < layer1_size; i++)
             mean[i] = mean[i]/actualCount;
 
-    // Saving to the file
-    //fprintf(filePt, "%s\n", feature.str);
-    for(i = 0; i < layer1_size-1; i++)
-        fprintf(filePt, "%f ", mean[i]);
-    fprintf(filePt, "%f\n", mean[layer1_size-1]);
+    // Saving the embedding in the featureWord
+    for(i = 0; i < layer1_size; i++)
+        feature->embed[i] = mean[i];
+
+    free(mean);
 }
 
 // Searching a feature word
@@ -543,10 +573,12 @@ void performCommonSenseTask(){
     char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
 
     // Clean the strings for test and validation sets, store features
-    readTestValFiles(valFile, val);
-    readTestValFiles(testFile, test);
+    noVal = readTestValFiles(valFile, val);
+    noTest = readTestValFiles(testFile, test);
 
     // Get the features for test and validation sets
+    // Re-evaluate the features for the entire vocab
+    computeEmbeddings();
 
     // Evaluate the cosine distance
 
@@ -556,7 +588,7 @@ void performCommonSenseTask(){
 }
 
 // Reading the test and validation files
-void readTestValFiles(char* fileName, struct prsTuple* holder){
+long readTestValFiles(char* fileName, struct prsTuple* holder){
     // Read the file
     FILE* filePt = fopen(fileName, "rb");
     long noTuples = 0;
@@ -572,7 +604,7 @@ void readTestValFiles(char* fileName, struct prsTuple* holder){
     // Initialize and save the feature words
     holder = (struct prsTuple*) malloc(sizeof(struct prsTuple) * noTuples);
     long i;
-    for( i = 0; i < noTuples; i++){
+    for(i = 0; i < noTuples; i++){
         holder[i].p = addFeatureWord(pWord);
         holder[i].r = addFeatureWord(rWord);
         holder[i].s = addFeatureWord(sWord);
@@ -583,4 +615,6 @@ void readTestValFiles(char* fileName, struct prsTuple* holder){
     printf("Found %ld tuples in %s...\n\n", noTuples, fileName);
     // Close the file
     fclose(filePt);
+
+    return noTuples;
 }
