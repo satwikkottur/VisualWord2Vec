@@ -295,7 +295,7 @@ end
 %    precValues = [precValues, mean(precVal(:))];
 %end
 
-% Use the same threshold for test set
+% Us the same threshold for test set
 % Faster implementation
 textTestScore = mean(max(...
                     testRscoreText(:, testRlabels) + ...

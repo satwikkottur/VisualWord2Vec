@@ -7,6 +7,7 @@ const int featHashSize = 200000;
 int featVocabSize = 0;
 int featVocabMaxSize = 5000;
 long noTest = 0, noVal = 0;
+float* cosDist;
 /***************************************************************************/
 // reading feature file
 void readFeatureFile(char* filePath){
@@ -126,6 +127,7 @@ struct featureWord constructFeatureWord(char* word){
     strcpy(feature.str, word);
 
     // Initialize the fature embedding
+    //feature.magnitude = 0;
     //feature.embed = (float*) malloc(layer1_size * sizeof(float));
     
     // Do something if not in vocab
@@ -431,6 +433,14 @@ void computeFeatureEmbedding(struct featureWord* feature){
     for(i = 0; i < layer1_size; i++)
         feature->embed[i] = mean[i];
 
+    // Compute the magnitude of mean
+    float magnitude = 0;
+    for(i = 0; i < layer1_size; i++)
+        magnitude += mean[i];
+        
+    feature->magnitude = (float*) malloc(sizeof(float));
+    feature->magnitude = &magnitude;
+
     free(mean);
 }
 
@@ -581,6 +591,7 @@ void performCommonSenseTask(){
     computeEmbeddings();
 
     // Evaluate the cosine distance
+    evaluateCosDistance();
 
     // ReLU
 
@@ -617,4 +628,33 @@ long readTestValFiles(char* fileName, struct prsTuple* holder){
     fclose(filePt);
 
     return noTuples;
+}
+
+// Cosine distance evaluation
+void evaluateCosDistance(){
+    // Allocate memory for cosDist variable
+    cosDist = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
+    
+    // For each pair, we evaluate the dot product along with normalization
+    long a, b, i, offset;
+    float magProd = 0;
+    for(a = 0; a < featVocabSize; a++){
+        offset = featVocabSize * a;
+        for(b = 0; b < featVocabSize; b++){
+            float dotProduct = 0;
+            for(i = 0; i < layer1_size; i++){
+                if(featHashWords[a].embed == NULL || featHashWords[b].embed == NULL)
+                    printf("NULL pointers : %d %d\n", a, b);
+
+                else
+                    dotProduct += 
+                        featHashWords[a].embed[i] * featHashWords[b].embed[i];
+            }
+            
+            // Save the dotproduct
+            magProd = (*featHashWords[a].magnitude) * (*featHashWords[b].magnitude);
+            if(magProd)
+                cosDist[offset + b] = dotProduct / magProd;
+        }
+    }
 }

@@ -616,10 +616,10 @@ void TrainModel() {
     //computeEmbeddings();
 
     // saving after the refining the network
-    saveEmbeddings(postPath);
+    //saveEmbeddings(postPath);
     
     // common sense task
-    //performCommonSenseTask();
+    performCommonSenseTask();
     /***************************************************************************************/
     // skip writing to the file
     return;
