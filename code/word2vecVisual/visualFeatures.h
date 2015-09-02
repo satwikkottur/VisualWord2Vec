@@ -120,4 +120,6 @@ void performCommonSenseTask();
 long readTestValFiles(char*, struct prsTuple*);
 // Computing the cos distances
 void evaluateCosDistance();
+// Computing the test and val scores
+void computeTestValScores(struct prsTuple*, long, float, float*);
 #endif

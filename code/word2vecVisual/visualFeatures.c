@@ -1,13 +1,15 @@
 # include "visualFeatures.h"
 
 // Storing the feature hash (globals)
-struct featureWord* featHashWords;
-int* featHashInd;
-const int featHashSize = 200000;
-int featVocabSize = 0;
-int featVocabMaxSize = 5000;
-long noTest = 0, noVal = 0;
-float* cosDist;
+struct featureWord* featHashWords; // Vocab for feature words
+int* featHashInd; // Storing the hash indices that reference to vocab
+const int featHashSize = 200000; // Size of the hash for feature words
+int featVocabSize = 0; // Actual vocab size for feature word 
+int featVocabMaxSize = 5000; // Maximum number of feature vocab
+long noTest = 0, noVal = 0; // Number of test and validation variables
+float* cosDist; // Storing the cosine distances between all the feature vocabulary
+float* valScore, testScore; // Storing the scores for test and val
+
 /***************************************************************************/
 // reading feature file
 void readFeatureFile(char* filePath){
@@ -593,7 +595,10 @@ void performCommonSenseTask(){
     // Evaluate the cosine distance
     evaluateCosDistance();
 
-    // ReLU
+    // Going through all the test / validation examples
+    // For each, going through training instances and computing the score
+    computeTestValScores(val, noVal, 1.2, valScore);
+    computeTestValScores(test, noTest, 1.2, testScore);
 
     // Compute the accuracy
 }
@@ -656,5 +661,41 @@ void evaluateCosDistance(){
             if(magProd)
                 cosDist[offset + b] = dotProduct / magProd;
         }
+    }
+}
+
+// Computing the test and validation scores
+void computeTestValScores(struct prsTuple* holder, long noInst, float threshold, float* scoreList){
+    printf("\nComputing the scores...\n\n");
+    // Allocate memory if NULL
+    if(scoreList == NULL)
+        scoreList = (float*) malloc(noInst * sizeof(float));
+
+    // Iteration variables
+    long a, b;
+    float meanScore, pScore, rScore, sScore, curScore; 
+    for(a = 0; a < noInst, a++){
+        meanScore = 0.0;
+        // For each training instance, find score, ReLU and max
+        for(b = 0; b < NUM_TRAINING; b++){
+            // Get P score
+            pScore = cosDist[featVocabSize * prs[b].p + holder[a].p];
+            
+            // Get R score
+            rScore = cosDist[featVocabSize * prs[b].r + holder[a].r];
+            
+            // Get S score
+            sScore = cosDist[featVocabSize * prs[b].s + holder[a].s];
+            
+            // ReLU
+            curScore += pScore + rScore + sScore - threshold;
+            if(curScore < 0) curScore = 0;
+            
+            // Add it to the meanScore
+            meanScore += curScore;
+        }
+
+        // Save the mean score for the current instance
+        scoreList[a] = meanScore / NUM_TRAINING;
     }
 }
