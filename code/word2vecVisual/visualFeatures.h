@@ -23,7 +23,7 @@
 
 #define MAX_STRING_LENGTH 100
 #define NUM_TRAINING 4260
-#define NUM_CLUSTERS 10
+#define NUM_CLUSTERS 5
 #define VISUAL_FEATURE_SIZE 1222
 
 // Declaring the extern variables allowing separation of code
