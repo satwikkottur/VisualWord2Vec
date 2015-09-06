@@ -602,7 +602,7 @@ void TrainModel() {
     // Reading for the word features, cluster ids and visual features
     // ClusterId reading will be avoided when clustering is ported to C
     readFeatureFile(featurePath);
-    readClusterIdFile(clusterPath);
+    //readClusterIdFile(clusterPath);
     readVisualFeatureFile(visualPath);
     //clusterVisualFeatures(NUM_CLUSTERS);
     // saving before the refining the network
@@ -615,10 +615,7 @@ void TrainModel() {
     // Refine the network
     refineNetwork();
 
-    // Perform common sense task again
-    performCommonSenseTask();
-
-    //clusterVisualFeatures(NUM_CLUSTERS);
+    clusterVisualFeatures(NUM_CLUSTERS);
     
     // Compute the embeddings for all the feature words
     //computeEmbeddings();

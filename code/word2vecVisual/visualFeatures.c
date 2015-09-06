@@ -598,7 +598,7 @@ void performCommonSenseTask(){
     // Going through all the test / validation examples
     // For each, going through training instances and computing the score
     float threshold;
-    for(threshold = -2.0; threshold < 1; threshold += 0.1){
+    for(threshold = -2.0; threshold < 3.0; threshold += 0.1){
         valScore = (float*) malloc(noVal * sizeof(float));
         testScore = (float*) malloc(noTest * sizeof(float));
         
