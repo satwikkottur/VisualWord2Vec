@@ -23,7 +23,7 @@
 
 #define MAX_STRING_LENGTH 100
 #define NUM_TRAINING 4260
-#define NUM_CLUSTERS 5
+#define NUM_CLUSTERS 10
 #define VISUAL_FEATURE_SIZE 1222
 
 // Declaring the extern variables allowing separation of code
@@ -84,10 +84,13 @@ void refineNetwork();
 
 // Evaluate y_i for each output cluster
 void computeMultinomial(float*, int);
+// Evaluate y_i for all the phrases
+void computeMultinomialPhrase(float*, int*, int);
     
 // Updating the weights 
 void updateWeights(float*, int, int);
-
+// Updating the weights for phrases
+void updateWeightsPhrase(float*, int*, int, int);
 // save the embeddings
 void saveEmbeddings(char*);
 
