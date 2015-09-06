@@ -68,7 +68,6 @@ for i=1:nim
 end
 R_feat=double(R_feat);
 
-return
 w2v=load(w2v_model);
 
 

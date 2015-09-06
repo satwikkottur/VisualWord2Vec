@@ -8,7 +8,8 @@ int featVocabSize = 0; // Actual vocab size for feature word
 int featVocabMaxSize = 5000; // Maximum number of feature vocab
 long noTest = 0, noVal = 0; // Number of test and validation variables
 float* cosDist; // Storing the cosine distances between all the feature vocabulary
-float* valScore, testScore; // Storing the scores for test and val
+float* valScore, *testScore; // Storing the scores for test and val
+int verbose = 0;
 
 /***************************************************************************/
 // reading feature file
@@ -129,8 +130,8 @@ struct featureWord constructFeatureWord(char* word){
     strcpy(feature.str, word);
 
     // Initialize the fature embedding
-    //feature.magnitude = 0;
-    //feature.embed = (float*) malloc(layer1_size * sizeof(float));
+    feature.magnitude = 0;
+    feature.embed = (float*) malloc(layer1_size * sizeof(float));
     
     // Do something if not in vocab
     if(index == -1) {
@@ -438,10 +439,10 @@ void computeFeatureEmbedding(struct featureWord* feature){
     // Compute the magnitude of mean
     float magnitude = 0;
     for(i = 0; i < layer1_size; i++)
-        magnitude += mean[i];
+        magnitude += mean[i] * mean[i];
         
-    feature->magnitude = (float*) malloc(sizeof(float));
-    feature->magnitude = &magnitude;
+    //feature->magnitude = (float*) malloc(sizeof(float));
+    feature->magnitude = sqrt(magnitude);
 
     free(mean);
 }
@@ -538,7 +539,7 @@ void clusterVisualFeatures(int noClusters){
     int k = noClusters;                           /* number of cluster to create */
     int d = VISUAL_FEATURE_SIZE;                           /* dimensionality of the vectors */
     int n = NUM_TRAINING;                         /* number of vectors */
-    int nt = 1;                           /* number of threads to use */
+    //int nt = 1;                           /* number of threads to use */
     int niter = 0;                        /* number of iterations (0 for convergence)*/
     int redo = 1;                         /* number of redo */
 
@@ -585,8 +586,7 @@ void performCommonSenseTask(){
     char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
 
     // Clean the strings for test and validation sets, store features
-    noVal = readTestValFiles(valFile, val);
-    noTest = readTestValFiles(testFile, test);
+    readTestValFiles(valFile, testFile);
 
     // Get the features for test and validation sets
     // Re-evaluate the features for the entire vocab
@@ -597,84 +597,128 @@ void performCommonSenseTask(){
 
     // Going through all the test / validation examples
     // For each, going through training instances and computing the score
-    computeTestValScores(val, noVal, 1.2, valScore);
-    computeTestValScores(test, noTest, 1.2, testScore);
+    float threshold;
+    for(threshold = -2.0; threshold < 1; threshold += 0.1){
+        valScore = (float*) malloc(noVal * sizeof(float));
+        testScore = (float*) malloc(noTest * sizeof(float));
+        
+        computeTestValScores(val, noVal, threshold, valScore);
+        computeTestValScores(test, noTest, threshold, testScore);
 
-    // Compute the accuracy
+        // Compute the accuracy
+        float* precVal = computeMAP(valScore, val, noVal);
+        float* precTest = computeMAP(testScore, test, noTest);
+
+        printf("Precision (threshold , val , test) : %f %f %f\n", 
+                                        threshold, precVal[0], precTest[0]);
+    }
 }
 
 // Reading the test and validation files
-long readTestValFiles(char* fileName, struct prsTuple* holder){
+void readTestValFiles(char* valName, char* testName){
     // Read the file
-    FILE* filePt = fopen(fileName, "rb");
-    long noTuples = 0;
+    long noTuples = 0, i;
     
     // Counting the number of lines
     char pWord[MAX_STRING_LENGTH], 
          rWord[MAX_STRING_LENGTH], 
          sWord[MAX_STRING_LENGTH];
     int gTruth = -1;
+
+    FILE* filePt = fopen(valName, "rb");
     while(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]> %d\n", pWord, rWord, sWord, &gTruth) != EOF)
         noTuples++;
 
+    // Rewind the stream and read again
+    rewind(filePt);
+    
     // Initialize and save the feature words
-    holder = (struct prsTuple*) malloc(sizeof(struct prsTuple) * noTuples);
-    long i;
+    val = (struct prsTuple*) malloc(sizeof(struct prsTuple) * noTuples);
+
     for(i = 0; i < noTuples; i++){
-        holder[i].p = addFeatureWord(pWord);
-        holder[i].r = addFeatureWord(rWord);
-        holder[i].s = addFeatureWord(sWord);
-    
-        holder[i].cId = gTruth;
+        if(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]> %d\n", pWord, rWord, sWord, &gTruth) != EOF){
+            val[i].p = addFeatureWord(pWord);
+            val[i].r = addFeatureWord(rWord);
+            val[i].s = addFeatureWord(sWord);
+        
+            val[i].cId = gTruth;
+            //printf("%d = <%d:%d:%d> %d\n", i, val[i].p, val[i].r, val[i].s, val[i].cId);
+        }
     }
-    
-    printf("Found %ld tuples in %s...\n\n", noTuples, fileName);
+
+    noVal = noTuples;
+    printf("Found %ld tuples in %s...\n\n", noTuples, valName);
     // Close the file
     fclose(filePt);
+    /*******************************************************************************/
+    // Test file
+    // filePt 
+    filePt = fopen(testName, "rb");
+    noTuples = 0;
+    while(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]> %d\n", pWord, rWord, sWord, &gTruth) != EOF)
+        noTuples++;
 
-    return noTuples;
+    // Rewind the stream and read again
+    rewind(filePt);
+    
+    // Initialize and save the feature words
+    test = (struct prsTuple*) malloc(sizeof(struct prsTuple) * noTuples);
+    for(i = 0; i < noTuples; i++){
+        if(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]> %d\n", pWord, rWord, sWord, &gTruth) != EOF){
+            test[i].p = addFeatureWord(pWord);
+            test[i].r = addFeatureWord(rWord);
+            test[i].s = addFeatureWord(sWord);
+        
+            test[i].cId = gTruth;
+            //printf("%d <%d:%d:%d> %d\n", i, test[i].p, test[i].r, test[i].s, test[i].cId);
+        }
+    }
+
+    noTest = noTuples;
+    printf("Found %ld tuples in %s...\n\n", noTuples, testName);
+    // Close the file
+    fclose(filePt);
 }
 
 // Cosine distance evaluation
 void evaluateCosDistance(){
+    if (verbose) printf("Evaluating pairwise dotproducts..\n\n");
     // Allocate memory for cosDist variable
     cosDist = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
     
     // For each pair, we evaluate the dot product along with normalization
     long a, b, i, offset;
-    float magProd = 0;
+    float magProd = 0, dotProduct;
     for(a = 0; a < featVocabSize; a++){
         offset = featVocabSize * a;
         for(b = 0; b < featVocabSize; b++){
-            float dotProduct = 0;
-            for(i = 0; i < layer1_size; i++){
-                if(featHashWords[a].embed == NULL || featHashWords[b].embed == NULL)
-                    printf("NULL pointers : %d %d\n", a, b);
+            if(featHashWords[a].embed == NULL || featHashWords[b].embed == NULL)
+                printf("NULL pointers : %ld %ld\n", a, b);
 
-                else
-                    dotProduct += 
-                        featHashWords[a].embed[i] * featHashWords[b].embed[i];
+            dotProduct = 0;
+            for(i = 0; i < layer1_size; i++){
+                dotProduct += 
+                    featHashWords[a].embed[i] * featHashWords[b].embed[i];
             }
             
             // Save the dotproduct
-            magProd = (*featHashWords[a].magnitude) * (*featHashWords[b].magnitude);
+            magProd = (featHashWords[a].magnitude) * (featHashWords[b].magnitude);
             if(magProd)
                 cosDist[offset + b] = dotProduct / magProd;
+             else
+                cosDist[offset + b] = 0.0;
         }
     }
 }
 
 // Computing the test and validation scores
 void computeTestValScores(struct prsTuple* holder, long noInst, float threshold, float* scoreList){
-    printf("\nComputing the scores...\n\n");
-    // Allocate memory if NULL
-    if(scoreList == NULL)
-        scoreList = (float*) malloc(noInst * sizeof(float));
+    if(verbose) printf("Computing the scores...\n\n");
 
     // Iteration variables
     long a, b;
     float meanScore, pScore, rScore, sScore, curScore; 
-    for(a = 0; a < noInst, a++){
+    for(a = 0; a < noInst; a++){
         meanScore = 0.0;
         // For each training instance, find score, ReLU and max
         for(b = 0; b < NUM_TRAINING; b++){
@@ -686,9 +730,9 @@ void computeTestValScores(struct prsTuple* holder, long noInst, float threshold,
             
             // Get S score
             sScore = cosDist[featVocabSize * prs[b].s + holder[a].s];
-            
+           
             // ReLU
-            curScore += pScore + rScore + sScore - threshold;
+            curScore = pScore + rScore + sScore - threshold;
             if(curScore < 0) curScore = 0;
             
             // Add it to the meanScore
@@ -697,5 +741,58 @@ void computeTestValScores(struct prsTuple* holder, long noInst, float threshold,
 
         // Save the mean score for the current instance
         scoreList[a] = meanScore / NUM_TRAINING;
+        //printf("%ld : %f\n", a, scoreList[a]);
     }
+}
+
+// Compute mAP and basic precision
+float* computeMAP(float* score, struct prsTuple* holder, long noInst){
+    if (verbose) printf("Computing MAP...\n\n");
+    // Crude implementation
+    long a, b;
+    int* rankedLabels = (int*) malloc(sizeof(int) * noInst);
+    float* rankedScores = (float*) malloc(sizeof(float) * noInst);
+
+    // Make a copy of scores
+    for(a = 0; a < noInst; a++) rankedScores[a] = score[a];
+
+    long maxInd;
+    // Get the rank of positive instances wrt to the scores
+    for(a = 0; a < noInst; a++){
+        maxInd = 0;
+        for(b = 0; b < noInst; b++)
+            // Check if max is also current max
+            if(rankedScores[b] != -1 && 
+                        rankedScores[maxInd] < rankedScores[b]) 
+                maxInd = b;
+
+        // Swap the max and element at that instance
+        rankedLabels[a] = holder[maxInd].cId;
+        // NULLing the max ind 
+        rankedScores[maxInd] = -1;
+    }
+
+    float mAP = 0, base = 0;
+    long noPositives = 0;
+    // Compute the similarity wrt ideal ordering 1,2,3.....
+    for(a = 0; a < noInst; a++)
+        if(rankedLabels[a] == 1){
+            // Increasing the positives
+            noPositives++;
+            mAP += noPositives / (float) (a + 1);
+            //printf("%ld %ld %f\n", noPositives, a + 1, noPositives/(float) (a + 1));
+        }
+   
+    // Compute mAP
+    mAP = mAP / noPositives;
+    // Compute base precision
+    base = noPositives / (float)noInst;
+    // Packing both in an array
+    float* precision = (float*) malloc(2 * sizeof(float));
+    precision[0] = mAP;
+    precision[1] = base;
+
+    // Free memory
+    free(rankedScores);
+    return precision;
 }

@@ -1,0 +1,14 @@
+List of todos:
+
+
+Sept 2:
+a) Read the test and validation files better (solve memory allocation problem) (done)
+b) Compute the scores for each of test, train.
+c) Write cross-validation code in C
+d) Compute the accuracy and match it with matlab accuracies
+e) Vary learning rate, use differential learning rates
+f) Vary number of clusters
+g) Use Wiki to train word2vec, instead of MS COCO
+h) Use averaging as opposed to just words
+i) Can we use just sentences and abstract geometry vectors
+j) 

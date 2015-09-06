@@ -37,7 +37,7 @@ struct featureWord{
     int* index;
     // Word embedding for the instance
     float* embed; 
-    float* magnitude;
+    float magnitude;
 };
 
 // Structure to hold information about P,R,S triplets
@@ -116,10 +116,12 @@ void clusterVisualFeatures(int);
 /*****************************************/
 // Common sense task
 void performCommonSenseTask();
-// Reading the test and valudation files
-long readTestValFiles(char*, struct prsTuple*);
+// Reading the test and validation files
+void readTestValFiles(char*, char*);
 // Computing the cos distances
 void evaluateCosDistance();
 // Computing the test and val scores
 void computeTestValScores(struct prsTuple*, long, float, float*);
+// Computing the mean AP and basic precision
+float* computeMAP(float*, struct prsTuple*, long);
 #endif
