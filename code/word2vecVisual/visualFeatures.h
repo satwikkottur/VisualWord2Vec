@@ -45,6 +45,8 @@ char* multi_tok(char*, char*);
 
 // Function to refine the network through clusters
 void refineNetwork();
+// Function to refine the network through clusters, through phrases
+void refineNetworkPhrase();
 
 // Evaluate y_i for each output cluster
 void computeMultinomial(float*, int);

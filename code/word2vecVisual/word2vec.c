@@ -575,9 +575,9 @@ void TrainModel() {
     if (negative > 0) InitUnigramTable();
     start = clock();
     // [S] : Creates the threads for execution
-    //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+    for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
     // [S] : Waits for the completion of execution of the threads
-    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+    for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     //***************************************************************************************
     // [S] added
@@ -609,7 +609,8 @@ void TrainModel() {
     performCommonSenseTask();
 
     // Refine the network
-    refineNetwork();
+    //refineNetwork();
+    refineNetworkPhrase();
     
     // Compute the embeddings for all the feature words
     //computeEmbeddings();

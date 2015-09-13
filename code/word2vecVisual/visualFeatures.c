@@ -20,7 +20,7 @@ void readFeatureFile(char* filePath){
     // Opening the file
     FILE* filePt = fopen(filePath, "rb");
 
-    char pWord[MAX_STRING_LENGTH], sWord[MAX_STRING_LENGTH], rWord[MAX_STRING_LENGTH];
+    char pWord[MAX_STRING], sWord[MAX_STRING], rWord[MAX_STRING];
     long noTuples = 0, i;
 
     if(filePt == NULL){
@@ -128,7 +128,7 @@ struct featureWord constructFeatureWord(char* word){
     int index = SearchVocab(word); 
 
     struct featureWord feature;
-    feature.str = (char*) malloc(MAX_STRING_LENGTH);
+    feature.str = (char*) malloc(MAX_STRING);
     strcpy(feature.str, word);
 
     // Initialize the fature embedding
@@ -141,7 +141,7 @@ struct featureWord constructFeatureWord(char* word){
         int count=0, i;
 
         // Split based on 's
-        char* token = (char*) malloc(MAX_STRING_LENGTH);
+        char* token = (char*) malloc(MAX_STRING);
         strcpy(token, word);
 
         char* first = multi_tok(token, "'s");
@@ -151,7 +151,7 @@ struct featureWord constructFeatureWord(char* word){
         if(second != NULL) token = strcat(first, second);
         else token = first;
 
-        char* temp = (char*) malloc(MAX_STRING_LENGTH);
+        char* temp = (char*) malloc(MAX_STRING);
         strcpy(temp, token);
         
         // Remove ' ', ',', '.', '?', '!', '\', '/'
@@ -281,6 +281,86 @@ void refineNetwork(){
             // Propage the error to the PRS features
             updateWeights(y, r.index[c], train[i].cId);
         }
+    }
+}
+
+// Refine the network through clusters, for phrases
+void refineNetworkPhrase(){
+    long long c, i;
+    float* y = (float*) malloc(sizeof(float) * noClusters);
+    struct featureWord p, s, r;
+    int* wordList = (int*) malloc(100 * sizeof(int));
+    int wordCount = 0;
+
+    // Checking if training examples are present
+    if(noTrain == 0){
+        printf("Training examples not loaded!\n");   
+        exit(1);
+    }
+
+    // Read each of the training instance
+    for(i = 0; i < noTrain; i++){
+        //printf("Training %lld instance ....\n", i);
+        
+        // Checking possible fields to avoid segmentation error
+        if(train[i].cId < 1 || train[i].cId > noClusters) {
+            printf("\nCluster id (%d) for %lld instance invalid!\n", train[i].cId, i);
+            exit(1);
+        }
+
+        // Now collecting words for training
+        /*****************************************/
+        // Updating the weights for P
+        p = featHashWords[train[i].p];
+        wordCount = 0;
+        
+        for(c = 0; c < p.count; c++){
+            // If not in vocab, continue
+            if(p.index[c] == -1) continue;
+
+            wordList[wordCount] = p.index[c];
+            // Getting the actual count of words
+            wordCount++;
+        }
+        // Predict the cluster
+        computeMultinomialPhrase(y, wordList, wordCount);
+        // Propage the error the embeddings
+        updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
+        /*****************************************/
+        // Updating the weights for S
+        s = featHashWords[train[i].s];
+        wordCount = 0;
+        
+        for(c = 0; c < s.count; c++){
+            // If not in vocab, continue
+            if(s.index[c] == -1) continue;
+
+            wordList[wordCount] = s.index[c];
+            // Getting the actual count of words
+            wordCount++;
+        }
+        // Predict the cluster
+        computeMultinomialPhrase(y, wordList, wordCount);
+        // Propage the error the embeddings
+        updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
+        /*****************************************/
+        // Updating the weights for R
+        r = featHashWords[train[i].r];
+        wordCount = 0;
+        
+        for(c = 0; c < r.count; c++){
+            // If not in vocab, continue
+            if(r.index[c] == -1) continue;
+
+            wordList[wordCount] = r.index[c];
+            // Getting the actual count of words
+            wordCount++;
+        }
+        // Predict the cluster
+        computeMultinomialPhrase(y, wordList, wordCount);
+        // Propage the error the embeddings
+        updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
+        /*****************************************/
     }
 }
 
@@ -716,9 +796,9 @@ void readTestValFiles(char* valName, char* testName){
     long noTuples = 0, i;
     
     // Counting the number of lines
-    char pWord[MAX_STRING_LENGTH], 
-         rWord[MAX_STRING_LENGTH], 
-         sWord[MAX_STRING_LENGTH];
+    char pWord[MAX_STRING], 
+         rWord[MAX_STRING], 
+         sWord[MAX_STRING];
     int gTruth = -1;
 
     FILE* filePt = fopen(valName, "rb");

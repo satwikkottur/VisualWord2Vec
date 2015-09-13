@@ -7,11 +7,11 @@ List of todos:
 - Vary learning rate, use differential learning rates (done)
 - Vary number of clusters (done)
 - Use Wiki to train word2vec, instead of MS COCO
-- Use averaging as opposed to just words (done) (debugging left)
-- Can we use just sentences and abstract geometry vectors? (infra ready)
+- Use averaging as opposed to just words (done) (done)
+- Can we use just sentences and abstract geometry vectors? (done)
 - Regressing with the actual visual vectors - might have to include dropout
 - Use the modified visual features instead of binary (done)
-- remove NUM_CLUSTERS
+- remove NUM_CLUSTERS (done)
 - remove NUM_TRAINING (done)
 - remove prs to train (done)
 - remove VISUAL_FEATURE_SIZE
