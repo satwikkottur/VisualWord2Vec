@@ -22,10 +22,10 @@
 
 /**********************************************************************************/
 // [S] added
-// time module to measure time
-#include "timer.h"
-clock_t startPoint;
-#include "visualFeatures.h"
+# include "macros.h"
+# include "structs.h"
+# include "visualFeatures.h"
+# include "debugFunctions.h"
 /***********************************************************************************/
 
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
@@ -358,15 +358,7 @@ void InitNet() {
     syn0[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
   }
 
-  // Timing the creation of binary tree
-  // Starting the timer
-  //startPoint = getTimePoint();
-
   CreateBinaryTree();
-
-  // Count time
-  //float timeSeconds = measureTime(startPoint);
-  //printf("Time taken : %f seconds\n", timeSeconds);
 }
 
 void *TrainModelThread(void *id) {
@@ -583,9 +575,9 @@ void TrainModel() {
     if (negative > 0) InitUnigramTable();
     start = clock();
     // [S] : Creates the threads for execution
-    for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+    //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
     // [S] : Waits for the completion of execution of the threads
-    for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     //***************************************************************************************
     // [S] added
@@ -595,7 +587,7 @@ void TrainModel() {
     char postPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
     char prePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre.txt";
     char vocabPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_vocab.txt";
-    char visualPath[] = "/home/satwik/VisualWord2Vec/data/Num_features.txt";
+    char visualPath[] = "/home/satwik/VisualWord2Vec/data/float_features.txt";
 
     // Initializing the refining
     initRefining();
@@ -607,7 +599,7 @@ void TrainModel() {
     //readClusterIdFile(clusterPath);
     // Clustering in C
     readVisualFeatureFile(visualPath);
-    clusterVisualFeatures(NUM_CLUSTERS);
+    clusterVisualFeatures(10);
     
     // saving before the refining the network
     //saveEmbeddings(prePath);

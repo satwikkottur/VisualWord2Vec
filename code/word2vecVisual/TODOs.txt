@@ -1,15 +1,19 @@
 List of todos:
 
-
-Sept 2:
-a) Read the test and validation files better (solve memory allocation problem) (done)
-b) Compute the scores for each of test, train. (done)
-c) Write cross-validation code in C (done)
-d) Compute the accuracy and match it with matlab accuracies (done)
-e) Vary learning rate, use differential learning rates (done)
-f) Vary number of clusters (done)
-g) Use Wiki to train word2vec, instead of MS COCO
-h) Use averaging as opposed to just words (done) (debugging left)
-i) Can we use just sentences and abstract geometry vectors? (infra ready)
-j) Regressing with the actual visual vectors
-k) Extract the visual features
+- Read the test and validation files better (solve memory allocation problem) (done)
+- Compute the scores for each of test, train. (done)
+- Write cross-validation code in C (done)
+- Compute the accuracy and match it with matlab accuracies (done)
+- Vary learning rate, use differential learning rates (done)
+- Vary number of clusters (done)
+- Use Wiki to train word2vec, instead of MS COCO
+- Use averaging as opposed to just words (done) (debugging left)
+- Can we use just sentences and abstract geometry vectors? (infra ready)
+- Regressing with the actual visual vectors - might have to include dropout
+- Use the modified visual features instead of binary (done)
+- remove NUM_CLUSTERS
+- remove NUM_TRAINING (done)
+- remove prs to train (done)
+- remove VISUAL_FEATURE_SIZE
+- Generalize the last layer
+- Get the numbers for all the various settings

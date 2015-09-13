@@ -10,17 +10,19 @@ BIN = bin/
 
 #all: visualFeatures word2vec
 #	$(CC) visualFeatures.o word2vec.o -o word2vec $(CFLAGS)
-all: word2vec visualFeatures
+all: word2vec visualFeatures debugFunctions
 	$(MOVE)
-	$(CC) $(BIN)word2vec.o $(BIN)visualFeatures.o -o $(BIN)word2vec $(CFLAGS)
+	$(CC) $(BIN)word2vec.o $(BIN)visualFeatures.o $(BIN)debugFunctions.o -o $(BIN)word2vec $(CFLAGS)
 word2vec : word2vec.c
 	$(CC) -c word2vec.c $(CFLAGS)
 visualFeatures : visualFeatures.c
 	$(CC) -c visualFeatures.c $(CFLAGS)
+debugFunctions : debugFunctions.c
+	$(CC) -c debugFunctions.c $(CFLAGS)
 
 run:
 	make
-	./$(BIN)word2vec -train modelsNdata/coco_test.txt -output word2vec_output.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -read-vocab modelsNdata/large-vocab.txt
+	./$(BIN)word2vec -train modelsNdata/coco_test.txt -output word2vec_output_makerun.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -read-vocab modelsNdata/large-vocab.txt
 
 small:
 	make

@@ -13,55 +13,19 @@
 # include <yael/vector.h>
 # include <yael/kmeans.h>
 # include <yael/machinedeps.h>
-
-// Macros for the visual features
-#define MAX_STRING 100
-#define EXP_TABLE_SIZE 1000
-#define MAX_EXP 6
-#define MAX_SENTENCE_LENGTH 1000
-#define MAX_CODE_LENGTH 40
-
-#define MAX_STRING_LENGTH 100
-#define NUM_TRAINING 4260
-#define NUM_CLUSTERS 10
-#define VISUAL_FEATURE_SIZE 1222
+# include "structs.h"
+# include "macros.h"
 
 // Declaring the extern variables allowing separation of code
 extern long long vocab_size, layer1_size;
 extern float *syn0, *syn1, *expTable;
-
-// Structure to hold the index information
-struct featureWord{
-    char* str;
-    int count;
-    int* index;
-    // Word embedding for the instance
-    float* embed; 
-    float magnitude;
-};
-
-// Structure to hold information about P,R,S triplets
-struct prsTuple{
-    int p, r, s;
-    //struct featureWord p, r, s;
-    
-    // visual features for the instance 
-    int* feat;
-    // Cluster id assigned to the current instance
-    int cId; 
-};
 
 /************************************************************************/
 // Signatures of original functions
 /************************************************************************/
 typedef float real; // Re-naming float as real
 int SearchVocab(char* word);
-
 /************************************************************************/
-// Storing the triplets
-struct prsTuple prs[NUM_TRAINING];
-struct prsTuple* test;
-struct prsTuple* val;
 
 // getting the vocab indices
 struct featureWord constructFeatureWord(char*);

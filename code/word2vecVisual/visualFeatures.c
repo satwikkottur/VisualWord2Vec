@@ -6,16 +6,22 @@ int* featHashInd; // Storing the hash indices that reference to vocab
 const int featHashSize = 200000; // Size of the hash for feature words
 int featVocabSize = 0; // Actual vocab size for feature word 
 int featVocabMaxSize = 5000; // Maximum number of feature vocab
-long noTest = 0, noVal = 0; // Number of test and validation variables
+long noTrain = 0, noTest = 0, noVal = 0; // Number of test and validation variables
 float* cosDist; // Storing the cosine distances between all the feature vocabulary
 float* valScore, *testScore; // Storing the scores for test and val
 int verbose = 0;
+int noClusters = 0;
+
+struct prsTuple *train, *test, *val;
 
 /***************************************************************************/
 // reading feature file
 void readFeatureFile(char* filePath){
     // Opening the file
     FILE* filePt = fopen(filePath, "rb");
+
+    char pWord[MAX_STRING_LENGTH], sWord[MAX_STRING_LENGTH], rWord[MAX_STRING_LENGTH];
+    long noTuples = 0, i;
 
     if(filePt == NULL){
         printf("File at %s doesnt exist!\n", filePath);
@@ -24,41 +30,35 @@ void readFeatureFile(char* filePath){
 
     printf("\nReading %s...\n", filePath);
 
-    char pWord[MAX_STRING_LENGTH], sWord[MAX_STRING_LENGTH], rWord[MAX_STRING_LENGTH];
-    // Read and store the contents
-    int noTuples = 0;
-    while(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]>\n", pWord, sWord, rWord) != EOF){
-        //printf("%s : %s : %s\n", pWord, sWord, rWord);
-        
-        // Getting the indices for p, s, r
-        // Get the indices, for the current tuple
-        prs[noTuples].p = addFeatureWord(pWord);
-        prs[noTuples].r = addFeatureWord(rWord);
-        prs[noTuples].s = addFeatureWord(sWord);
-        //printf("%s : %s : %s\n", prs[noTuples].p.str, prs[noTuples].s.str, prs[noTuples].r.str);
-        
+    // Compute the number of lines / instances and check with current existing variable
+    while(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]>\n", pWord, rWord, sWord) != EOF)
         noTuples++;
-    }
-
-    // Debugging
-    /*int i;
+    // Rewind the stream and read again
+    rewind(filePt);
+    
+    // Initialize and save the feature words
+    train = (struct prsTuple*) malloc(sizeof(struct prsTuple) * noTuples);
+    // Read and store the contents
     for(i = 0; i < noTuples; i++){
-        //printf("%s : %s : %s  ( ", prs[i].p.str, prs[i].s.str, prs[i].r.str);
-        //printf("%d )\n", i);
-        //printf("%d %d %d\n", prs[i].p, prs[i].s, prs[i].r);
-        printf("%s : %s : %s\n", featHashWords[prs[i].p].str, 
-                            featHashWords[prs[i].s].str,
-                            featHashWords[prs[i].r].str);
-    }*/
-
-    // Sanity check
-    if(noTuples != NUM_TRAINING){
-        printf("\nNumber of training instances dont match in feature file!\n");
-        exit(1);
+        if(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]>\n", pWord, sWord, rWord) != EOF){
+            // Getting the indices for p, s, r
+            train[i].p = addFeatureWord(pWord);
+            train[i].r = addFeatureWord(rWord);
+            train[i].s = addFeatureWord(sWord);
+        }
     }
+
+    // Checking with noTrain, if exists, else initializing
+    if(noTrain != 0){
+        if(noTrain != noTuples){
+            printf("Mismatch with number of training examples: %s\n", filePath);
+            exit(1);
+        }
+    }
+    else noTrain = noTuples;
 
     fclose(filePt);
-    printf("File read with %d tuples\n\n", noTuples);
+    printf("File read with %ld tuples\n\n", noTuples);
 }
 
 // Reading the cluster ids
@@ -72,20 +72,20 @@ void readClusterIdFile(char* clusterPath){
 
     int i = 0, clusterId;
     while(fscanf(filePt, "%d\n", &clusterId) != EOF){
-        //if(prs[i].cId == -1) prs[i].cId = clusterId;
-        prs[i].cId = clusterId;
+        //if(train[i].cId == -1) train[i].cId = clusterId;
+        train[i].cId = clusterId;
         i++;
     }
 
     // Sanity check
-    if(i != NUM_TRAINING){
+    if(i != noTrain){
         printf("\nNumber of training instances dont match in cluster file!\n");
         exit(1);
     }
 
     // Debugging
-    /*for(i = 0; i < NUM_TRAINING; i++){
-        printf("%s : %s : %s : (%d)\n", prs[i].p.str, prs[i].s.str, prs[i].r.str, prs[i].cId);
+    /*for(i = 0; i < noTrain; i++){
+        printf("%s : %s : %s : (%d)\n", train[i].p.str, train[i].s.str, train[i].r.str, train[i].cId);
     }*/
 
     fclose(filePt);
@@ -100,18 +100,20 @@ void readVisualFeatureFile(char* fileName){
         exit(1);
     }
 
-    int feature, i, noLines = 0;
+    float feature;
+    int i, noLines = 0;
     // Reading till EOF
-    while(fscanf(filePt, "%d", &feature) != EOF){
-        prs[noLines].feat = (int*) malloc(sizeof(int) * VISUAL_FEATURE_SIZE);
-        prs[noLines].feat[0] = feature;
+    while(fscanf(filePt, "%f", &feature) != EOF){
+        train[noLines].feat = (float*) malloc(sizeof(float) * VISUAL_FEATURE_SIZE);
+        // Save the already read feature
+        train[noLines].feat[0] = feature;
 
         for(i = 1; i < VISUAL_FEATURE_SIZE; i++){
-            //printf("%d ", feature);
-            fscanf(filePt, "%d", &feature);
-            prs[noLines].feat[i] = feature;
+            //printf("%f ", feature);
+            fscanf(filePt, "%f", &feature);
+            train[noLines].feat[i] = feature;
         }
-        //printf("%d\n", feature);
+        //printf("%f\n", feature);
 
         //printf("Line : %d\n", noLines);
         noLines++;
@@ -205,7 +207,7 @@ void initRefining(){
     }
 
     // Initialize the last layer of weights
-    for (a = 0; a < NUM_CLUSTERS; a++) for (b = 0; b < layer1_size; b++){
+    for (a = 0; a < noClusters; a++) for (b = 0; b < layer1_size; b++){
         next_random = next_random * (unsigned long long)25214903917 + 11;
         syn1[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
     }
@@ -219,33 +221,30 @@ void initRefining(){
 
 // Refine the network through clusters
 void refineNetwork(){
-    // Reading the features for debugging
-    /*int x, z;
-    for(x = 0; x < NUM_TRAINING; x++){
-        for( z = 0; z < VISUAL_FEATURE_SIZE; z++){
-            printf("%d ", prs[x].feat[z]);
-        }
-        printf("\n");
-    }*/
-
     long long c, i;
-    float* y = (float*) malloc(sizeof(float) * NUM_CLUSTERS);
+    float* y = (float*) malloc(sizeof(float) * noClusters);
     struct featureWord p, s, r;
 
+    // Checking if training examples are present
+    if(noTrain == 0){
+        printf("Training examples not loaded!\n");   
+        exit(1);
+    }
+
     // Read each of the training instance
-    for(i = 0; i < NUM_TRAINING; i++){
+    for(i = 0; i < noTrain; i++){
         //printf("Training %lld instance ....\n", i);
         
         // Checking possible fields to avoid segmentation error
-        if(prs[i].cId < 1 || prs[i].cId > NUM_CLUSTERS) {
-            printf("\nCluster id (%d) for %lld instance invalid!\n", prs[i].cId, i);
+        if(train[i].cId < 1 || train[i].cId > noClusters) {
+            printf("\nCluster id (%d) for %lld instance invalid!\n", train[i].cId, i);
             exit(1);
         }
 
-        //printf("Counts : %d %d %d\n", prs[i].p.count, prs[i].s.count, prs[i].r.count);
+        //printf("Counts : %d %d %d\n", train[i].p.count, train[i].s.count, train[i].r.count);
 
         // Updating the weights for P
-        p = featHashWords[prs[i].p];
+        p = featHashWords[train[i].p];
         for(c = 0; c < p.count; c++){
             // If not in vocab, continue
             if(p.index[c] == -1) continue;
@@ -254,11 +253,11 @@ void refineNetwork(){
             // Predict the cluster
             computeMultinomial(y, p.index[c]);
             // Propage the error to the PRS features
-            updateWeights(y, p.index[c], prs[i].cId);
+            updateWeights(y, p.index[c], train[i].cId);
         }
         
         // Updating the weights for S
-        s = featHashWords[prs[i].s];
+        s = featHashWords[train[i].s];
         for(c = 0; c < s.count; c++){
             // If not in vocab, continue
             if(s.index[c] == -1) continue;
@@ -267,11 +266,11 @@ void refineNetwork(){
             // Predict the cluster
             computeMultinomial(y, s.index[c]);
             // Propage the error to the PRS features
-            updateWeights(y, s.index[c], prs[i].cId);
+            updateWeights(y, s.index[c], train[i].cId);
         }
 
         // Updating the weights for R
-        r = featHashWords[prs[i].r];
+        r = featHashWords[train[i].r];
         for(c = 0; c < r.count; c++){
             // If not in vocab, continue
             if(r.index[c] == -1) continue;
@@ -280,7 +279,7 @@ void refineNetwork(){
             // Predict the cluster
             computeMultinomial(y, r.index[c]);
             // Propage the error to the PRS features
-            updateWeights(y, r.index[c], prs[i].cId);
+            updateWeights(y, r.index[c], train[i].cId);
         }
     }
 }
@@ -293,7 +292,7 @@ void computeMultinomial(float* y, int wordId){
 
     // Offset to access the outer layer weights
     offset1 = wordId * layer1_size;
-    for (b = 0; b < NUM_CLUSTERS; b++){
+    for (b = 0; b < noClusters; b++){
         dotProduct = 0;
         // Offset to access the values of hidden layer weights
         offset2 = b * layer1_size;
@@ -311,21 +310,21 @@ void computeMultinomial(float* y, int wordId){
     }
 
     // Normalizing to create a probability measure
-    for(b = 0; b < NUM_CLUSTERS; b++) sum += y[b];
+    for(b = 0; b < noClusters; b++) sum += y[b];
 
     if(sum > 0)
-        for(b = 0; b < NUM_CLUSTERS; b++) y[b] = y[b]/sum;
+        for(b = 0; b < noClusters; b++) y[b] = y[b]/sum;
 }
 
 // Updating the weights given the multinomial prediction, word id and true cluster id
 void updateWeights(float* y, int wordId, int trueId){
     // compute gradient for outer layer weights, gradient g
-    float* e = (float*) malloc(NUM_CLUSTERS * sizeof(float));
+    float* e = (float*) malloc(noClusters * sizeof(float));
     long long a, b, c, offset1, offset2;
     float learningRateInner = 0.01, learningRateOuter = 0.01;
 
     // Computing error
-    for(b = 0; b < NUM_CLUSTERS; b++){
+    for(b = 0; b < noClusters; b++){
         if(b == trueId - 1) e[b] = y[b] - 1;
         else e[b] = y[b];
     }
@@ -337,7 +336,7 @@ void updateWeights(float* y, int wordId, int trueId){
     // compute gradient for inner layer weights
     // update inner layer weights
     // Offset for accessing inner weights
-    for(b = 0; b < NUM_CLUSTERS; b++){
+    for(b = 0; b < noClusters; b++){
         // Offset for accesing outer weights
         offset2 = layer1_size * b;
         
@@ -347,7 +346,7 @@ void updateWeights(float* y, int wordId, int trueId){
 
     // compute gradient for outer layer weights
     // update outer layer weights
-    for(a = 0; a < NUM_CLUSTERS; a++){
+    for(a = 0; a < noClusters; a++){
         offset2 = layer1_size * a;
         for(b = 0; b < layer1_size; b++){
             syn1[offset2 + b] -= learningRateOuter * e[a] * syn0copy[b];
@@ -366,7 +365,7 @@ void computeMultinomialPhrase(float* y, int* wordId, int noWords){
     long long a, b, i, offset1, offset2;
 
     // Offset to access the outer layer weights
-    for (b = 0; b < NUM_CLUSTERS; b++){
+    for (b = 0; b < noClusters; b++){
         dotProduct = 0;
         // Offset to access the values of hidden layer weights
         offset2 = b * layer1_size;
@@ -387,21 +386,21 @@ void computeMultinomialPhrase(float* y, int* wordId, int noWords){
     }
 
     // Normalizing to create a probability measure
-    for(b = 0; b < NUM_CLUSTERS; b++) sum += y[b];
+    for(b = 0; b < noClusters; b++) sum += y[b];
 
     if(sum > 0)
-        for(b = 0; b < NUM_CLUSTERS; b++) y[b] = y[b]/sum;
+        for(b = 0; b < noClusters; b++) y[b] = y[b]/sum;
 }
 
 // Updates the weights for a phrase
 void updateWeightsPhrase(float* y, int* wordId, int noWords, int trueId){
     // compute gradient for outer layer weights, gradient g
-    float* e = (float*) malloc(NUM_CLUSTERS * sizeof(float));
+    float* e = (float*) malloc(noClusters * sizeof(float));
     long long a, b, c, i, offset1, offset2;
-    float learningRateOuter = 0.01, learningRateInner = 0.01;
+    float learningRateOuter = 0.001, learningRateInner = 0.001;
 
     // Computing error
-    for(b = 0; b < NUM_CLUSTERS; b++){
+    for(b = 0; b < noClusters; b++){
         if(b == trueId - 1) e[b] = y[b] - 1;
         else e[b] = y[b];
     }
@@ -420,7 +419,7 @@ void updateWeightsPhrase(float* y, int* wordId, int noWords, int trueId){
     // Offset for accessing inner weights
     for(i = 0; i < noWords; i++){
         offset1 = layer1_size * wordId[i];
-        for(b = 0; b < NUM_CLUSTERS; b++){
+        for(b = 0; b < noClusters; b++){
             // Offset for accesing outer weights
             offset2 = layer1_size * b;
             
@@ -433,7 +432,7 @@ void updateWeightsPhrase(float* y, int* wordId, int noWords, int trueId){
     // update outer layer weights
     for(i = 0; i < noWords; i++){
         offset1 = layer1_size * i;
-        for(a = 0; a < NUM_CLUSTERS; a++){
+        for(a = 0; a < noClusters; a++){
             offset2 = layer1_size * a;
             for(b = 0; b < layer1_size; b++){
                 syn1[offset2 + b] -= 1.0/noWords * learningRateOuter * e[a] * syn0copy[offset1 + b];
@@ -626,10 +625,10 @@ char *multi_tok(char *input, char *delimiter) {
 
 // Clustering kmeans wrapper
 // Source: http://yael.gforge.inria.fr/tutorial/tuto_kmeans.html
-void clusterVisualFeatures(int noClusters){
-    int k = noClusters;                           /* number of cluster to create */
+void clusterVisualFeatures(int clusters){
+    int k = clusters;                           /* number of cluster to create */
     int d = VISUAL_FEATURE_SIZE;                           /* dimensionality of the vectors */
-    int n = NUM_TRAINING;                         /* number of vectors */
+    int n = noTrain;                         /* number of vectors */
     //int nt = 1;                           /* number of threads to use */
     int niter = 0;                        /* number of iterations (0 for convergence)*/
     int redo = 1;                         /* number of redo */
@@ -640,7 +639,7 @@ void clusterVisualFeatures(int noClusters){
     for (i = 0; i < n; i++){
         offset = i * d;
         for(j = 0; j < d; j++)
-            v[offset + j] = (float) prs[i].feat[j];
+            v[offset + j] = (float) train[i].feat[j];
     }
 
     /* variables are allocated externaly */
@@ -659,11 +658,16 @@ void clusterVisualFeatures(int noClusters){
 
     // Write the cluster ids to the prsTuple structure
     for (i = 0; i < n; i++)
-        prs[i].cId = assign[i] + 1;
+        train[i].cId = assign[i] + 1;
 
-    // Debugging the cId for the prs tuples
+    // Debugging the cId for the train tuples
     /*for (i = 0; i < n; i++)
-        printf("%i\n", prs[i].cId);*/
+        printf("%i\n", train[i].cId);*/
+
+    // Assigning the number of clusters
+    if(noClusters == 0){
+        noClusters = clusters;
+    }
 
     // Free memory
     free(v); free(centroids); free(dis); free(assign); free(nassign);
@@ -813,15 +817,15 @@ void computeTestValScores(struct prsTuple* holder, long noInst, float threshold,
     for(a = 0; a < noInst; a++){
         meanScore = 0.0;
         // For each training instance, find score, ReLU and max
-        for(b = 0; b < NUM_TRAINING; b++){
+        for(b = 0; b < noTrain; b++){
             // Get P score
-            pScore = cosDist[featVocabSize * prs[b].p + holder[a].p];
+            pScore = cosDist[featVocabSize * train[b].p + holder[a].p];
             
             // Get R score
-            rScore = cosDist[featVocabSize * prs[b].r + holder[a].r];
+            rScore = cosDist[featVocabSize * train[b].r + holder[a].r];
             
             // Get S score
-            sScore = cosDist[featVocabSize * prs[b].s + holder[a].s];
+            sScore = cosDist[featVocabSize * train[b].s + holder[a].s];
            
             // ReLU
             curScore = pScore + rScore + sScore - threshold;
@@ -832,7 +836,7 @@ void computeTestValScores(struct prsTuple* holder, long noInst, float threshold,
         }
 
         // Save the mean score for the current instance
-        scoreList[a] = meanScore / NUM_TRAINING;
+        scoreList[a] = meanScore / noTrain;
         //printf("%ld : %f\n", a, scoreList[a]);
     }
 }
