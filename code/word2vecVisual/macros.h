@@ -8,5 +8,4 @@
 #define MAX_SENTENCE_LENGTH 1000
 #define MAX_CODE_LENGTH 40
 
-#define VISUAL_FEATURE_SIZE 1222
 #endif

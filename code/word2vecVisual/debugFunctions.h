@@ -17,6 +17,7 @@ extern struct featureWord* featHashWords;
 extern struct prsTuple* train;
 extern long noTrain;
 extern int noCluster;
+extern int visualFeatSize;
 
 void debugVisualFeatureRead(char*);
 void debugPRSFeatureRead(char*);

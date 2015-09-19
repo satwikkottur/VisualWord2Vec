@@ -6,14 +6,19 @@ List of todos:
 - Compute the accuracy and match it with matlab accuracies (done)
 - Vary learning rate, use differential learning rates (done)
 - Vary number of clusters (done)
-- Use Wiki to train word2vec, instead of MS COCO
+- Also use Wiki to train word2vec, instead of MS COCO
 - Use averaging as opposed to just words (done) (done)
 - Can we use just sentences and abstract geometry vectors? (done)
-- Regressing with the actual visual vectors - might have to include dropout
+- Regressing with the actual visual vectors - might have to include dropout (defer)
 - Use the modified visual features instead of binary (done)
 - remove NUM_CLUSTERS (done)
 - remove NUM_TRAINING (done)
 - remove prs to train (done)
-- remove VISUAL_FEATURE_SIZE
-- Generalize the last layer
+- remove VISUAL_FEATURE_SIZE (done)
+- Generalize the last layer (defer)
 - Get the numbers for all the various settings
+- Perform PCA for the visual features before clustering (done, offline, matlab)
+- Perform a sweep for various number of clusters (steps of 2/3)
+- Train different models for P,R,S
+- Iteration over dataset based on performance on validation set
+- Check overfitting based on performance on validation and testing (train and test?)

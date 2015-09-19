@@ -587,7 +587,8 @@ void TrainModel() {
     char postPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
     char prePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre.txt";
     char vocabPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_vocab.txt";
-    char visualPath[] = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+    char visualPath[] = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
+    //char visualPath[] = "/home/satwik/VisualWord2Vec/data/float_features.txt";
 
     // Initializing the refining
     initRefining();

@@ -6,10 +6,10 @@ void debugVisualFeatureRead(char* fileName){
     // Iterators
     int i, j;
     for(i = 0; i < noTrain; i++){
-        for(j = 0; j < VISUAL_FEATURE_SIZE-1; j++)
+        for(j = 0; j < visualFeatSize-1; j++)
             fprintf(filePt, "%f ", train[i].feat[j]);
        
-        fprintf(filePt, "%f\n", train[i].feat[VISUAL_FEATURE_SIZE-1]);
+        fprintf(filePt, "%f\n", train[i].feat[visualFeatSize-1]);
     }
 
     fclose(filePt);
