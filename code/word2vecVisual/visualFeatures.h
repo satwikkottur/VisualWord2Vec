@@ -84,7 +84,7 @@ void readVisualFeatureFile(char*);
 void clusterVisualFeatures(int);
 /*****************************************/
 // Common sense task
-void performCommonSenseTask();
+int performCommonSenseTask();
 // Reading the test and validation files
 void readTestValFiles(char*, char*);
 // Computing the cos distances

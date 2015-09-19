@@ -12,6 +12,7 @@ float* valScore, *testScore; // Storing the scores for test and val
 int verbose = 0; // Printing which function is being executed
 int noClusters = 0; // Number of clusters to be used
 int visualFeatSize = 0; // Size of the visual features used
+float prevValAcc = 0, prevTestAcc = 0;
 
 struct prsTuple *train, *test, *val;
 
@@ -760,14 +761,15 @@ void clusterVisualFeatures(int clusters){
 }
 
 // Common sense evaluation
-void performCommonSenseTask(){
+int performCommonSenseTask(){
     printf("Common sense task\n\n");
     // Read the validation and test sets    
     char testFile[] = "/home/satwik/VisualWord2Vec/data/test_features.txt";
     char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
 
-    // Clean the strings for test and validation sets, store features
-    readTestValFiles(valFile, testFile);
+    if(noTest == 0 || noVal == 0)
+        // Clean the strings for test and validation sets, store features
+        readTestValFiles(valFile, testFile);
 
     // Get the features for test and validation sets
     // Re-evaluate the features for the entire vocab
@@ -780,9 +782,12 @@ void performCommonSenseTask(){
     // For each, going through training instances and computing the score
     valScore = (float*) malloc(noVal * sizeof(float));
     testScore = (float*) malloc(noTest * sizeof(float));
+
     // Threshold sweeping for validation
+    // and get the best validation and correspoding testing accuracy
+    float bestValAcc = 0, bestTestAcc = 0;
     float threshold;
-    for(threshold = -2.0; threshold < 3.0; threshold += 0.1){
+    for(threshold = -1.0; threshold < 2.0; threshold += 0.1){
         
         computeTestValScores(val, noVal, threshold, valScore);
         computeTestValScores(test, noTest, threshold, testScore);
@@ -791,8 +796,25 @@ void performCommonSenseTask(){
         float* precVal = computeMAP(valScore, val, noVal);
         float* precTest = computeMAP(testScore, test, noTest);
 
-        printf("Precision (threshold , val , test) : %f %f %f\n", 
+        // Get the maximum
+        if(bestValAcc < precVal[0]){
+            bestValAcc = precVal[0];
+            bestTestAcc = precTest[0];
+        }
+        if(verbose)
+            printf("Precision (threshold , val , test) : %f %f %f\n", 
                                         threshold, precVal[0], precTest[0]);
+    }
+    printf("Precision (val, test) : %f %f\n", bestValAcc, bestTestAcc);
+
+    // Stop the procedure if validation accuracy decreases
+    if(prevValAcc > bestValAcc){
+        return 0;
+    }
+    else{
+        prevValAcc = bestValAcc;
+        prevTestAcc = bestTestAcc;
+        return 1;
     }
 }
 

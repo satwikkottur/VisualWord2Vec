@@ -609,9 +609,16 @@ void TrainModel() {
     // Perform common sense task
     performCommonSenseTask();
 
-    // Refine the network
-    //refineNetwork();
-    refineNetworkPhrase();
+    int i;
+    int noOverfit = 1;
+    while(noOverfit){
+        // Refine the network
+        refineNetwork();
+        //refineNetworkPhrase();
+        
+        // Perform common sense task
+        noOverfit = performCommonSenseTask();
+    }
     
     // Compute the embeddings for all the feature words
     //computeEmbeddings();
@@ -619,8 +626,6 @@ void TrainModel() {
     // saving after the refining the network
     //saveEmbeddings(postPath);
     
-    // common sense task
-    performCommonSenseTask();
     /***************************************************************************************/
     // skip writing to the file
     return;

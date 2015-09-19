@@ -20,5 +20,6 @@ List of todos:
 - Perform PCA for the visual features before clustering (done, offline, matlab)
 - Perform a sweep for various number of clusters (steps of 2/3)
 - Train different models for P,R,S
-- Iteration over dataset based on performance on validation set
-- Check overfitting based on performance on validation and testing (train and test?)
+- Keep track of best validation and test accuracies (done)
+- Iteration over dataset based on performance on validation set (done)
+- Check overfitting based on performance on validation and testing (train and test?) (done)
