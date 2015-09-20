@@ -587,8 +587,8 @@ void TrainModel() {
     char postPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
     char prePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre.txt";
     char vocabPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_vocab.txt";
-    char visualPath[] = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
-    //char visualPath[] = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+    //char visualPath[] = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
+    char visualPath[] = "/home/satwik/VisualWord2Vec/data/float_features.txt";
 
     // Initializing the refining
     initRefining();
@@ -611,6 +611,17 @@ void TrainModel() {
 
     int i;
     int noOverfit = 1;
+    for(i = 0; i < 5; i++){
+        // Refine the network
+        //refineNetwork();
+        refineNetworkPhrase();
+        
+        // Perform common sense task
+        noOverfit = performCommonSenseTask();
+    }
+    
+    /*int i;
+    int noOverfit = 1;
     while(noOverfit){
         // Refine the network
         refineNetwork();
@@ -618,8 +629,7 @@ void TrainModel() {
         
         // Perform common sense task
         noOverfit = performCommonSenseTask();
-    }
-    
+    }*/
     // Compute the embeddings for all the feature words
     //computeEmbeddings();
 
