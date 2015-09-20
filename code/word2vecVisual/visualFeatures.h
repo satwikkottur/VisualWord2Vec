@@ -30,6 +30,8 @@ int SearchVocab(char* word);
 // getting the vocab indices
 struct featureWord constructFeatureWord(char*);
 /********************************************************/
+// Initializing the feature hash
+void initFeatureHash();
 
 // Initializing the refining of network
 void initRefining();

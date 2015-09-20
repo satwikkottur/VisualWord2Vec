@@ -15,7 +15,8 @@ int visualFeatSize = 0; // Size of the visual features used
 float prevValAcc = 0, prevTestAcc = 0;
 
 struct prsTuple *train, *test, *val;
-
+float *syn0P, *syn0Q, *syn0R;
+float *syn1P, *syn1Q, *syn1R;
 /***************************************************************************/
 // reading feature file
 void readFeatureFile(char* filePath){
@@ -201,13 +202,24 @@ struct featureWord constructFeatureWord(char* word){
     return feature;
 }
 
+// Initializing the feature hash
+void initFeatureHash(){
+    long a;
+
+    // Setting up the hash
+    featHashWords = (struct featureWord *) malloc(sizeof(struct featureWord) * featVocabMaxSize);
+    featHashInd = (int*) malloc(sizeof(int) * featHashSize);
+    for(a = 0; a < featHashSize; a++)
+        featHashInd[a] = -1;
+}
+
 // Initializing the refining
 void initRefining(){
     long long a, b;
     unsigned long long next_random = 1;
 
     // Setup the network 
-    a = posix_memalign((void **)&syn1, 128, (long long)vocab_size * layer1_size * sizeof(real));
+    a = posix_memalign((void **)&syn1, 128, (long long)noClusters * layer1_size * sizeof(real));
     if (syn1 == NULL) {
         printf("Memory allocation failed\n"); 
         exit(1);
@@ -218,13 +230,43 @@ void initRefining(){
         next_random = next_random * (unsigned long long)25214903917 + 11;
         syn1[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
     }
+}
+
+// Initializing the multi-model refining
+/*void initMultiRefining(){
+    long long a, b;
+    unsigned long long next_random = 1;
+
+    // Make copies of syn0 as syn0P, syn0R, syn0S
+
+    // Initialize syn1P, syn1R, syn1S
+    // Setup the network 
+    a = posix_memalign((void **)&syn1P, 128, (long long)vocab_size * layer1_size * sizeof(real));
+    a = posix_memalign((void **)&syn1S, 128, (long long)vocab_size * layer1_size * sizeof(real));
+    a = posix_memalign((void **)&syn1R, 128, (long long)vocab_size * layer1_size * sizeof(real));
+    if (syn1P == NULL || syn1R == NULL || syn1S == NULL) {
+        printf("Memory allocation failed\n"); 
+        exit(1);
+    }
+
+    // Initialize the last layer of weights
+    for (a = 0; a < noClusters; a++) for (b = 0; b < layer1_size; b++){
+        next_random = next_random * (unsigned long long)25214903917 + 11;
+        syn1R[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
+
+        next_random = next_random * (unsigned long long)25214903917 + 11;
+        syn1S[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
+
+        next_random = next_random * (unsigned long long)25214903917 + 11;
+        syn1P[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
+    }
 
     // Setting up the hash
     featHashWords = (struct featureWord *) malloc(sizeof(struct featureWord) * featVocabMaxSize);
     featHashInd = (int*) malloc(sizeof(int) * featHashSize);
     for(a = 0; a < featHashSize; a++)
         featHashInd[a] = -1;
-}
+}*/
 
 // Refine the network through clusters
 void refineNetwork(){
@@ -389,11 +431,13 @@ void computeMultinomial(float* y, int wordId){
         }
 
         // Exponential (clip if less or greater than the limit)
-        if (dotProduct <= - MAX_EXP) dotProduct = -MAX_EXP;
-        else if (dotProduct >= MAX_EXP) dotProduct = MAX_EXP;
-        else dotProduct = expTable[(int) ((dotProduct + MAX_EXP) * (EXP_TABLE_SIZE / MAX_EXP / 2))];
-
-        y[b] = dotProduct;
+        //if (dotProduct <= - MAX_EXP) dotProduct = -MAX_EXP;
+        //else if (dotProduct >= MAX_EXP) dotProduct = MAX_EXP;
+        //else dotProduct = expTable[(int) ((dotProduct + MAX_EXP) * (EXP_TABLE_SIZE / MAX_EXP / 2))];
+ 
+        // Exponentiating
+        //printf();
+        y[b] = exp(dotProduct);
     }
 
     // Normalizing to create a probability measure
@@ -465,11 +509,11 @@ void computeMultinomialPhrase(float* y, int* wordId, int noWords){
         }
 
         // Exponential (clip if less or greater than the limit)
-        if (dotProduct <= - MAX_EXP) dotProduct = -MAX_EXP;
-        else if (dotProduct >= MAX_EXP) dotProduct = MAX_EXP;
-        else dotProduct = expTable[(int) ((dotProduct + MAX_EXP) * (EXP_TABLE_SIZE / MAX_EXP / 2))];
+        //if (dotProduct <= - MAX_EXP) dotProduct = -MAX_EXP;
+        //else if (dotProduct >= MAX_EXP) dotProduct = MAX_EXP;
+        //else dotProduct = expTable[(int) ((dotProduct + MAX_EXP) * (EXP_TABLE_SIZE / MAX_EXP / 2))];
 
-        y[b] = dotProduct;
+        y[b] = exp(dotProduct);
     }
 
     // Normalizing to create a probability measure

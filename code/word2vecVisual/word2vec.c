@@ -587,11 +587,11 @@ void TrainModel() {
     char postPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
     char prePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre.txt";
     char vocabPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_vocab.txt";
-    //char visualPath[] = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
-    char visualPath[] = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+    char visualPath[] = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
+    //char visualPath[] = "/home/satwik/VisualWord2Vec/data/float_features.txt";
 
-    // Initializing the refining
-    initRefining();
+    // Initializing the hash
+    initFeatureHash();
     // Reading for the word features, cluster ids and visual features
     // ClusterId reading will be avoided when clustering is ported to C
     readFeatureFile(featurePath);
@@ -602,6 +602,9 @@ void TrainModel() {
     readVisualFeatureFile(visualPath);
     clusterVisualFeatures(10);
     
+    // Initializing the refining network
+    initRefining();
+
     // saving before the refining the network
     //saveEmbeddings(prePath);
     //saveFeatureWordVocab(vocabPath);
@@ -609,20 +612,9 @@ void TrainModel() {
     // Perform common sense task
     performCommonSenseTask();
 
-    int i;
-    int noOverfit = 1;
-    for(i = 0; i < 5; i++){
-        // Refine the network
-        //refineNetwork();
-        refineNetworkPhrase();
-        
-        // Perform common sense task
-        noOverfit = performCommonSenseTask();
-    }
-    
     /*int i;
     int noOverfit = 1;
-    while(noOverfit){
+    for(i = 0; i < 5; i++){
         // Refine the network
         refineNetwork();
         //refineNetworkPhrase();
@@ -630,6 +622,17 @@ void TrainModel() {
         // Perform common sense task
         noOverfit = performCommonSenseTask();
     }*/
+    
+    int i;
+    int noOverfit = 1;
+    while(noOverfit){
+        // Refine the network
+        //refineNetwork();
+        refineNetworkPhrase();
+        
+        // Perform common sense task
+        noOverfit = performCommonSenseTask();
+    }
     // Compute the embeddings for all the feature words
     //computeEmbeddings();
 
