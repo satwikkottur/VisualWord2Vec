@@ -603,7 +603,8 @@ void TrainModel() {
     clusterVisualFeatures(10);
     
     // Initializing the refining network
-    initRefining();
+    //initRefining();
+    initMultiRefining();
 
     // saving before the refining the network
     //saveEmbeddings(prePath);

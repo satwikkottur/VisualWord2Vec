@@ -233,17 +233,27 @@ void initRefining(){
 }
 
 // Initializing the multi-model refining
-/*void initMultiRefining(){
+void initMultiRefining(){
     long long a, b;
     unsigned long long next_random = 1;
 
-    // Make copies of syn0 as syn0P, syn0R, syn0S
+    // Allocate and Make copies of syn0 as syn0P, syn0R, syn0S
+    a = posix_memalign((void **)&syn0P, 128, (long long)vocab_size * layer1_size * sizeof(real));
+    a = posix_memalign((void **)&syn0S, 128, (long long)vocab_size * layer1_size * sizeof(real));
+    a = posix_memalign((void **)&syn0R, 128, (long long)vocab_size * layer1_size * sizeof(real));
+    if (syn0P == NULL || syn0R == NULL || syn0S == NULL) {
+        printf("Memory allocation failed\n"); 
+        exit(1);
+    }
+    memcpy(syn0P, syn0, (size_t)vocab_size * layer1_size * sizeof(float));
+    memcpy(syn0S, syn0, (size_t)vocab_size * layer1_size * sizeof(float));
+    memcpy(syn0R, syn0, (size_t)vocab_size * layer1_size * sizeof(float));
 
     // Initialize syn1P, syn1R, syn1S
     // Setup the network 
-    a = posix_memalign((void **)&syn1P, 128, (long long)vocab_size * layer1_size * sizeof(real));
-    a = posix_memalign((void **)&syn1S, 128, (long long)vocab_size * layer1_size * sizeof(real));
-    a = posix_memalign((void **)&syn1R, 128, (long long)vocab_size * layer1_size * sizeof(real));
+    a = posix_memalign((void **)&syn1P, 128, (long long)noClusters * layer1_size * sizeof(real));
+    a = posix_memalign((void **)&syn1S, 128, (long long)noClusters * layer1_size * sizeof(real));
+    a = posix_memalign((void **)&syn1R, 128, (long long)noClusters * layer1_size * sizeof(real));
     if (syn1P == NULL || syn1R == NULL || syn1S == NULL) {
         printf("Memory allocation failed\n"); 
         exit(1);
@@ -260,13 +270,7 @@ void initRefining(){
         next_random = next_random * (unsigned long long)25214903917 + 11;
         syn1P[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
     }
-
-    // Setting up the hash
-    featHashWords = (struct featureWord *) malloc(sizeof(struct featureWord) * featVocabMaxSize);
-    featHashInd = (int*) malloc(sizeof(int) * featHashSize);
-    for(a = 0; a < featHashSize; a++)
-        featHashInd[a] = -1;
-}*/
+}
 
 // Refine the network through clusters
 void refineNetwork(){
@@ -324,6 +328,83 @@ void refineNetwork(){
             // If not in vocab, continue
             if(r.index[c] == -1) continue;
             //printf("r: %d %d\n", r.index[c], r.count);
+
+            // Predict the cluster
+            computeMultinomial(y, r.index[c]);
+            // Propage the error to the PRS features
+            updateWeights(y, r.index[c], train[i].cId);
+        }
+    }
+}
+
+// Refine the network through clusters using multiple models
+void refineMultiNetwork(){
+    long long c, i;
+    float* y = (float*) malloc(sizeof(float) * noClusters);
+    struct featureWord p, s, r;
+
+    // Checking if training examples are present
+    if(noTrain == 0){
+        printf("Training examples not loaded!\n");   
+        exit(1);
+    }
+
+    // Read each of the training instance
+    for(i = 0; i < noTrain; i++){
+        //printf("Training %lld instance ....\n", i);
+        
+        // Checking possible fields to avoid segmentation error
+        if(train[i].cId < 1 || train[i].cId > noClusters) {
+            printf("\nCluster id (%d) for %lld instance invalid!\n", train[i].cId, i);
+            exit(1);
+        }
+
+        //printf("Counts : %d %d %d\n", train[i].p.count, train[i].s.count, train[i].r.count);
+
+        // Updating the weights for P
+        p = featHashWords[train[i].p];
+        for(c = 0; c < p.count; c++){
+            // If not in vocab, continue
+            if(p.index[c] == -1) continue;
+            //printf("p: %d %d\n", p.index[c], p.count);
+
+            // Point syn0 and syn1 to P model
+            syn0 = syn0P;
+            syn1 = syn1P;
+
+            // Predict the cluster
+            computeMultinomial(y, p.index[c]);
+            // Propage the error to the PRS features
+            updateWeights(y, p.index[c], train[i].cId);
+        }
+        
+        // Updating the weights for S
+        s = featHashWords[train[i].s];
+        for(c = 0; c < s.count; c++){
+            // If not in vocab, continue
+            if(s.index[c] == -1) continue;
+            //printf("s: %d %d\n", s.index[c], s.count);
+
+            // Point syn0 and syn1 to S model
+            syn0 = syn0S;
+            syn1 = syn1S;
+
+            // Predict the cluster
+            computeMultinomial(y, s.index[c]);
+            // Propage the error to the PRS features
+            updateWeights(y, s.index[c], train[i].cId);
+        }
+
+        // Updating the weights for R
+        r = featHashWords[train[i].r];
+        for(c = 0; c < r.count; c++){
+            // If not in vocab, continue
+            if(r.index[c] == -1) continue;
+            //printf("r: %d %d\n", r.index[c], r.count);
+
+            // Point syn0 and syn1 to R model
+            syn0 = syn0R;
+            syn1 = syn1R;
 
             // Predict the cluster
             computeMultinomial(y, r.index[c]);

@@ -35,6 +35,7 @@ void initFeatureHash();
 
 // Initializing the refining of network
 void initRefining();
+void initMultiRefining(); // Training multiple models
 
 // Reading the feature file
 void readFeatureFile(char*);
@@ -49,6 +50,7 @@ char* multi_tok(char*, char*);
 void refineNetwork();
 // Function to refine the network through clusters, through phrases
 void refineNetworkPhrase();
+// Function to refine the network through clusters, using multiple models
 
 // Evaluate y_i for each output cluster
 void computeMultinomial(float*, int);
