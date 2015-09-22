@@ -575,9 +575,9 @@ void TrainModel() {
     if (negative > 0) InitUnigramTable();
     start = clock();
     // [S] : Creates the threads for execution
-    //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+    for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
     // [S] : Waits for the completion of execution of the threads
-    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+    for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     //***************************************************************************************
     // [S] added
@@ -606,50 +606,24 @@ void TrainModel() {
     //initRefining();
     initMultiRefining();
 
-    // refining the multi model network
-    refineMultiNetwork();
-
-    // Computing embeddings for multi model
-    computeMultiEmbeddings();
-    
-    // Compute the cosine values
-    evaluateMultiCosDistance();
-    return;
-
-    // saving before the refining the network
-    //saveEmbeddings(prePath);
-    //saveFeatureWordVocab(vocabPath);
-
     // Perform common sense task
     //performCommonSenseTask();
+    // Performing the multi model common sense task
+    //performMultiCommonSenseTask();
 
-    /*int i;
-    int noOverfit = 1;
-    for(i = 0; i < 5; i++){
-        // Refine the network
-        refineNetwork();
-        //refineNetworkPhrase();
-        
-        // Perform common sense task
-        noOverfit = performCommonSenseTask();
-    }*/
-    
-    int i;
     int noOverfit = 1;
     while(noOverfit){
         // Refine the network
         //refineNetwork();
-        refineNetworkPhrase();
+        //refineNetworkPhrase();
+        // Refine the network for multi model
+        refineMultiNetwork();
         
         // Perform common sense task
-        noOverfit = performCommonSenseTask();
+        //noOverfit = performCommonSenseTask();
+        // Performing the multi model common sense task
+        noOverfit = performMultiCommonSenseTask();
     }
-    // Compute the embeddings for all the feature words
-    //computeEmbeddings();
-
-    // saving after the refining the network
-    //saveEmbeddings(postPath);
-    
     /***************************************************************************************/
     // skip writing to the file
     return;

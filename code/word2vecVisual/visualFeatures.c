@@ -11,7 +11,7 @@ float* cosDist; // Storing the cosine distances between all the feature vocabula
 float* valScore, *testScore; // Storing the scores for test and val
 // Storing the cosine distances between all the feature vocabulary (multimodel)
 float *cosDistP, *cosDistR, *cosDistS; 
-int verbose = 1; // Printing which function is being executed
+int verbose = 0; // Printing which function is being executed
 int noClusters = 0; // Number of clusters to be used
 int visualFeatSize = 0; // Size of the visual features used
 float prevValAcc = 0, prevTestAcc = 0;
@@ -1033,6 +1033,64 @@ int performCommonSenseTask(){
     }
 }
 
+// Common sense evaluation
+int performMultiCommonSenseTask(){
+    printf("Common sense task with multi models....\n\n");
+    // Read the validation and test sets    
+    char testFile[] = "/home/satwik/VisualWord2Vec/data/test_features.txt";
+    char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
+
+    if(noTest == 0 || noVal == 0)
+        // Clean the strings for test and validation sets, store features
+        readTestValFiles(valFile, testFile);
+
+    // Get the features for test and validation sets
+    // Re-evaluate the features for the entire vocab
+    computeMultiEmbeddings();
+
+    // Evaluate the cosine distance
+    evaluateMultiCosDistance();
+
+    // Going through all the test / validation examples
+    // For each, going through training instances and computing the score
+    valScore = (float*) malloc(noVal * sizeof(float));
+    testScore = (float*) malloc(noTest * sizeof(float));
+
+    // Threshold sweeping for validation
+    // and get the best validation and correspoding testing accuracy
+    float bestValAcc = 0, bestTestAcc = 0;
+    float threshold;
+    for(threshold = -1.0; threshold < 2.0; threshold += 0.1){
+        
+        computeMultiTestValScores(val, noVal, threshold, valScore);
+        computeMultiTestValScores(test, noTest, threshold, testScore);
+
+        // Compute the accuracy
+        float* precVal = computeMAP(valScore, val, noVal);
+        float* precTest = computeMAP(testScore, test, noTest);
+
+        // Get the maximum
+        if(bestValAcc < precVal[0]){
+            bestValAcc = precVal[0];
+            bestTestAcc = precTest[0];
+        }
+        if(verbose)
+            printf("Precision (threshold , val , test) : %f %f %f\n", 
+                                        threshold, precVal[0], precTest[0]);
+    }
+    printf("Precision (val, test) : %f %f\n", bestValAcc, bestTestAcc);
+
+    // Stop the procedure if validation accuracy decreases
+    if(prevValAcc > bestValAcc){
+        return 0;
+    }
+    else{
+        prevValAcc = bestValAcc;
+        prevTestAcc = bestTestAcc;
+        return 1;
+    }
+}
+
 // Reading the test and validation files
 void readTestValFiles(char* valName, char* testName){
     // Read the file
@@ -1229,6 +1287,40 @@ void computeTestValScores(struct prsTuple* holder, long noInst, float threshold,
             
             // Get S score
             sScore = cosDist[featVocabSize * train[b].s + holder[a].s];
+           
+            // ReLU
+            curScore = pScore + rScore + sScore - threshold;
+            if(curScore < 0) curScore = 0;
+            
+            // Add it to the meanScore
+            meanScore += curScore;
+        }
+
+        // Save the mean score for the current instance
+        scoreList[a] = meanScore / noTrain;
+        //printf("%ld : %f\n", a, scoreList[a]);
+    }
+}
+
+// Computing the test and validation scores
+void computeMultiTestValScores(struct prsTuple* holder, long noInst, float threshold, float* scoreList){
+    if(verbose) printf("Computing the scores...\n\n");
+
+    // Iteration variables
+    long a, b;
+    float meanScore, pScore, rScore, sScore, curScore; 
+    for(a = 0; a < noInst; a++){
+        meanScore = 0.0;
+        // For each training instance, find score, ReLU and max
+        for(b = 0; b < noTrain; b++){
+            // Get P score
+            pScore = cosDistP[featVocabSize * train[b].p + holder[a].p];
+            
+            // Get R score
+            rScore = cosDistR[featVocabSize * train[b].r + holder[a].r];
+            
+            // Get S score
+            sScore = cosDistS[featVocabSize * train[b].s + holder[a].s];
            
             // ReLU
             curScore = pScore + rScore + sScore - threshold;

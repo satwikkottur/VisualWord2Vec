@@ -94,6 +94,8 @@ void clusterVisualFeatures(int);
 /*****************************************/
 // Common sense task
 int performCommonSenseTask();
+// Common sense task with multi models
+int performMultiCommonSenseTask();
 // Reading the test and validation files
 void readTestValFiles(char*, char*);
 // Computing the cos distances
@@ -102,6 +104,8 @@ void evaluateCosDistance();
 void evaluateMultiCosDistance();
 // Computing the test and val scores
 void computeTestValScores(struct prsTuple*, long, float, float*);
+// Computing the test and val scores with multi models
+void computeMultiTestValScores(struct prsTuple*, long, float, float*);
 // Computing the mean AP and basic precision
 float* computeMAP(float*, struct prsTuple*, long);
 #endif
