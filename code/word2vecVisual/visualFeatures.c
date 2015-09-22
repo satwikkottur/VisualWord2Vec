@@ -500,6 +500,96 @@ void refineNetworkPhrase(){
     }
 }
 
+// Refine the network through clusters, for phrases. for multiple models
+void refineMultiNetworkPhrase(){
+    long long c, i;
+    float* y = (float*) malloc(sizeof(float) * noClusters);
+    struct featureWord p, s, r;
+    int* wordList = (int*) malloc(100 * sizeof(int));
+    int wordCount = 0;
+
+    // Checking if training examples are present
+    if(noTrain == 0){
+        printf("Training examples not loaded!\n");   
+        exit(1);
+    }
+
+    // Read each of the training instance
+    for(i = 0; i < noTrain; i++){
+        //printf("Training %lld instance ....\n", i);
+        
+        // Checking possible fields to avoid segmentation error
+        if(train[i].cId < 1 || train[i].cId > noClusters) {
+            printf("\nCluster id (%d) for %lld instance invalid!\n", train[i].cId, i);
+            exit(1);
+        }
+
+        // Now collecting words for training
+        /*****************************************/
+        // Updating the weights for P
+        p = featHashWords[train[i].p];
+        wordCount = 0;
+        
+        for(c = 0; c < p.count; c++){
+            // If not in vocab, continue
+            if(p.index[c] == -1) continue;
+
+            wordList[wordCount] = p.index[c];
+            // Getting the actual count of words
+            wordCount++;
+        }
+        // Pointing syn0, syn1 to syn0P,syn1P
+        syn0 = syn0P;
+        syn1 = syn1P;
+
+        // Predict the cluster
+        computeMultinomialPhrase(y, wordList, wordCount);
+        // Propage the error the embeddings
+        updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
+        /*****************************************/
+        // Updating the weights for S
+        s = featHashWords[train[i].s];
+        wordCount = 0;
+        
+        for(c = 0; c < s.count; c++){
+            // If not in vocab, continue
+            if(s.index[c] == -1) continue;
+
+            wordList[wordCount] = s.index[c];
+            // Getting the actual count of words
+            wordCount++;
+        }
+        // Pointing syn0, syn1 to syn0S,syn1S
+        syn0 = syn0S;
+        syn1 = syn1S;
+        // Predict the cluster
+        computeMultinomialPhrase(y, wordList, wordCount);
+        // Propage the error the embeddings
+        updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
+        /*****************************************/
+        // Updating the weights for R
+        r = featHashWords[train[i].r];
+        wordCount = 0;
+        
+        for(c = 0; c < r.count; c++){
+            // If not in vocab, continue
+            if(r.index[c] == -1) continue;
+
+            wordList[wordCount] = r.index[c];
+            // Getting the actual count of words
+            wordCount++;
+        }
+        // Pointing syn0, syn1 to syn0R,syn1R
+        syn0 = syn0R;
+        syn1 = syn1R;
+        // Predict the cluster
+        computeMultinomialPhrase(y, wordList, wordCount);
+        // Propage the error the embeddings
+        updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
+        /*****************************************/
+    }
+}
+
 // Evaluate y_i for each output cluster
 void computeMultinomial(float* y, int wordId){
     // y stores the multinomial distribution
@@ -1168,7 +1258,7 @@ void evaluateCosDistance(){
     float magProd = 0, dotProduct;
     for(a = 0; a < featVocabSize; a++){
         offset = featVocabSize * a;
-        for(b = 0; b < featVocabSize; b++){
+        for(b = a; b < featVocabSize; b++){
             if(featHashWords[a].embed == NULL || featHashWords[b].embed == NULL)
                 printf("NULL pointers : %ld %ld\n", a, b);
 
@@ -1180,10 +1270,14 @@ void evaluateCosDistance(){
             
             // Save the dotproduct
             magProd = (featHashWords[a].magnitude) * (featHashWords[b].magnitude);
-            if(magProd)
+            if(magProd){
                 cosDist[offset + b] = dotProduct / magProd;
-             else
+                cosDist[a + b * featVocabSize] = dotProduct / magProd;
+            }
+             else{
                 cosDist[offset + b] = 0.0;
+                cosDist[a + b * featVocabSize] = 0.0;
+            }
         }
     }
 }

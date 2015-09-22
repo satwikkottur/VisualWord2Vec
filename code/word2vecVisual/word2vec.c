@@ -609,15 +609,16 @@ void TrainModel() {
     // Perform common sense task
     //performCommonSenseTask();
     // Performing the multi model common sense task
-    //performMultiCommonSenseTask();
+    performMultiCommonSenseTask();
 
     int noOverfit = 1;
     while(noOverfit){
         // Refine the network
+        // Refine the network for multi model
         //refineNetwork();
         //refineNetworkPhrase();
-        // Refine the network for multi model
-        refineMultiNetwork();
+        //refineMultiNetwork();
+        refineMultiNetworkPhrase();
         
         // Perform common sense task
         //noOverfit = performCommonSenseTask();
