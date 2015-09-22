@@ -9,6 +9,9 @@ struct featureWord{
     // Word embedding for the instance
     float* embed; 
     float magnitude;
+    // Word embeddings for each of the model
+    float* embedR, *embedP, *embedS;
+    float magnitudeR, magnitudeP, magnitudeS;
 };
 
 // Structure to hold information about P,R,S triplets

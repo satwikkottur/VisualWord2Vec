@@ -608,6 +608,12 @@ void TrainModel() {
 
     // refining the multi model network
     refineMultiNetwork();
+
+    // Computing embeddings for multi model
+    computeMultiEmbeddings();
+    
+    // Compute the cosine values
+    evaluateMultiCosDistance();
     return;
 
     // saving before the refining the network

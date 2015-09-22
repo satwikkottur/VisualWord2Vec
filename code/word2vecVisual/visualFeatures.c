@@ -9,6 +9,8 @@ int featVocabMaxSize = 5000; // Maximum number of feature vocab
 long noTrain = 0, noTest = 0, noVal = 0; // Number of test and validation variables
 float* cosDist; // Storing the cosine distances between all the feature vocabulary
 float* valScore, *testScore; // Storing the scores for test and val
+// Storing the cosine distances between all the feature vocabulary (multimodel)
+float *cosDistP, *cosDistR, *cosDistS; 
 int verbose = 1; // Printing which function is being executed
 int noClusters = 0; // Number of clusters to be used
 int visualFeatSize = 0; // Size of the visual features used
@@ -139,9 +141,12 @@ struct featureWord constructFeatureWord(char* word){
     feature.str = (char*) malloc(MAX_STRING);
     strcpy(feature.str, word);
 
-    // Initialize the fature embedding
+    // Initialize the future embedding
     feature.magnitude = 0;
-    feature.embed = (float*) malloc(layer1_size * sizeof(float));
+    feature.embed = NULL;
+    feature.embedR = NULL;
+    feature.embedS = NULL;
+    feature.embedP = NULL;
     
     // Do something if not in vocab
     if(index == -1) {
@@ -708,6 +713,26 @@ void computeEmbeddings(){
     }
 }
 
+// Compute embeddings for multi models
+void computeMultiEmbeddings(){
+    long i;
+    // Computing the feature embeddings
+    for(i = 0; i < featVocabSize; i++){
+        // Allocate and then compute the feature embedding for each model
+        if(featHashWords[i].embedR == NULL)
+            featHashWords[i].embedR = (float*) malloc(layer1_size * sizeof(float));
+        
+        if(featHashWords[i].embedP == NULL)
+            featHashWords[i].embedP = (float*) malloc(layer1_size * sizeof(float));
+
+        if(featHashWords[i].embedS == NULL)
+            featHashWords[i].embedS = (float*) malloc(layer1_size * sizeof(float));
+
+        // Computing the feature embedding
+        computeMultiFeatureEmbedding(&featHashWords[i]);
+    }
+}
+
 // Compute embedding for a feature word
 void computeFeatureEmbedding(struct featureWord* feature){
     // Go through the current feature and get the mean of components
@@ -748,6 +773,70 @@ void computeFeatureEmbedding(struct featureWord* feature){
     feature->magnitude = sqrt(magnitude);
 
     free(mean);
+}
+
+// Compute embedding for a feature word for multi-model
+void computeMultiFeatureEmbedding(struct featureWord* feature){
+    // Go through the current feature and get the mean of components
+    int i, c, actualCount = 0;
+    long long offset;
+    float *meanR, *meanS, *meanP;
+    
+    // Initializing with zeros
+    meanR = (float*) calloc(layer1_size, sizeof(float));
+    meanS = (float*) calloc(layer1_size, sizeof(float));
+    meanP = (float*) calloc(layer1_size, sizeof(float));
+
+    // Get the mean feature for the word
+    for(c = 0; c < feature->count; c++){
+        // If not in vocab, continue
+        if(feature->index[c] == -1) continue;
+
+        // Write the vector
+        offset = feature->index[c] * layer1_size;
+        for (i = 0; i < layer1_size; i++) {
+            meanR[i] += syn0R[offset + i];
+            meanP[i] += syn0P[offset + i];
+            meanS[i] += syn0S[offset + i];
+        }
+
+        // Increase the count
+        actualCount++;
+    }
+
+    // Normalizing if non-zero count
+    if(actualCount)
+        for (i = 0; i < layer1_size; i++){
+            meanR[i] = meanR[i]/actualCount;
+            meanS[i] = meanS[i]/actualCount;
+            meanP[i] = meanP[i]/actualCount;
+        }
+    // Saving the embedding in the featureWord
+    for(i = 0; i < layer1_size; i++){
+        feature->embedR[i] = meanR[i];
+        feature->embedP[i] = meanP[i];
+        feature->embedS[i] = meanS[i];
+    }
+
+    // Compute the magnitude of meanR, meanS, meanP
+    float magnitude = 0;
+    for(i = 0; i < layer1_size; i++)
+        magnitude += meanR[i] * meanR[i];
+    feature->magnitudeR = sqrt(magnitude);
+
+    magnitude = 0;
+    for(i = 0; i < layer1_size; i++)
+        magnitude += meanP[i] * meanP[i];
+    feature->magnitudeP = sqrt(magnitude);
+
+    magnitude = 0;
+    for(i = 0; i < layer1_size; i++)
+        magnitude += meanS[i] * meanS[i];
+    feature->magnitudeS = sqrt(magnitude);
+
+    free(meanR);
+    free(meanP);
+    free(meanS);
 }
 
 // Searching a feature word
@@ -1037,6 +1126,86 @@ void evaluateCosDistance(){
                 cosDist[offset + b] = dotProduct / magProd;
              else
                 cosDist[offset + b] = 0.0;
+        }
+    }
+}
+
+// Cosine distance evaluation for multi model
+void evaluateMultiCosDistance(){
+    if (verbose) printf("Evaluating pairwise dot products(multi)....\n\n");
+    // Allocate memory for cosDist variable
+    cosDistR = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
+    cosDistS = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
+    cosDistP = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
+    
+    // For each pair, we evaluate the dot product along with normalization
+    long a, b, i, offset;
+    float magProd = 0, dotProduct;
+    for(a = 0; a < featVocabSize; a++){
+        offset = featVocabSize * a;
+        for(b = a; b < featVocabSize; b++){
+            // cosDist for P
+            if(featHashWords[a].embedP == NULL || featHashWords[b].embedP == NULL)
+                printf("NULL pointers : %ld %ld\n", a, b);
+
+            dotProduct = 0;
+            for(i = 0; i < layer1_size; i++){
+                dotProduct += 
+                    featHashWords[a].embedP[i] * featHashWords[b].embedP[i];
+            }
+            
+            // Save the dotproduct (symmetrically)
+            magProd = (featHashWords[a].magnitudeP) * (featHashWords[b].magnitudeP);
+            if(magProd){
+                cosDistP[offset + b] = dotProduct / magProd;
+                cosDistP[a + b * featVocabSize] = dotProduct / magProd;
+            }
+             else{
+                cosDistP[offset + b] = 0.0;
+                cosDistP[a + b * featVocabSize] = 0.0;
+            }
+            // ===================================================================//
+            // cosDist for R
+            if(featHashWords[a].embedR == NULL || featHashWords[b].embedR == NULL)
+                printf("NULL pointers : %ld %ld\n", a, b);
+
+            dotProduct = 0;
+            for(i = 0; i < layer1_size; i++){
+                dotProduct += 
+                    featHashWords[a].embedR[i] * featHashWords[b].embedR[i];
+            }
+            
+            // Save the dotproduct
+            magProd = (featHashWords[a].magnitudeR) * (featHashWords[b].magnitudeR);
+            if(magProd){
+                cosDistR[offset + b] = dotProduct / magProd;
+                cosDistR[a + b * featVocabSize] = dotProduct / magProd;
+            }
+            else{
+                cosDistR[offset + b] = 0.0;
+                cosDistR[a + b * featVocabSize] = 0.0;
+            }
+            // ===================================================================//
+            // cosDist for S
+            if(featHashWords[a].embedS == NULL || featHashWords[b].embedS == NULL)
+                printf("NULL pointers : %ld %ld\n", a, b);
+
+            dotProduct = 0;
+            for(i = 0; i < layer1_size; i++){
+                dotProduct += 
+                    featHashWords[a].embedS[i] * featHashWords[b].embedS[i];
+            }
+            
+            // Save the dotproduct
+            magProd = (featHashWords[a].magnitudeS) * (featHashWords[b].magnitudeS);
+            if(magProd){
+                cosDistS[offset + b] = dotProduct / magProd;
+                cosDistS[a + b * featVocabSize] = dotProduct / magProd;
+            }
+            else{
+                cosDistS[offset + b] = 0.0;
+                cosDistS[a + b * featVocabSize] = 0.0;
+            }
         }
     }
 }

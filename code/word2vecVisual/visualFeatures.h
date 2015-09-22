@@ -67,6 +67,8 @@ void saveEmbeddings(char*);
 
 // Compute the embeddings for all the words
 void computeEmbeddings();
+// Computing the embeddings in case of multi-model
+void computeMultiEmbeddings();
 
 // save a single feature
 void saveFeatureEmbedding(struct featureWord, FILE*);
@@ -74,6 +76,8 @@ void saveFeatureEmbedding(struct featureWord, FILE*);
 void saveFeatureWordVocab(char*);
 // Computing the embedding for the feature word 
 void computeFeatureEmbedding(struct featureWord*);
+// Computing the embedding for feature word in case of multi model
+void computeMultiFeatureEmbedding(struct featureWord*);
 /*****************************************/
 // Adding a feature word to the hash
 int addFeatureWord(char*);
@@ -94,6 +98,8 @@ int performCommonSenseTask();
 void readTestValFiles(char*, char*);
 // Computing the cos distances
 void evaluateCosDistance();
+// Computing the cos distances for multi-model
+void evaluateMultiCosDistance();
 // Computing the test and val scores
 void computeTestValScores(struct prsTuple*, long, float, float*);
 // Computing the mean AP and basic precision
