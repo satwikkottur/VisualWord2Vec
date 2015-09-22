@@ -575,9 +575,9 @@ void TrainModel() {
     if (negative > 0) InitUnigramTable();
     start = clock();
     // [S] : Creates the threads for execution
-    for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+    //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
     // [S] : Waits for the completion of execution of the threads
-    for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     //***************************************************************************************
     // [S] added
@@ -606,12 +606,16 @@ void TrainModel() {
     //initRefining();
     initMultiRefining();
 
+    // refining the multi model network
+    refineMultiNetwork();
+    return;
+
     // saving before the refining the network
     //saveEmbeddings(prePath);
     //saveFeatureWordVocab(vocabPath);
 
     // Perform common sense task
-    performCommonSenseTask();
+    //performCommonSenseTask();
 
     /*int i;
     int noOverfit = 1;

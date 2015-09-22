@@ -9,14 +9,14 @@ int featVocabMaxSize = 5000; // Maximum number of feature vocab
 long noTrain = 0, noTest = 0, noVal = 0; // Number of test and validation variables
 float* cosDist; // Storing the cosine distances between all the feature vocabulary
 float* valScore, *testScore; // Storing the scores for test and val
-int verbose = 0; // Printing which function is being executed
+int verbose = 1; // Printing which function is being executed
 int noClusters = 0; // Number of clusters to be used
 int visualFeatSize = 0; // Size of the visual features used
 float prevValAcc = 0, prevTestAcc = 0;
 
 struct prsTuple *train, *test, *val;
-float *syn0P, *syn0Q, *syn0R;
-float *syn1P, *syn1Q, *syn1R;
+float *syn0P, *syn0S, *syn0R;
+float *syn1P, *syn1S, *syn1R;
 /***************************************************************************/
 // reading feature file
 void readFeatureFile(char* filePath){
@@ -351,7 +351,8 @@ void refineMultiNetwork(){
 
     // Read each of the training instance
     for(i = 0; i < noTrain; i++){
-        //printf("Training %lld instance ....\n", i);
+        if (verbose)
+            printf("Training %lld instance ....\n", i);
         
         // Checking possible fields to avoid segmentation error
         if(train[i].cId < 1 || train[i].cId > noClusters) {

@@ -51,6 +51,7 @@ void refineNetwork();
 // Function to refine the network through clusters, through phrases
 void refineNetworkPhrase();
 // Function to refine the network through clusters, using multiple models
+void refineMultiNetwork();
 
 // Evaluate y_i for each output cluster
 void computeMultinomial(float*, int);
