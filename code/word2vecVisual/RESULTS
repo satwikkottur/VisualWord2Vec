@@ -33,10 +33,22 @@ Converges in one/two passes
 Sept 22
 (Multi models for P,S,R)
 
+PCA (371), Individual words, 5 : 
+    73.20 => 73.06
+    73.06 => 72.98
+    73.18 => 73.06
 PCA (371), Individual words, 10 : 
     73.29 => 74.09
     73.34 => 74.09
     73.28 => 74.02
+PCA (371), Individual words, 15 : 
+    73.25 => 74.01
+    73.23 => 74.01
+    73.27 => 74.01
+PCA (371), Individual words, 20 : 
+    73.29 => 73.93
+    73.25 => 73.92
+    73.30 => 73.93
 
 PCA (371), Phrases, 10 : 
     72.98 => 73.74

@@ -617,8 +617,8 @@ void TrainModel() {
         // Refine the network for multi model
         //refineNetwork();
         //refineNetworkPhrase();
-        //refineMultiNetwork();
-        refineMultiNetworkPhrase();
+        refineMultiNetwork();
+        //refineMultiNetworkPhrase();
         
         // Perform common sense task
         //noOverfit = performCommonSenseTask();
