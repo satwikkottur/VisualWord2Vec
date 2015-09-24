@@ -30,12 +30,6 @@
 
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
 
-struct vocab_word {
-  long long cn;
-  int *point;
-  char *word, *code, codelen;
-};
-
 char train_file[MAX_STRING], output_file[MAX_STRING];
 char save_vocab_file[MAX_STRING], read_vocab_file[MAX_STRING];
 struct vocab_word *vocab;
@@ -589,6 +583,11 @@ void TrainModel() {
     char vocabPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_vocab.txt";
     char visualPath[] = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
     //char visualPath[] = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+
+    // Writing word2vec from file
+    char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_save.txt";
+    //saveWord2Vec(wordPath);
+    //loadWord2Vec(wordPath);
 
     // Initializing the hash
     initFeatureHash();

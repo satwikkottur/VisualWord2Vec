@@ -25,4 +25,10 @@ struct prsTuple{
     int cId; 
 };
 
+// Structure
+struct vocab_word {
+  long long cn;
+  int *point;
+  char *word, *code, codelen;
+};
 #endif

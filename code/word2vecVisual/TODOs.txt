@@ -18,11 +18,11 @@ List of todos:
 - Generalize the last layer (defer)
 - Get the numbers for all the various settings (done, multi model left)
 - Perform PCA for the visual features before clustering (done, offline, matlab)
-- Perform a sweep for various number of clusters (steps of 2/3)
+- Perform a sweep for various number of clusters (done)
 - Train different models for P,R,S (done)
 - Keep track of best validation and test accuracies (done)
 - Iteration over dataset based on performance on validation set (done)
 - Check overfitting based on performance on validation and testing (train and test?) (done)
 - Replace total sweep with symmetric sweep in simple cosDist evaluation (done)
 - Get the options into command line arguments for faster chain execution
-- Save the word2vec for different runs for faster chain execution
+- Save the word2vec for different runs for faster chain execution (done)

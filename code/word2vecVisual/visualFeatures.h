@@ -19,6 +19,7 @@
 // Declaring the extern variables allowing separation of code
 extern long long vocab_size, layer1_size;
 extern float *syn0, *syn1, *expTable;
+extern struct vocab_word* vocab;
 
 /************************************************************************/
 // Signatures of original functions
@@ -110,4 +111,8 @@ void computeTestValScores(struct prsTuple*, long, float, float*);
 void computeMultiTestValScores(struct prsTuple*, long, float, float*);
 // Computing the mean AP and basic precision
 float* computeMAP(float*, struct prsTuple*, long);
+// Saving the word2vec vectors for further use
+void saveWord2Vec(char*);
+// Loading the word2vec vectors for further use
+void loadWord2Vec(char*);
 #endif
