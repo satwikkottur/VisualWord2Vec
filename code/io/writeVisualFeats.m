@@ -4,13 +4,18 @@
 % MAT files taken from /home/satwik/VisualWord2Vec/data/modifiedFeatures/
 
 dataPath = '/home/satwik/VisualWord2Vec/data';
-featPath = fullfile(dataPath, 'modifiedFeatures/');
+%featPath = fullfile(dataPath, 'modifiedFeatures/');
+featPath = fullfile(dataPath, 'correctedFeatures/');
 
 listing = dir(fullfile(featPath, '*.mat'));
 featDim = 1222;
 
 % Open a file to write the features
 fileId = fopen(fullfile(dataPath, 'float_features.txt'), 'wb');
+
+% Writing the feature dimension
+fprintf('%d\n', featDim);
+
 for i = 1:length(listing)
     fprintf('Current feature : %d / %d...\n', i, length(listing));
     feature = load(fullfile(featPath, listing(i).name));

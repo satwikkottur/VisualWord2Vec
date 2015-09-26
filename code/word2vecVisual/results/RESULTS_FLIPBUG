@@ -1,0 +1,64 @@
+Results using modifedFeatures/:
+These have real valued location features are not binary.
+However, in some feature extraction, race was used instead of flip (bug).
+================================================
+Sept 20
+
+Converges in 8-9 iterations
+PCA (371), Individual words, 10 : 
+    73.15 => 73.65
+    73.42 => 73.86
+    73.13 => 73.60
+
+PCA (371), Phrases, 10 : 
+    73.14 => 73.47
+    73.32 => 73.60
+    73.18 => 73.54
+
+Converges in one/two passes
+1222, Individual words, 10 :
+    73.29 => 73.31
+    73.24 => 73.25
+    73.26 => 73.27
+
+1222, Phrases, 10 : 
+    73.29 => 73.09
+    73.21 => 73.21
+    73.31 => 73.31
+================================================
+================================================
+Sept 22
+(Multi models for P,S,R)
+
+PCA (371), Individual words, 5 : 
+    73.20 => 73.06
+    73.06 => 72.98
+    73.18 => 73.06
+PCA (371), Individual words, 10 : 
+    73.29 => 74.09
+    73.34 => 74.09
+    73.28 => 74.02
+PCA (371), Individual words, 15 : 
+    73.25 => 74.01
+    73.23 => 74.01
+    73.27 => 74.01
+PCA (371), Individual words, 20 : 
+    73.29 => 73.93
+    73.25 => 73.92
+    73.30 => 73.93
+
+PCA (371), Phrases, 10 : 
+    72.98 => 73.74
+    73.30 => 73.86
+    73.18 => 73.70
+
+1222, Individual words, 10 :
+    73.22 => 73.70
+    73.31 => 73.77
+    73.44 => 73.74
+
+1222, Phrases, 10 : 
+    73.17 => 73.20
+    73.10 => 73.27
+    73.16 => 73.20
+================================================

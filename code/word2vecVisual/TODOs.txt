@@ -6,7 +6,6 @@ List of todos:
 - Compute the accuracy and match it with matlab accuracies (done)
 - Vary learning rate, use differential learning rates (done)
 - Vary number of clusters (done)
-- Also use Wiki to train word2vec, instead of MS COCO
 - Use averaging as opposed to just words (done) (done)
 - Can we use just sentences and abstract geometry vectors? (done)
 - Regressing with the actual visual vectors - might have to include dropout (defer)
@@ -26,3 +25,10 @@ List of todos:
 - Replace total sweep with symmetric sweep in simple cosDist evaluation (done)
 - Get the options into command line arguments for faster chain execution
 - Save the word2vec for different runs for faster chain execution (done)
+- Also use Wiki to train word2vec, instead of MS COCO
+- Use the new features for training (done)
+- Re-compute the scores for all the experiments
+- Setup t-SNE embeddings
+- Get the embeddings which differ a lot and are positively classified
+- Visualize using t-SNE
+- Get the plot of accuracy vs amount of training data

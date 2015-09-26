@@ -356,8 +356,8 @@ void refineMultiNetwork(){
 
     // Read each of the training instance
     for(i = 0; i < noTrain; i++){
-        if (verbose)
-            printf("Training %lld instance ....\n", i);
+        //if (verbose)
+        //    printf("Training %lld instance ....\n", i);
         
         // Checking possible fields to avoid segmentation error
         if(train[i].cId < 1 || train[i].cId > noClusters) {
@@ -1506,11 +1506,19 @@ void loadWord2Vec(char* fileName){
     FILE* filePt = fopen(fileName, "rb");
     
     long i, j, offset;
+    long noVocab, dims;
     float value;
     char word[MAX_STRING];
-    // Reading the dimensiosn
+    fscanf(filePt, "%ld %ld\n", &noVocab, &dims);
+    if(vocab_size != noVocab && layer1_size != dims){
+        printf("Word2Vec reading incompatible! \n");
+        exit(1);
+    }
+
+    // Reading the dimensions
     for (i = 0; i < vocab_size; i++){
         fscanf(filePt, "%s", word);
+        // Allocate memory and store the word
         offset = layer1_size * i;
         for(j = 0; j < layer1_size; j++){
             fscanf(filePt, "%f", &value);
