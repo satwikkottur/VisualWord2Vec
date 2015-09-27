@@ -1,30 +1,71 @@
 Results using correctedFeatures/:
 These have real valued location features are not binary.
 The race, flip feature extraction bug is also taken care of.
+The original word2vec baseline is from xiaos' ICCV
 ================================================
 Sept 26
 PCA (374), Individual words, 10 : 
+    72.30 => 73.50
+PCA (374), Individual words, 15 : 
+    3 
+    72.30 => 73.50
+PCA (374), Individual words, 20 : 
+    72.30 => 73.38
 
 PCA (374), Phrases, 10 : 
+    6
+    72.30 => 
+PCA (374), Phrases, 15 : 
+    8
+    72.30 => 
+PCA (374), Phrases, 20 : 
+    7
+    72.30 => 
 
 1222, Individual words, 10 :
+    72.30 => 73.20
+1222, Individual words, 15 :
+    4
+    72.30 => 
+1222, Individual words, 20 :
+    5
+    72.30 => 
 
 1222, Phrases, 10 : 
+    72.30 => 73.50
 ================================================
 ================================================
 (Multi models for P,S,R)
 
 PCA (374), Individual words, 5 : 
-
+    72.30 => 72.06
 PCA (374), Individual words, 10 : 
-
+    72.30 => 73.74
 PCA (374), Individual words, 15 : 
-
+    72.30 => 74.02
 PCA (374), Individual words, 20 : 
+    72.30 => 73.91
 
 PCA (374), Phrases, 10 : 
+    72.30 => 
+PCA (374), Phrases, 15 : 
+    72.30 =>
+    1
+PCA (374), Phrases, 20 : 
+    72.30 => 
+    2
 
 1222, Individual words, 10 :
-
+    72.30 => 73.44, 73.44
 1222, Phrases, 10 : 
+    72.30 => 72.40, 72.40
 ================================================
+Accuracy vs amount of training data
+Force number of training data to first N tuples
+PCA, multi, 15, Individual words, 
+     N = 1000 : 72.30 => 70.63
+     N = 2000 : 
+     N = 3000 : 
+     N = 4000 : 
+
+

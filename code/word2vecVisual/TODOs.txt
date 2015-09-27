@@ -23,7 +23,7 @@ List of todos:
 - Iteration over dataset based on performance on validation set (done)
 - Check overfitting based on performance on validation and testing (train and test?) (done)
 - Replace total sweep with symmetric sweep in simple cosDist evaluation (done)
-- Get the options into command line arguments for faster chain execution
+- Get the options into command line arguments for faster chain execution (done, modified for now)
 - Save the word2vec for different runs for faster chain execution (done)
 - Also use Wiki to train word2vec, instead of MS COCO
 - Use the new features for training (done)

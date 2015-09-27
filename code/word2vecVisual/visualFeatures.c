@@ -19,6 +19,10 @@ float prevValAcc = 0, prevTestAcc = 0;
 struct prsTuple *train, *test, *val;
 float *syn0P, *syn0S, *syn0R;
 float *syn1P, *syn1S, *syn1R;
+
+// Forcing limited number of data
+int forceTrainData = 0;
+int forcedTrainSize = 2000;
 /***************************************************************************/
 // reading feature file
 void readFeatureFile(char* filePath){
@@ -41,6 +45,9 @@ void readFeatureFile(char* filePath){
     // Rewind the stream and read again
     rewind(filePt);
     
+    if(forceTrainData)
+        noTuples = forcedTrainSize;
+
     // Initialize and save the feature words
     train = (struct prsTuple*) malloc(sizeof(struct prsTuple) * noTuples);
     // Read and store the contents
@@ -127,7 +134,14 @@ void readVisualFeatureFile(char* fileName){
 
         //printf("Line : %d\n", noLines);
         noLines++;
+
+        // If forced train size, quit after noLines exceeds the max size
+        if(forceTrainData)
+            if(noLines == forcedTrainSize)
+                break;
     }
+
+    printf("\nRead visual features for %d tuples...\n", noLines);
 
     // Closing the file
     fclose(filePt);

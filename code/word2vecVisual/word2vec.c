@@ -27,7 +27,16 @@
 # include "visualFeatures.h"
 # include "debugFunctions.h"
 /***********************************************************************************/
+// Extern variables
+extern float prevTestAcc, prevValAcc;
 
+// Variations
+int trainPhrases = 0;
+int trainMulti = 0;
+int clusterArg = 20;
+int usePCA = 0;
+
+/***********************************************************************************/
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
 
 char train_file[MAX_STRING], output_file[MAX_STRING];
@@ -581,13 +590,17 @@ void TrainModel() {
     //char postPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
     //char prePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre.txt";
     //char vocabPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_vocab.txt";
-    //char visualPath[] = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
-    char visualPath[] = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+
+    char* visualPath = (char*) malloc(sizeof(char) * 100);
+    if(usePCA)
+        visualPath = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
+    else
+        visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
 
     // Writing word2vec from file
     //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_save.txt";
-    char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
     //saveWord2Vec(wordPath);
+    char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
     loadWord2Vec(wordPath);
 
     // Initializing the hash
@@ -600,30 +613,51 @@ void TrainModel() {
     //readClusterIdFile(clusterPath);
     // Clustering in C
     readVisualFeatureFile(visualPath);
-    clusterVisualFeatures(10);
+    clusterVisualFeatures(clusterArg);
     
-    // Initializing the refining network
-    //initRefining();
-    initMultiRefining();
+    if(trainMulti){
+        // Initializing the refining network
+        initMultiRefining();
+        // Performing the multi model common sense task
+        //performMultiCommonSenseTask();
+    }
+    else{
+        // Initializing the refining network
+        initRefining();
+        // Perform common sense task
+        //performCommonSenseTask();
+    }
 
-    // Perform common sense task
-    //performCommonSenseTask();
-    // Performing the multi model common sense task
-    performMultiCommonSenseTask();
+    // Reset valAccuracy as the first run doesnt count
+    prevValAcc = 0; 
+    prevTestAcc = 0;
 
+    printf("\n\n (PCA, phrases, multi, noClusters) = (%d, %d, %d, %d)\n\n", 
+                                        usePCA, trainPhrases, trainMulti, clusterArg);
+    
     int noOverfit = 1;
     while(noOverfit){
-        // Refine the network
         // Refine the network for multi model
-        //refineNetwork();
-        //refineNetworkPhrase();
-        refineMultiNetwork();
-        //refineMultiNetworkPhrase();
+        if(trainMulti){
+            if(trainPhrases)
+                refineMultiNetworkPhrase();
+            else
+                refineMultiNetwork();
+        }
+        // Refine the network
+        else{
+            if(trainPhrases)
+                refineNetworkPhrase();
+            else
+                refineNetwork();
+        }
         
-        // Perform common sense task
-        //noOverfit = performCommonSenseTask();
-        // Performing the multi model common sense task
-        noOverfit = performMultiCommonSenseTask();
+        if(trainMulti)
+            // Performing the multi model common sense task
+            noOverfit = performMultiCommonSenseTask();
+        else
+            // Perform common sense task
+            noOverfit = performCommonSenseTask();
     }
     /***************************************************************************************/
     // skip writing to the file
