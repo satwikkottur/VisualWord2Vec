@@ -22,7 +22,7 @@ float *syn1P, *syn1S, *syn1R;
 
 // Forcing limited number of data
 int forceTrainData = 0;
-int forcedTrainSize = 2000;
+int forcedTrainSize = 4000;
 /***************************************************************************/
 // reading feature file
 void readFeatureFile(char* filePath){
@@ -1080,11 +1080,14 @@ void clusterVisualFeatures(int clusters){
 }
 
 // Common sense evaluation
-int performCommonSenseTask(){
+int performCommonSenseTask(float* testTupleScores){
     printf("Common sense task\n\n");
     // Read the validation and test sets    
     char testFile[] = "/home/satwik/VisualWord2Vec/data/test_features.txt";
     char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
+
+    // Keep a local copy of the test scores for the best model based on threshold
+    float* bestTestScore = (float*) malloc(sizeof(float) * noTrain);
 
     if(noTest == 0 || noVal == 0)
         // Clean the strings for test and validation sets, store features
@@ -1119,6 +1122,10 @@ int performCommonSenseTask(){
         if(bestValAcc < precVal[0]){
             bestValAcc = precVal[0];
             bestTestAcc = precTest[0];
+            //Also store the scores for all test tuples
+            if(testTupleScores != NULL){
+                memcpy(bestTestScore, testScore, sizeof(float) * noTrain);
+            }
         }
         if(verbose)
             printf("Precision (threshold , val , test) : %f %f %f\n", 
@@ -1133,17 +1140,24 @@ int performCommonSenseTask(){
     else{
         prevValAcc = bestValAcc;
         prevTestAcc = bestTestAcc;
+        // Copy the best test scores to gain access outside the function for visualizations
+        if(testTupleScores != NULL)
+            memcpy(testTupleScores, bestTestScore, sizeof(float) * noTrain);
         return 1;
     }
+    free(bestTestScore);
 }
 
 // Common sense evaluation
-int performMultiCommonSenseTask(){
+int performMultiCommonSenseTask(float* testTupleScores){
     printf("Common sense task with multi models....\n\n");
     // Read the validation and test sets    
     char testFile[] = "/home/satwik/VisualWord2Vec/data/test_features.txt";
     char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
 
+    // Keep a local copy of the test scores for the best model based on threshold
+    float* bestTestScore = (float*) malloc(sizeof(float) * noTrain);
+    
     if(noTest == 0 || noVal == 0)
         // Clean the strings for test and validation sets, store features
         readTestValFiles(valFile, testFile);
@@ -1177,6 +1191,10 @@ int performMultiCommonSenseTask(){
         if(bestValAcc < precVal[0]){
             bestValAcc = precVal[0];
             bestTestAcc = precTest[0];
+            //Also store the scores for all test tuples
+            if(testTupleScores != NULL){
+                memcpy(bestTestScore, testScore, sizeof(float) * noTrain);
+            }
         }
         if(verbose)
             printf("Precision (threshold , val , test) : %f %f %f\n", 
@@ -1191,8 +1209,13 @@ int performMultiCommonSenseTask(){
     else{
         prevValAcc = bestValAcc;
         prevTestAcc = bestTestAcc;
+        // Copy the best test scores to gain access outside the function for visualizations
+        if(testTupleScores != NULL)
+            memcpy(testTupleScores, bestTestScore, sizeof(float) * noTrain);
+
         return 1;
     }
+    free(bestTestScore);
 }
 
 // Reading the test and validation files

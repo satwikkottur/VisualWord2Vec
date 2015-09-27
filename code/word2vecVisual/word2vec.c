@@ -29,11 +29,12 @@
 /***********************************************************************************/
 // Extern variables
 extern float prevTestAcc, prevValAcc;
+extern long noTrain;
 
 // Variations
 int trainPhrases = 0;
-int trainMulti = 0;
-int clusterArg = 20;
+int trainMulti = 1;
+int clusterArg = 25;
 int usePCA = 0;
 
 /***********************************************************************************/
@@ -615,6 +616,10 @@ void TrainModel() {
     readVisualFeatureFile(visualPath);
     clusterVisualFeatures(clusterArg);
     
+    // Store the basemodel test tuple scores and best model test tuple scores
+    float* baseTestScores = (float*) malloc;
+    float* bestTestScores = ;
+
     if(trainMulti){
         // Initializing the refining network
         initMultiRefining();
@@ -654,10 +659,10 @@ void TrainModel() {
         
         if(trainMulti)
             // Performing the multi model common sense task
-            noOverfit = performMultiCommonSenseTask();
+            noOverfit = performMultiCommonSenseTask(NULL);
         else
             // Perform common sense task
-            noOverfit = performCommonSenseTask();
+            noOverfit = performCommonSenseTask(NULL);
     }
     /***************************************************************************************/
     // skip writing to the file
