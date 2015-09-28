@@ -591,6 +591,9 @@ void TrainModel() {
     //char postPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
     //char prePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre.txt";
     //char vocabPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_vocab.txt";
+    char testFile[] = "/home/satwik/VisualWord2Vec/data/test_features.txt";
+    char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
+    
 
     char* visualPath = (char*) malloc(sizeof(char) * 100);
     if(usePCA)
@@ -616,15 +619,20 @@ void TrainModel() {
     readVisualFeatureFile(visualPath);
     clusterVisualFeatures(clusterArg);
     
+    // Read the validation and test sets    
+    if(noTest == 0)
+        // Clean the strings for test and validation sets, store features
+        readTestValFiles(valFile, testFile);
+
     // Store the basemodel test tuple scores and best model test tuple scores
-    //float* baseTestScores = (float*) malloc(sizeof(float) * noTest);
-    //float* bestTestScores = (float*) malloc(sizeof(float) * noTest);
+    float* baseTestScores = (float*) malloc(sizeof(float) * noTest);
+    float* bestTestScores = (float*) malloc(sizeof(float) * noTest);
 
     if(trainMulti){
         // Initializing the refining network
         initMultiRefining();
         // Performing the multi model common sense task
-        //performMultiCommonSenseTask(baseTestScores);
+        performMultiCommonSenseTask(baseTestScores);
     }
     else{
         // Initializing the refining network
@@ -659,14 +667,17 @@ void TrainModel() {
         
         if(trainMulti)
             // Performing the multi model common sense task
-            noOverfit = performMultiCommonSenseTask(NULL);
+            noOverfit = performMultiCommonSenseTask(bestTestScores);
         else
             // Perform common sense task
-            noOverfit = performCommonSenseTask(NULL);
+            noOverfit = performCommonSenseTask(bestTestScores);
+        
+        // Break after one iteration
+        break;
     }
 
     // Find test tuples with best improvement, for further visualization
-    //findBestTestTuple(baseTestScores, bestTestScores);
+    findBestTestTuple(baseTestScores, bestTestScores);
     /***************************************************************************************/
     // skip writing to the file
     return;

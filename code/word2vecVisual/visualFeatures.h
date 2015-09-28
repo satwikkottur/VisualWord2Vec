@@ -90,7 +90,11 @@ void saveMultiFeatureEmbedding(struct featureWord, FILE*);
 void saveFeatureWordVocab(char*);
 
 // Saving tuple embeddings and tuple words in separate files
-void saveTupleEmbeddings(char*, char*, struct prsTuple*, int*);
+void saveTupleEmbeddings(char*, char*, struct prsTuple*, float*, float*, int*, int);
+// Saving tuple embeddings and tuple words in separate files, for multimodel
+void saveMultiTupleEmbeddings(char*, char*, struct prsTuple*, float*, float*, int*, int);
+// Saving the tuples only along with scores
+void saveTupleScores(char*, struct prsTuple*,float*, float*, int*, int);
 /*****************************************/
 // Adding a feature word to the hash
 int addFeatureWord(char*);

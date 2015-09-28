@@ -836,13 +836,89 @@ void saveFeatureWordVocab(char* fileName){
 }
 
 // Saving tuples
-void saveTupleEmbeddings(char* tupleFile, char* embedFile, struct prsTuple* holder, int* members){
+void saveTupleEmbeddings(char* tupleFile, char* embedFile, struct prsTuple* holder, float* baseScores, float* bestScores, int* members, int noMembers){
     // Compute the embeddings before saving
     computeEmbeddings();
     
-    // Open the tuple and embed files
+    // Save the tuples along with scores
+    saveTupleScores(tupleFile, holder, baseScores, bestScores, members, noMembers); 
     
-    // Save the embeddings and tuples
+    // Save the embeddings for the tuples
+    FILE* filePt = fopen(embedFile, "wb");
+
+    int i, j, index;
+    for(i = 0; i < noMembers; i++){
+        index = members[i];
+        // Store P embed
+        for(j = 0; j < layer1_size-1; j++)
+            fprintf(filePt, "%f ", featHashWords[holder[index].p].embed[j]);
+        fprintf(filePt, "%f\n", featHashWords[holder[index].p].embed[layer1_size-1]);
+    
+        // Store S embed
+        for(j = 0; j < layer1_size-1; j++)
+            fprintf(filePt, "%f ", featHashWords[holder[index].r].embed[j]);
+        fprintf(filePt, "%f\n", featHashWords[holder[index].r].embed[layer1_size-1]);
+
+        // Store R embed
+        for(j = 0; j < layer1_size-1; j++)
+            fprintf(filePt, "%f ", featHashWords[holder[index].s].embed[j]);
+        fprintf(filePt, "%f\n", featHashWords[holder[index].s].embed[layer1_size-1]);
+    }
+
+    fclose(filePt);
+}
+
+// Saving tuples
+void saveMultiTupleEmbeddings(char* tupleFile, char* embedFile, struct prsTuple* holder, float* baseScores, float* bestScores, int* members, int noMembers){
+    // Compute the embeddings before saving
+    computeMultiEmbeddings();
+    
+    // Save the tuples along with scores
+    saveTupleScores(tupleFile, holder, baseScores, bestScores, members, noMembers); 
+    
+    // Save the embeddings for the tuples
+    FILE* filePt = fopen(embedFile, "wb");
+
+    int i, j, index;
+    for(i = 0; i < noMembers; i++){
+        index = members[i];
+        // Store P embed
+        for(j = 0; j < layer1_size-1; j++)
+            fprintf(filePt, "%f ", featHashWords[holder[index].p].embedP[j]);
+        fprintf(filePt, "%f\n", featHashWords[holder[index].p].embedP[layer1_size-1]);
+    
+        // Store S embed
+        for(j = 0; j < layer1_size-1; j++)
+            fprintf(filePt, "%f ", featHashWords[holder[index].r].embedR[j]);
+        fprintf(filePt, "%f\n", featHashWords[holder[index].r].embedR[layer1_size-1]);
+
+        // Store R embed
+        for(j = 0; j < layer1_size-1; j++)
+            fprintf(filePt, "%f ", featHashWords[holder[index].s].embedS[j]);
+        fprintf(filePt, "%f\n", featHashWords[holder[index].s].embedS[layer1_size-1]);
+    }
+
+    fclose(filePt);
+}
+
+// Saving only tuples
+void saveTupleScores(char* tupleFile, struct prsTuple* holder, float* baseScores, float* bestScores, int* members, int noMembers){
+    FILE* filePt = fopen(tupleFile, "wb");
+        
+    int i, index;
+    for (i = 0; i < noMembers; i++){
+        index = members[i]; 
+
+        // Save the tuples along with scores
+        fprintf(filePt, "<%s:%s:%s>(%f,%f)\n", featHashWords[holder[index].p].str, 
+                                                featHashWords[holder[index].r].str,
+                                                featHashWords[holder[index].s].str,
+                                                baseScores[index],
+                                                bestScores[index]);
+    }
+
+    // Close the file
+    fclose(filePt);
 }
 
 // Compute embeddings
@@ -1196,9 +1272,6 @@ int performMultiCommonSenseTask(float* testTupleScores){
     // Read the validation and test sets    
     char testFile[] = "/home/satwik/VisualWord2Vec/data/test_features.txt";
     char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
-
-    // Keep a local copy of the test scores for the best model based on threshold
-    float* bestTestScore = (float*) malloc(sizeof(float) * noTest);
     
     if(noTest == 0 || noVal == 0)
         // Clean the strings for test and validation sets, store features
@@ -1215,12 +1288,14 @@ int performMultiCommonSenseTask(float* testTupleScores){
     // For each, going through training instances and computing the score
     valScore = (float*) malloc(noVal * sizeof(float));
     testScore = (float*) malloc(noTest * sizeof(float));
+    // Keep a local copy of the test scores for the best model based on threshold
+    float* bestTestScore = (float*) malloc(sizeof(float) * noTest);
 
     // Threshold sweeping for validation
     // and get the best validation and correspoding testing accuracy
     float bestValAcc = 0, bestTestAcc = 0;
     float threshold;
-    for(threshold = -1.0; threshold < 2.0; threshold += 0.1){
+    for(threshold = 1.5; threshold < 2.0; threshold += 0.1){
         
         computeMultiTestValScores(val, noVal, threshold, valScore);
         computeMultiTestValScores(test, noTest, threshold, testScore);
@@ -1234,9 +1309,8 @@ int performMultiCommonSenseTask(float* testTupleScores){
             bestValAcc = precVal[0];
             bestTestAcc = precTest[0];
             //Also store the scores for all test tuples
-            if(testTupleScores != NULL){
+            if(testTupleScores != NULL)
                 memcpy(bestTestScore, testScore, sizeof(float) * noTest);
-            }
         }
         if(verbose)
             printf("Precision (threshold , val , test) : %f %f %f\n", 
@@ -1633,6 +1707,10 @@ void findBestTestTuple(float* baseScore, float* bestScore){
 
     // Do something here
     // Dump the tuples and embeddings along with base and best score
+    char tupleFile[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/improved_test_tuples.txt";
+    char embedFile[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/improved_test_embed.txt";
+
+    saveMultiTupleEmbeddings(tupleFile, embedFile, test, baseScore, bestScore, improvedInd, count);
 
     free(improvedInd);
 }
