@@ -29,13 +29,13 @@
 /***********************************************************************************/
 // Extern variables
 extern float prevTestAcc, prevValAcc;
-extern long noTrain;
+extern long noTest;
 
 // Variations
 int trainPhrases = 0;
 int trainMulti = 1;
-int clusterArg = 25;
-int usePCA = 0;
+int clusterArg = 15;
+int usePCA = 1;
 
 /***********************************************************************************/
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
@@ -617,14 +617,14 @@ void TrainModel() {
     clusterVisualFeatures(clusterArg);
     
     // Store the basemodel test tuple scores and best model test tuple scores
-    float* baseTestScores = (float*) malloc;
-    float* bestTestScores = ;
+    //float* baseTestScores = (float*) malloc(sizeof(float) * noTest);
+    //float* bestTestScores = (float*) malloc(sizeof(float) * noTest);
 
     if(trainMulti){
         // Initializing the refining network
         initMultiRefining();
         // Performing the multi model common sense task
-        //performMultiCommonSenseTask();
+        //performMultiCommonSenseTask(baseTestScores);
     }
     else{
         // Initializing the refining network
@@ -664,6 +664,9 @@ void TrainModel() {
             // Perform common sense task
             noOverfit = performCommonSenseTask(NULL);
     }
+
+    // Find test tuples with best improvement, for further visualization
+    //findBestTestTuple(baseTestScores, bestTestScores);
     /***************************************************************************************/
     // skip writing to the file
     return;

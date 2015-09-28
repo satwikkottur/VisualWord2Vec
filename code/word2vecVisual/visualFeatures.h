@@ -65,22 +65,32 @@ void computeMultinomialPhrase(float*, int*, int);
 void updateWeights(float*, int, int);
 // Updating the weights for phrases
 void updateWeightsPhrase(float*, int*, int, int);
-// save the embeddings
-void saveEmbeddings(char*);
 
+//------------------------------------------------------------
 // Compute the embeddings for all the words
 void computeEmbeddings();
 // Computing the embeddings in case of multi-model
 void computeMultiEmbeddings();
 
-// save a single feature
-void saveFeatureEmbedding(struct featureWord, FILE*);
-// Save the vocab for the feature word
-void saveFeatureWordVocab(char*);
 // Computing the embedding for the feature word 
 void computeFeatureEmbedding(struct featureWord*);
 // Computing the embedding for feature word in case of multi model
 void computeMultiFeatureEmbedding(struct featureWord*);
+//------------------------------------------------------------
+// save the embeddings
+void saveEmbeddings(char*);
+// save a single feature
+void saveFeatureEmbedding(struct featureWord, FILE*);
+// save the embeddings for the multi model
+void saveMultiEmbeddings(char*);
+// save a single feature, for multi model
+void saveMultiFeatureEmbedding(struct featureWord, FILE*);
+
+// Save the vocab for the feature word
+void saveFeatureWordVocab(char*);
+
+// Saving tuple embeddings and tuple words in separate files
+void saveTupleEmbeddings(char*, char*, struct prsTuple*, int*);
 /*****************************************/
 // Adding a feature word to the hash
 int addFeatureWord(char*);
@@ -115,4 +125,9 @@ float* computeMAP(float*, struct prsTuple*, long);
 void saveWord2Vec(char*);
 // Loading the word2vec vectors for further use
 void loadWord2Vec(char*);
+
+/*****************************************/
+// Visualization and qualitative analysis
+// Get the best test tuples with maximum improvement
+void findBestTestTuple(float*, float*);
 #endif

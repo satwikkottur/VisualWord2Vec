@@ -790,6 +790,38 @@ void saveFeatureEmbedding(struct featureWord feature, FILE* filePt){
     fprintf(filePt, "%f\n", feature.embed[layer1_size-1]);
 }
 
+// Saving the feature embeddings needed for comparing, at the given file name, for multi model
+void saveMultiEmbeddings(char* saveName){
+    FILE* filePt = fopen(saveName, "wb");
+    int i;
+
+    // Re-compute the embeddings before saving
+    computeMultiEmbeddings();
+    
+    // Go through the vocab and save the embeddings
+    for(i = 0; i < featVocabSize; i++)
+        saveFeatureEmbedding(featHashWords[i], filePt);
+    
+    fclose(filePt);
+}
+
+// Save a particular embedding, for multi model
+void saveMultiFeatureEmbedding(struct featureWord feature, FILE* filePt){
+    // Saving to the file, all the three embeddings
+    int i;
+    for(i = 0; i < layer1_size - 1; i++)
+        fprintf(filePt, "%f ", feature.embedP[i]);
+    fprintf(filePt, "%f\n", feature.embedP[layer1_size-1]);
+
+    for(i = 0; i < layer1_size - 1; i++)
+        fprintf(filePt, "%f ", feature.embedR[i]);
+    fprintf(filePt, "%f\n", feature.embedR[layer1_size-1]);
+
+    for(i = 0; i < layer1_size - 1; i++)
+        fprintf(filePt, "%f ", feature.embedS[i]);
+    fprintf(filePt, "%f\n", feature.embedS[layer1_size-1]);
+}
+
 // Saving the feature vocab
 void saveFeatureWordVocab(char* fileName){
     FILE* filePt = fopen(fileName, "wb");
@@ -801,6 +833,16 @@ void saveFeatureWordVocab(char* fileName){
 
     fclose(filePt);
 
+}
+
+// Saving tuples
+void saveTupleEmbeddings(char* tupleFile, char* embedFile, struct prsTuple* holder, int* members){
+    // Compute the embeddings before saving
+    computeEmbeddings();
+    
+    // Open the tuple and embed files
+    
+    // Save the embeddings and tuples
 }
 
 // Compute embeddings
@@ -1087,7 +1129,7 @@ int performCommonSenseTask(float* testTupleScores){
     char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
 
     // Keep a local copy of the test scores for the best model based on threshold
-    float* bestTestScore = (float*) malloc(sizeof(float) * noTrain);
+    float* bestTestScore = (float*) malloc(sizeof(float) * noTest);
 
     if(noTest == 0 || noVal == 0)
         // Clean the strings for test and validation sets, store features
@@ -1124,7 +1166,7 @@ int performCommonSenseTask(float* testTupleScores){
             bestTestAcc = precTest[0];
             //Also store the scores for all test tuples
             if(testTupleScores != NULL){
-                memcpy(bestTestScore, testScore, sizeof(float) * noTrain);
+                memcpy(bestTestScore, testScore, sizeof(float) * noTest);
             }
         }
         if(verbose)
@@ -1142,7 +1184,7 @@ int performCommonSenseTask(float* testTupleScores){
         prevTestAcc = bestTestAcc;
         // Copy the best test scores to gain access outside the function for visualizations
         if(testTupleScores != NULL)
-            memcpy(testTupleScores, bestTestScore, sizeof(float) * noTrain);
+            memcpy(testTupleScores, bestTestScore, sizeof(float) * noTest);
         return 1;
     }
     free(bestTestScore);
@@ -1156,7 +1198,7 @@ int performMultiCommonSenseTask(float* testTupleScores){
     char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
 
     // Keep a local copy of the test scores for the best model based on threshold
-    float* bestTestScore = (float*) malloc(sizeof(float) * noTrain);
+    float* bestTestScore = (float*) malloc(sizeof(float) * noTest);
     
     if(noTest == 0 || noVal == 0)
         // Clean the strings for test and validation sets, store features
@@ -1193,7 +1235,7 @@ int performMultiCommonSenseTask(float* testTupleScores){
             bestTestAcc = precTest[0];
             //Also store the scores for all test tuples
             if(testTupleScores != NULL){
-                memcpy(bestTestScore, testScore, sizeof(float) * noTrain);
+                memcpy(bestTestScore, testScore, sizeof(float) * noTest);
             }
         }
         if(verbose)
@@ -1211,7 +1253,7 @@ int performMultiCommonSenseTask(float* testTupleScores){
         prevTestAcc = bestTestAcc;
         // Copy the best test scores to gain access outside the function for visualizations
         if(testTupleScores != NULL)
-            memcpy(testTupleScores, bestTestScore, sizeof(float) * noTrain);
+            memcpy(testTupleScores, bestTestScore, sizeof(float) * noTest);
 
         return 1;
     }
@@ -1567,4 +1609,30 @@ void loadWord2Vec(char* fileName){
     }
 
     fclose(filePt);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+// Analysis
+// FInd the best test tuple with maximum improvements
+void findBestTestTuple(float* baseScore, float* bestScore){
+    // Initialize list of improved test tuple and count
+    int* improvedInd = (int*) malloc(sizeof(int) * noTest);
+    int count = 0;
+
+    // Check if the tuple if positive and there is an increase
+    long i;
+    for(i = 0; i < noTest; i++){
+        if(test[i].cId && (bestScore[i] > baseScore[i])){
+            // Store the index and increase the count
+            improvedInd[count] = i;
+            count++;
+        }
+    }
+
+    printf("%d tuples improved! \n", count);
+
+    // Do something here
+    // Dump the tuples and embeddings along with base and best score
+
+    free(improvedInd);
 }
