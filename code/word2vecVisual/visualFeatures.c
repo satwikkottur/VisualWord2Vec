@@ -800,7 +800,7 @@ void saveMultiEmbeddings(char* saveName){
     
     // Go through the vocab and save the embeddings
     for(i = 0; i < featVocabSize; i++)
-        saveFeatureEmbedding(featHashWords[i], filePt);
+        saveMultiFeatureEmbedding(featHashWords[i], filePt);
     
     fclose(filePt);
 }
@@ -832,7 +832,6 @@ void saveFeatureWordVocab(char* fileName){
         fprintf(filePt, "%s\n", featHashWords[i].str);
 
     fclose(filePt);
-
 }
 
 // Saving tuples

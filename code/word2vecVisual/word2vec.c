@@ -585,17 +585,22 @@ void TrainModel() {
 
     //***************************************************************************************
     // [S] added
+    char* visualPath = (char*) malloc(sizeof(char) * 100);
+    char* postPath = (char*) malloc(sizeof(char) * 100);
+    char* prePath = (char*) malloc(sizeof(char) * 100);
+    char* vocabPath = (char*) malloc(sizeof(char) * 100);
     // Reading the file for relation word
     char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
     //char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
-    //char postPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post.txt";
-    //char prePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre.txt";
-    //char vocabPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_vocab.txt";
+    sprintf(postPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post_%d_%d_%d_%d.txt", 
+                                        trainPhrases, usePCA, trainMulti, clusterArg);
+    sprintf(prePath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre_%d_%d_%d_%d.txt", 
+                                        trainPhrases, usePCA, trainMulti, clusterArg);
+    sprintf(vocabPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_vocab_%d_%d_%d_%d.txt",
+                                        trainPhrases, usePCA, trainMulti, clusterArg);
     char testFile[] = "/home/satwik/VisualWord2Vec/data/test_features.txt";
     char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
-    
 
-    char* visualPath = (char*) malloc(sizeof(char) * 100);
     if(usePCA)
         visualPath = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
     else
@@ -641,6 +646,14 @@ void TrainModel() {
         performCommonSenseTask(NULL);
     }
 
+    // Saving the feature word vocabulary
+    saveFeatureWordVocab(vocabPath);
+    // Saving the embeddings, before refining
+    if(trainMulti)
+        saveMultiEmbeddings(prePath);
+    else
+        saveEmbeddings(prePath);
+
     // Reset valAccuracy as the first run doesnt count
     prevValAcc = 0; 
     prevTestAcc = 0;
@@ -674,6 +687,12 @@ void TrainModel() {
             noOverfit = performCommonSenseTask(NULL);
             //noOverfit = performCommonSenseTask(bestTestScores);
     }
+
+    // Saving the embeddings, after refining
+    if(trainMulti)
+        saveMultiEmbeddings(postPath);
+    else
+        saveEmbeddings(postPath);
 
     // Find test tuples with best improvement, for further visualization
     findBestTestTuple(baseTestScores, bestTestScores);
