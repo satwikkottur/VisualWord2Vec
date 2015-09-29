@@ -34,8 +34,8 @@ extern long noTest;
 // Variations
 int trainPhrases = 0;
 int trainMulti = 1;
-int clusterArg = 15;
-int usePCA = 1;
+int clusterArg = 25;
+int usePCA = 0;
 
 /***********************************************************************************/
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
@@ -638,7 +638,7 @@ void TrainModel() {
         // Initializing the refining network
         initRefining();
         // Perform common sense task
-        //performCommonSenseTask();
+        performCommonSenseTask(NULL);
     }
 
     // Reset valAccuracy as the first run doesnt count
@@ -667,13 +667,12 @@ void TrainModel() {
         
         if(trainMulti)
             // Performing the multi model common sense task
+            //noOverfit = performMultiCommonSenseTask(NULL);
             noOverfit = performMultiCommonSenseTask(bestTestScores);
         else
             // Perform common sense task
-            noOverfit = performCommonSenseTask(bestTestScores);
-        
-        // Break after one iteration
-        break;
+            noOverfit = performCommonSenseTask(NULL);
+            //noOverfit = performCommonSenseTask(bestTestScores);
     }
 
     // Find test tuples with best improvement, for further visualization

@@ -1295,7 +1295,7 @@ int performMultiCommonSenseTask(float* testTupleScores){
     // and get the best validation and correspoding testing accuracy
     float bestValAcc = 0, bestTestAcc = 0;
     float threshold;
-    for(threshold = 1.5; threshold < 2.0; threshold += 0.1){
+    for(threshold = -1.0; threshold < 2.0; threshold += 0.1){
         
         computeMultiTestValScores(val, noVal, threshold, valScore);
         computeMultiTestValScores(test, noTest, threshold, testScore);
