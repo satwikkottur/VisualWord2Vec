@@ -643,8 +643,9 @@ void TrainModel() {
         // Initializing the refining network
         initRefining();
         // Perform common sense task
-        performCommonSenseTask(NULL);
+        performCommonSenseTask(baseTestScores);
     }
+    return;
 
     // Saving the feature word vocabulary
     saveFeatureWordVocab(vocabPath);

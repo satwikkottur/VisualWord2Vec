@@ -125,6 +125,8 @@ void computeTestValScores(struct prsTuple*, long, float, float*);
 void computeMultiTestValScores(struct prsTuple*, long, float, float*);
 // Computing the mean AP and basic precision
 float* computeMAP(float*, struct prsTuple*, long);
+// Computing the mean AP and basic precision, with a permutation specified
+float* computePermuteMAP(float*, struct prsTuple*, int*, long);
 // Saving the word2vec vectors for further use
 void saveWord2Vec(char*);
 // Loading the word2vec vectors for further use

@@ -1,4 +1,6 @@
 # include "visualFeatures.h"
+// Include the random permutation code
+# include "randompermute.h"
 
 // Storing the feature hash (globals)
 struct featureWord* featHashWords; // Vocab for feature words
@@ -1294,14 +1296,51 @@ int performMultiCommonSenseTask(float* testTupleScores){
     // and get the best validation and correspoding testing accuracy
     float bestValAcc = 0, bestTestAcc = 0;
     float threshold;
+    //float threshold, *iterPrecVal, *iterPrecTest;
+    int i;
+    int *randPermVal = (int*) malloc(sizeof(int) * noVal);
+    int *randPermTest = (int*) malloc(sizeof(int) * noVal);
+
+    //float precTest = (float*) malloc(sizeof(float) * 
+    //float precTest[2], precVal[2], iterPrecTest[2], iterPrecVal[2];
+    float* precVal = (float*) malloc(sizeof(float) * 2);
+    float* precTest = (float*) malloc(sizeof(float) * 2);
+    float* iterPrecTest = (float*) malloc(sizeof(float) * 2);
+    float* iterPrecVal = (float*) malloc(sizeof(float) * 2);
     for(threshold = -1.0; threshold < 2.0; threshold += 0.1){
         
         computeMultiTestValScores(val, noVal, threshold, valScore);
         computeMultiTestValScores(test, noTest, threshold, testScore);
 
         // Compute the accuracy
-        float* precVal = computeMAP(valScore, val, noVal);
-        float* precTest = computeMAP(testScore, test, noTest);
+        //precVal = computeMAP(valScore, val, noVal);
+        //precTest = computeMAP(testScore, test, noTest);
+
+        precVal[0] = 0; precVal[1] = 0;
+        precTest[0] = 0; precTest[1] = 0;
+        // Compute the accuracy for multiple permutations
+        int noIters = 100;
+        for (i = 0; i < noIters; i++){
+            printf("%d ", i);
+            // generate a permutation
+            rpermute(noVal, randPermVal); 
+            iterPrecVal = computePermuteMAP(valScore, val, randPermVal, noVal);
+
+            rpermute(noTest, randPermTest); 
+            iterPrecTest = computePermuteMAP(testScore, test, randPermTest, noTest);
+
+            // Updating the precVal, precTest
+            precVal[0] += iterPrecVal[0];
+            precVal[1] += iterPrecVal[1];
+            precTest[0] += iterPrecTest[0];
+            precTest[1] += iterPrecTest[1];
+        }
+        printf("\n");
+        // Normalizing for the mean
+        precVal[0] = precVal[0] / noIters;
+        precVal[1] = precVal[1] / noIters;
+        precTest[0] = precTest[0] / noIters;
+        precTest[1] = precTest[1] / noIters;
 
         // Get the maximum
         if(bestValAcc < precVal[0]){
@@ -1331,6 +1370,8 @@ int performMultiCommonSenseTask(float* testTupleScores){
         return 1;
     }
     free(bestTestScore);
+    free(randPermVal);
+    free(randPermTest);
 }
 
 // Reading the test and validation files
@@ -1598,15 +1639,15 @@ float* computeMAP(float* score, struct prsTuple* holder, long noInst){
     for(a = 0; a < noInst; a++){
         maxInd = 0;
         for(b = 0; b < noInst; b++)
-            // Check if max is also current max
-            if(rankedScores[b] != -1 && 
+            // Check if max is also current max (flag out using -5)
+            if(rankedScores[b] != -5 && 
                         rankedScores[maxInd] < rankedScores[b]) 
                 maxInd = b;
 
         // Swap the max and element at that instance
         rankedLabels[a] = holder[maxInd].cId;
         // NULLing the max ind 
-        rankedScores[maxInd] = -1;
+        rankedScores[maxInd] = -5;
     }
 
     float mAP = 0, base = 0;
@@ -1631,6 +1672,60 @@ float* computeMAP(float* score, struct prsTuple* holder, long noInst){
 
     // Free memory
     free(rankedScores);
+    free(rankedLabels);
+    return precision;
+}
+
+// Compute mAP and basic precision for a permutation of the data specified
+float* computePermuteMAP(float* score, struct prsTuple* holder, int* permute, long noInst){
+    if (verbose) printf("Computing MAP...\n\n");
+    // Crude implementation
+    long a, b;
+    int* rankedLabels = (int*) malloc(sizeof(int) * noInst);
+    float* rankedScores = (float*) malloc(sizeof(float) * noInst);
+
+    // Make a copy of scores
+    for(a = 0; a < noInst; a++) rankedScores[a] = score[a];
+
+    long maxInd;
+    // Get the rank of positive instances wrt to the scores
+    for(a = 0; a < noInst; a++){
+        maxInd = permute[0];
+        for(b = 0; b < noInst; b++)
+            // Check if max is also current max
+            if(rankedScores[permute[b]] != -5 && 
+                        rankedScores[maxInd] < rankedScores[permute[b]]) 
+                maxInd = permute[b];
+
+        // Swap the max and element at that instance
+        rankedLabels[a] = holder[maxInd].cId;
+        // NULLing the max ind 
+        rankedScores[maxInd] = -5;
+    }
+
+    float mAP = 0, base = 0;
+    long noPositives = 0;
+    // Compute the similarity wrt ideal ordering 1,2,3.....
+    for(a = 0; a < noInst; a++)
+        if(rankedLabels[a] == 1){
+            // Increasing the positives
+            noPositives++;
+            mAP += noPositives / (float) (a + 1);
+            //printf("%ld %ld %f\n", noPositives, a + 1, noPositives/(float) (a + 1));
+        }
+   
+    // Compute mAP
+    mAP = mAP / noPositives;
+    // Compute base precision
+    base = noPositives / (float)noInst;
+    // Packing both in an array
+    float* precision = (float*) malloc(2 * sizeof(float));
+    precision[0] = mAP;
+    precision[1] = base;
+
+    // Free memory
+    free(rankedScores);
+    free(rankedLabels);
     return precision;
 }
 

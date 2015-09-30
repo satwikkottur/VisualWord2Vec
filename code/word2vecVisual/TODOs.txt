@@ -32,3 +32,5 @@ List of todos:
 - Get the embeddings which differ a lot and are positively classified (done)
 - Visualize using t-SNE
 - Get the plot of accuracy vs amount of training data (done for one model, more info on this)
+- Figure out the 0.1% difference from ICCV baseline
+- Make the code faster (defer)
