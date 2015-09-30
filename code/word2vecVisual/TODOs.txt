@@ -29,6 +29,6 @@ List of todos:
 - Use the new features for training (done)
 - Re-compute the scores for all the experiments (done)
 - Setup t-SNE embeddings
-- Get the embeddings which differ a lot and are positively classified
+- Get the embeddings which differ a lot and are positively classified (done)
 - Visualize using t-SNE
-- Get the plot of accuracy vs amount of training data
+- Get the plot of accuracy vs amount of training data (done for one model, more info on this)
