@@ -97,9 +97,9 @@ Accuracy vs amount of training data
 Force number of training data to first N tuples
 PCA, multi, 15, Individual words, 
 
-    N = 1000 : 72.30 => 
-    N = 2000 : 72.30 => 
-    N = 3000 : 72.30 => 
-    N = 4000 : 72.30 =>
-    N = 4600 : 72.30 => 
+    N = 1000 : 72.30 => 70.63
+    N = 2000 : 72.30 => 72.37
+    N = 3000 : 72.30 => 73.53
+    N = 4000 : 72.30 => 73.83
+    N = 4600 : 72.30 => 74.02
 ================================================

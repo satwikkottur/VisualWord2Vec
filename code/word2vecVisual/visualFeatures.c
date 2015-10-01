@@ -1307,16 +1307,17 @@ int performMultiCommonSenseTask(float* testTupleScores){
     float* precTest = (float*) malloc(sizeof(float) * 2);
     float* iterPrecTest = (float*) malloc(sizeof(float) * 2);
     float* iterPrecVal = (float*) malloc(sizeof(float) * 2);
-    for(threshold = -1.0; threshold < 2.0; threshold += 0.1){
+    // generally around 1 - 2. Consider -1 - 2.0 for worst case
+    for(threshold = 1.0; threshold < 2.0; threshold += 0.1){
         
         computeMultiTestValScores(val, noVal, threshold, valScore);
         computeMultiTestValScores(test, noTest, threshold, testScore);
 
         // Compute the accuracy
-        //precVal = computeMAP(valScore, val, noVal);
-        //precTest = computeMAP(testScore, test, noTest);
+        precVal = computeMAP(valScore, val, noVal);
+        precTest = computeMAP(testScore, test, noTest);
 
-        precVal[0] = 0; precVal[1] = 0;
+        /*precVal[0] = 0; precVal[1] = 0;
         precTest[0] = 0; precTest[1] = 0;
         // Compute the accuracy for multiple permutations
         int noIters = 100;
@@ -1340,7 +1341,7 @@ int performMultiCommonSenseTask(float* testTupleScores){
         precVal[0] = precVal[0] / noIters;
         precVal[1] = precVal[1] / noIters;
         precTest[0] = precTest[0] / noIters;
-        precTest[1] = precTest[1] / noIters;
+        precTest[1] = precTest[1] / noIters;*/
 
         // Get the maximum
         if(bestValAcc < precVal[0]){
