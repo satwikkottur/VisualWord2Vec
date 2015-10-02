@@ -629,6 +629,9 @@ void TrainModel() {
         // Clean the strings for test and validation sets, store features
         readTestValFiles(valFile, testFile);
 
+    // Saving the feature word vocabulary
+    //saveFeatureWordVocab(vocabPath);
+    
     // Store the basemodel test tuple scores and best model test tuple scores
     float* baseTestScores = (float*) malloc(sizeof(float) * noTest);
     float* bestTestScores = (float*) malloc(sizeof(float) * noTest);
@@ -647,8 +650,6 @@ void TrainModel() {
     }
     return;
 
-    // Saving the feature word vocabulary
-    saveFeatureWordVocab(vocabPath);
     // Saving the embeddings, before refining
     if(trainMulti)
         saveMultiEmbeddings(prePath);
@@ -685,8 +686,8 @@ void TrainModel() {
             noOverfit = performMultiCommonSenseTask(bestTestScores);
         else
             // Perform common sense task
-            noOverfit = performCommonSenseTask(NULL);
-            //noOverfit = performCommonSenseTask(bestTestScores);
+            //noOverfit = performCommonSenseTask(NULL);
+            noOverfit = performCommonSenseTask(bestTestScores);
     }
 
     // Saving the embeddings, after refining

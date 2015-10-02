@@ -176,8 +176,8 @@ struct featureWord constructFeatureWord(char* word){
         char* first = multi_tok(token, "'s");
         char* second = multi_tok(NULL, "'s");
 
-        // Join both the parts without the 's
-        if(second != NULL) token = strcat(first, second);
+        // Join both the parts without the 's (from baseline: add it at the end)
+        if(second != NULL) token = strcat(first, strcat(second, " \'s"));
         else token = first;
 
         char* temp = (char*) malloc(MAX_STRING);
@@ -1790,22 +1790,29 @@ void findBestTestTuple(float* baseScore, float* bestScore){
 
     // Check if the tuple if positive and there is an increase
     long i;
-    for(i = 0; i < noTest; i++){
+    /*for(i = 0; i < noTest; i++){
         if(test[i].cId && (bestScore[i] > baseScore[i])){
             // Store the index and increase the count
             improvedInd[count] = i;
             count++;
         }
-    }
+    }*/
 
+    // Print all the test tuples along with ground truth
+    for (i = 0; i < noTest; i++){
+        improvedInd[i] = i;
+    }
     printf("%d tuples improved! \n", count);
 
     // Do something here
     // Dump the tuples and embeddings along with base and best score
-    char tupleFile[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/improved_test_tuples.txt";
-    char embedFile[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/improved_test_embed.txt";
+    char tupleFile[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/all_test_tuples.txt";
+    char embedFile[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/all_test_embed.txt";
 
-    saveMultiTupleEmbeddings(tupleFile, embedFile, test, baseScore, bestScore, improvedInd, count);
+    // Saving only improved tuples
+    //saveMultiTupleEmbeddings(tupleFile, embedFile, test, baseScore, bestScore, improvedInd, count);
+    // Saving all the test tuples
+    saveMultiTupleEmbeddings(tupleFile, embedFile, test, baseScore, bestScore, improvedInd, noTest);
 
     free(improvedInd);
 }
