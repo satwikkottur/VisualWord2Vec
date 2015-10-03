@@ -581,7 +581,7 @@ void TrainModel() {
     // [S] : Creates the threads for execution
     //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
     // [S] : Waits for the completion of execution of the threads
-    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+    ///for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     //***************************************************************************************
     // [S] added
@@ -591,6 +591,8 @@ void TrainModel() {
     char* vocabPath = (char*) malloc(sizeof(char) * 100);
     // Reading the file for relation word
     char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+
     //char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
     sprintf(postPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post_%d_%d_%d_%d.txt", 
                                         trainPhrases, usePCA, trainMulti, clusterArg);
@@ -648,13 +650,12 @@ void TrainModel() {
         // Perform common sense task
         performCommonSenseTask(baseTestScores);
     }
-    return;
 
     // Saving the embeddings, before refining
-    if(trainMulti)
+    /*if(trainMulti)
         saveMultiEmbeddings(prePath);
     else
-        saveEmbeddings(prePath);
+        saveEmbeddings(prePath);*/
 
     // Reset valAccuracy as the first run doesnt count
     prevValAcc = 0; 
@@ -691,13 +692,13 @@ void TrainModel() {
     }
 
     // Saving the embeddings, after refining
-    if(trainMulti)
+    /*if(trainMulti)
         saveMultiEmbeddings(postPath);
     else
-        saveEmbeddings(postPath);
+        saveEmbeddings(postPath);*/
 
     // Find test tuples with best improvement, for further visualization
-    findBestTestTuple(baseTestScores, bestTestScores);
+    //findBestTestTuple(baseTestScores, bestTestScores);
     /***************************************************************************************/
     // skip writing to the file
     return;
