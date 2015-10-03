@@ -28,9 +28,18 @@ List of todos:
 - Also use Wiki to train word2vec, instead of MS COCO
 - Use the new features for training (done)
 - Re-compute the scores for all the experiments (done)
-- Setup t-SNE embeddings
+- Setup t-SNE embeddings (done)
 - Get the embeddings which differ a lot and are positively classified (done)
-- Visualize using t-SNE
+- Visualize using t-SNE (done)
 - Get the plot of accuracy vs amount of training data (done for one model, more info on this)
 - Figure out the 0.1% difference from ICCV baseline
 - Make the code faster (defer)
+
+CVPR:
+- Run Xiaos Visual paraphrasing (?) for text baseline task
+- Number of dimensions vs accuracy graph and interpretation
+- Plot of accuracy vs number of training instances
+- Reason out why our model works better, intuitively
+- Check for pairs whose distance increase/decreased the most
+- Check for triplets whose relative distance increased/decreased the most
+- Visualize and reason about the clusters formed initially

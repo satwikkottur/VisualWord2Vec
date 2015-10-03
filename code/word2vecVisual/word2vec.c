@@ -34,7 +34,7 @@ extern long noTest;
 // Variations
 int trainPhrases = 0;
 int trainMulti = 1;
-int clusterArg = 25;
+int clusterArg = 10;
 int usePCA = 0;
 
 /***********************************************************************************/
@@ -590,8 +590,8 @@ void TrainModel() {
     char* prePath = (char*) malloc(sizeof(char) * 100);
     char* vocabPath = (char*) malloc(sizeof(char) * 100);
     // Reading the file for relation word
-    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
-    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_20.txt";
 
     //char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
     sprintf(postPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post_%d_%d_%d_%d.txt", 
@@ -605,8 +605,10 @@ void TrainModel() {
 
     if(usePCA)
         visualPath = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
-    else
-        visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+    else{
+        visualPath = "/home/satwik/VisualWord2Vec/data/float_features_20.txt";
+        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+    }
 
     // Writing word2vec from file
     //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_save.txt";

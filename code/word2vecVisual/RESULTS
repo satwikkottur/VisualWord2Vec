@@ -115,7 +115,7 @@ PCA, multi, 15, Individual words,
 ================================================
 Varying the dimension of the hidden layer
 Model : Individual words, Multi, 1222, 25
-20: (68.95, 68.01) =>
+20: (68.95, 68.01) => (74.14, 73.33)
 30: (72.29, 71.09) => (75.67, 74.48)
 40: (73.37, 72.18) => (75.81, 74.86)
 50: (74.36, 72.89) => (76.53, 75.35)
@@ -126,8 +126,12 @@ Model : Individual words, Multi, 1222, 25
 ================================================
 Varying the number of training examples per R
 Model : Individual words, Multi, 1222, 25
+1 :
 1
-5
-10
-15
-20
+5 : 
+3
+10 :
+4
+15 
+8
+20 

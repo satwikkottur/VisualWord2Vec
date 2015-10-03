@@ -57,6 +57,6 @@ function[Plabel, Slabel, Rlabel, Rfeatures] =  readFromFile(psrFeaturePath, numF
 
     Rfeatures = dlmread(numFeaturePath, ' ');
     % Ignore the last column as it is due to additional space at the end
-    Rfeatures = Rfeatures(:, 1:end-1);
+    %Rfeatures = Rfeatures(:, 1:end-1);
     %Rfeatures = [];
 end
