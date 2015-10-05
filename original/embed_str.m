@@ -23,7 +23,9 @@ for i=1:length(words3)
 end
 
 if sum(a)>0
-	vec=sum(vec_table(b(a>0),:),1);
+    % Taking the mean instead of sum
+	vec=mean(vec_table(b(a>0),:),1);
+	%vec=sum(vec_table(b(a>0),:),1);
 else
 	vec=vec_table(1,:)*0;
 end

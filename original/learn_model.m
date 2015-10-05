@@ -1,9 +1,12 @@
 
 datapath = '/home/linxiao/public_html/browser_sentint_full4/image_json';
 featpath = '/home/linxiao/public_html/browser_sentint_full4/image_features_tanmay';
+% using the final version of visual features
+featpath = '/srv/share/al/data_model/image_features_tanmay';
 %featpath_pairs = '/home/linxiao/public_html/browser_sentint_full4/image_features_pairs';
 %word2vec model. change to enwiki9.mat for wikipedia word2vec
-w2v_model='coco_w2v.mat';
+w2v_model='/home/satwik/VisualWord2Vec/models/coco_w2v_bestmodel.mat';
+%w2v_model='coco_w2v.mat';
 %C values and thresholds need to be tuned manually, check "TODO"s
 
 
@@ -111,6 +114,7 @@ else
     S_A=reshape(S_model_test_embed{3}.w,[ndims,200]);
 end
 
+w2v=load(w2v_model);
 %save('kron_models_new.mat','R_model_test_embed','R_model_crossval_embed', 'R_acc_crossval_embed', 'R_random_crossval_embed','P_model_test_embed', 'P_model_crossval_embed', 'P_acc_crossval_embed', 'P_random_crossval_embed','S_model_test_embed', 'S_model_crossval_embed', 'S_acc_crossval_embed', 'S_random_crossval_embed','R_A','P_A','S_A');
 
 %model1: directly classify. Not used here.
@@ -266,6 +270,13 @@ test_R_unique_score_embed_text=-pdist2(R_embedding(R_id,:),test_R_embedding,'cos
 test_P_unique_score_embed_text=-pdist2(P_embedding(P_id,:),test_P_embedding,'cosine');
 test_S_unique_score_embed_text=-pdist2(S_embedding(S_id,:),test_S_embedding,'cosine');
 
+val_R_unique_score_embed_text(isnan(val_R_unique_score_embed_text(:)))=-1;
+val_P_unique_score_embed_text(isnan(val_P_unique_score_embed_text(:)))=-1;
+val_S_unique_score_embed_text(isnan(val_S_unique_score_embed_text(:)))=-1;
+
+test_R_unique_score_embed_text(isnan(test_R_unique_score_embed_text(:)))=-1;
+test_P_unique_score_embed_text(isnan(test_P_unique_score_embed_text(:)))=-1;
+test_S_unique_score_embed_text(isnan(test_S_unique_score_embed_text(:)))=-1;
 
 %TODO: manually change threshold until prec_val is maximized. Text threshold usually around -2~1
 threshold=-1.2;
@@ -302,7 +313,7 @@ hybrid_perf_crossval=mean(hybrid_acc_crossval)
 corr(hybrid_score_test, test_score, 'type', 'Spearman')
 corr(hybrid_score_test, test_score, 'type', 'Kendall')
 
-
+break;
 
 %piece of script that deal with bing
 load bing_val;

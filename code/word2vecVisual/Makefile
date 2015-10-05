@@ -31,8 +31,8 @@ small:
 big:
 	make
 	#./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test_fs.txt -output modelsNdata/word2vec_after_refine.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
-	./$(BIN)word2vec -train modelsNdata/coco_train_minus_cs_test.txt -output modelsNdata/word2vec_after_refine.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
-	#./$(BIN)word2vec -train modelsNdata/coco_train_minus_cs_test.txt -output modelsNdata/word2vec_output.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -read-vocab modelsNdata/large-vocab.txt
+	#./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/enwik9 -output modelsNdata/word2vec_after_refine_bestmodel_wiki.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
+	./$(BIN)word2vec -train modelsNdata/coco_train_minus_cs_test.txt -output modelsNdata/word2vec_output.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -read-vocab modelsNdata/large-vocab.txt
 
 newline:
 	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test_tokenized_stops.txt -output word2vec_output_newline.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0

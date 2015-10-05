@@ -34,7 +34,7 @@ extern long noTest;
 // Variations
 int trainPhrases = 0;
 int trainMulti = 1;
-int clusterArg = 10;
+int clusterArg = 25;
 int usePCA = 0;
 
 /***********************************************************************************/
@@ -581,7 +581,7 @@ void TrainModel() {
     // [S] : Creates the threads for execution
     //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
     // [S] : Waits for the completion of execution of the threads
-    ///for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     //***************************************************************************************
     // [S] added
@@ -590,8 +590,8 @@ void TrainModel() {
     char* prePath = (char*) malloc(sizeof(char) * 100);
     char* vocabPath = (char*) malloc(sizeof(char) * 100);
     // Reading the file for relation word
-    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
-    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_20.txt";
+    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_18.txt";
 
     //char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
     sprintf(postPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post_%d_%d_%d_%d.txt", 
@@ -606,8 +606,8 @@ void TrainModel() {
     if(usePCA)
         visualPath = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
     else{
-        visualPath = "/home/satwik/VisualWord2Vec/data/float_features_20.txt";
-        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_18.txt";
+        visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
     }
 
     // Writing word2vec from file
@@ -634,7 +634,8 @@ void TrainModel() {
         readTestValFiles(valFile, testFile);
 
     // Saving the feature word vocabulary
-    //saveFeatureWordVocab(vocabPath);
+    saveFeatureWordVocab(vocabPath);
+    // Saving the embeddings, before refining
     
     // Store the basemodel test tuple scores and best model test tuple scores
     float* baseTestScores = (float*) malloc(sizeof(float) * noTest);
@@ -652,12 +653,12 @@ void TrainModel() {
         // Perform common sense task
         performCommonSenseTask(baseTestScores);
     }
-
-    // Saving the embeddings, before refining
-    /*if(trainMulti)
+    if(trainMulti)
         saveMultiEmbeddings(prePath);
     else
-        saveEmbeddings(prePath);*/
+        saveEmbeddings(prePath);
+    return;
+
 
     // Reset valAccuracy as the first run doesnt count
     prevValAcc = 0; 
@@ -700,10 +701,10 @@ void TrainModel() {
         saveEmbeddings(postPath);*/
 
     // Find test tuples with best improvement, for further visualization
-    //findBestTestTuple(baseTestScores, bestTestScores);
+    //findBestTestTuple(baseTestScores, bestTestScores);*/
     /***************************************************************************************/
+    return
     // skip writing to the file
-    return;
     
     fo = fopen(output_file, "wb");
     if (classes == 0) {

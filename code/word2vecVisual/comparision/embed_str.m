@@ -1,5 +1,5 @@
-function embed_str(word,filePt)
-fprintf(filePt, '%s = ', word);
+function vec=embed_str(word,dict,vec_table)
+
 [a,b]=strsplit(word,'''s');
 words1=[a;horzcat(b,{''})];
 words1=words1(:);
@@ -18,16 +18,14 @@ end
 
 a=zeros(length(words3),1);
 b=zeros(length(words3),1);
-apos = false;
 for i=1:length(words3)
-    if(strcmp(words3{i}, '''s'))
-        apos = true;
-    else
-        fprintf(filePt, ':%s:', words3{i});
-    end
-	%[a(i) b(i)]=ismember(words3{i},dict);
+	[a(i) b(i)]=ismember(words3{i},dict);
 end
-if(apos)
-    fprintf(filePt, ':''s:');
+
+if sum(a)>0
+    % Taking the mean instead of sum
+	vec=mean(vec_table(b(a>0),:),1);
+	%vec=sum(vec_table(b(a>0),:),1);
+else
+	vec=vec_table(1,:)*0;
 end
-fprintf(filePt, '\n');

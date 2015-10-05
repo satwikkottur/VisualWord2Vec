@@ -3,6 +3,9 @@ data/*
 *.mat
 *.bin
 *.o
+out*
+err*
+*.txt
 
 # Models folder
 models/*

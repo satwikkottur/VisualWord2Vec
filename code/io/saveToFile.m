@@ -18,17 +18,13 @@ function saveToFile(prsPath, numPath, Plabel, Rlabel, Slabel, Rfeatures)
 
     % Writing the dimension
     fprintf(numFile, '%d\n', size(Rfeatures, 2));
+    fclose(numFile);
+    dlmwrite(numPath, Rfeatures, '-append', 'delimiter', ' ');
     % Loop and write in the format required
     for i = 1:noInst
-        fprintf(prsFile, '<%s:%s:%s>\n', Plabel{i}, Rlabel{i}, Slabel{i});
-
-        for j = 1:size(Rfeatures, 2)-1
-            fprintf(numFile, '%f ', Rfeatures(i, j));
-        end
-        fprintf(numFile, '%f\n', Rfeatures(i, end));
+        fprintf(prsFile, '<%s:%s:%s>\n', Plabel{i}, Slabel{i}, Rlabel{i});
     end
 
     % Close the files for writing
     fclose(prsFile);
-    fclose(numFile);
 end

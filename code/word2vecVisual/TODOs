@@ -37,9 +37,10 @@ List of todos:
 
 CVPR:
 - Run Xiaos Visual paraphrasing (?) for text baseline task
-- Number of dimensions vs accuracy graph and interpretation
-- Plot of accuracy vs number of training instances
+- Number of dimensions vs accuracy graph and interpretation (done)
+- Plot of accuracy vs number of training instances (done)
 - Reason out why our model works better, intuitively
 - Check for pairs whose distance increase/decreased the most
 - Check for triplets whose relative distance increased/decreased the most
 - Visualize and reason about the clusters formed initially
+- Run Visual + Textual ICCV model

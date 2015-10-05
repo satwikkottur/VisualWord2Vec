@@ -42,7 +42,7 @@ void readFeatureFile(char* filePath){
     printf("\nReading %s...\n", filePath);
 
     // Compute the number of lines / instances and check with current existing variable
-    while(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]>\n", pWord, rWord, sWord) != EOF)
+    while(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]>\n", pWord, sWord, rWord) != EOF)
         noTuples++;
     // Rewind the stream and read again
     rewind(filePt);
@@ -151,11 +151,18 @@ void readVisualFeatureFile(char* fileName){
 
 // Finding the indices of words for P,R,S
 struct featureWord constructFeatureWord(char* word){
-    int index = SearchVocab(word); 
+    // Copy the word into a local variable token
+    char* token = (char*) malloc(MAX_STRING);
+    strcpy(token, word);
+
+    // Convert into lower case and continue search
+    int i;
+    for(i = 0; token[i]; i++) token[i] = tolower(token[i]);
+    int index = SearchVocab(token); 
 
     struct featureWord feature;
     feature.str = (char*) malloc(MAX_STRING);
-    strcpy(feature.str, word);
+    strcpy(feature.str, token);
 
     // Initialize the future embedding
     feature.magnitude = 0;
@@ -167,12 +174,9 @@ struct featureWord constructFeatureWord(char* word){
     // Do something if not in vocab
     if(index == -1) {
         //printf("Not in vocab -> %s : %s\n", word, "") ;
-        int count=0, i;
+        int count=0;
 
         // Split based on 's
-        char* token = (char*) malloc(MAX_STRING);
-        strcpy(token, word);
-
         char* first = multi_tok(token, "'s");
         char* second = multi_tok(NULL, "'s");
 
@@ -1228,14 +1232,52 @@ int performCommonSenseTask(float* testTupleScores){
     // and get the best validation and correspoding testing accuracy
     float bestValAcc = 0, bestTestAcc = 0;
     float threshold;
-    for(threshold = -1.0; threshold < 2.0; threshold += 0.1){
+    //float threshold, *iterPrecVal, *iterPrecTest;
+    int i;
+    int *randPermVal = (int*) malloc(sizeof(int) * noVal);
+    int *randPermTest = (int*) malloc(sizeof(int) * noVal);
+
+    float* precVal = (float*) malloc(sizeof(float) * 2);
+    float* precTest = (float*) malloc(sizeof(float) * 2);
+    float* iterPrecTest = (float*) malloc(sizeof(float) * 2);
+    float* iterPrecVal = (float*) malloc(sizeof(float) * 2);
+    for(threshold = 1.0; threshold < 2.0; threshold += 0.1){
         
         computeTestValScores(val, noVal, threshold, valScore);
         computeTestValScores(test, noTest, threshold, testScore);
 
         // Compute the accuracy
-        float* precVal = computeMAP(valScore, val, noVal);
-        float* precTest = computeMAP(testScore, test, noTest);
+        if(!permuteMAP){
+            precVal = computeMAP(valScore, val, noVal);
+            precTest = computeMAP(testScore, test, noTest);
+        }
+        else{
+            precVal[0] = 0; precVal[1] = 0;
+            precTest[0] = 0; precTest[1] = 0;
+            // Compute the accuracy for multiple permutations
+            int noIters = 100;
+            for (i = 0; i < noIters; i++){
+                printf("%d ", i);
+                // generate a permutation
+                rpermute(noVal, randPermVal); 
+                iterPrecVal = computePermuteMAP(valScore, val, randPermVal, noVal);
+
+                rpermute(noTest, randPermTest); 
+                iterPrecTest = computePermuteMAP(testScore, test, randPermTest, noTest);
+
+                // Updating the precVal, precTest
+                precVal[0] += iterPrecVal[0];
+                precVal[1] += iterPrecVal[1];
+                precTest[0] += iterPrecTest[0];
+                precTest[1] += iterPrecTest[1];
+            }
+            printf("\n");
+            // Normalizing for the mean
+            precVal[0] = precVal[0] / noIters;
+            precVal[1] = precVal[1] / noIters;
+            precTest[0] = precTest[0] / noIters;
+            precTest[1] = precTest[1] / noIters;
+        }
 
         // Get the maximum
         if(bestValAcc < precVal[0]){
@@ -1301,8 +1343,6 @@ int performMultiCommonSenseTask(float* testTupleScores){
     int *randPermVal = (int*) malloc(sizeof(int) * noVal);
     int *randPermTest = (int*) malloc(sizeof(int) * noVal);
 
-    //float precTest = (float*) malloc(sizeof(float) * 
-    //float precTest[2], precVal[2], iterPrecTest[2], iterPrecVal[2];
     float* precVal = (float*) malloc(sizeof(float) * 2);
     float* precTest = (float*) malloc(sizeof(float) * 2);
     float* iterPrecTest = (float*) malloc(sizeof(float) * 2);
@@ -1314,34 +1354,37 @@ int performMultiCommonSenseTask(float* testTupleScores){
         computeMultiTestValScores(test, noTest, threshold, testScore);
 
         // Compute the accuracy
-        precVal = computeMAP(valScore, val, noVal);
-        precTest = computeMAP(testScore, test, noTest);
-
-        /*precVal[0] = 0; precVal[1] = 0;
-        precTest[0] = 0; precTest[1] = 0;
-        // Compute the accuracy for multiple permutations
-        int noIters = 100;
-        for (i = 0; i < noIters; i++){
-            printf("%d ", i);
-            // generate a permutation
-            rpermute(noVal, randPermVal); 
-            iterPrecVal = computePermuteMAP(valScore, val, randPermVal, noVal);
-
-            rpermute(noTest, randPermTest); 
-            iterPrecTest = computePermuteMAP(testScore, test, randPermTest, noTest);
-
-            // Updating the precVal, precTest
-            precVal[0] += iterPrecVal[0];
-            precVal[1] += iterPrecVal[1];
-            precTest[0] += iterPrecTest[0];
-            precTest[1] += iterPrecTest[1];
+        if(!permuteMAP){
+            precVal = computeMAP(valScore, val, noVal);
+            precTest = computeMAP(testScore, test, noTest);
         }
-        printf("\n");
-        // Normalizing for the mean
-        precVal[0] = precVal[0] / noIters;
-        precVal[1] = precVal[1] / noIters;
-        precTest[0] = precTest[0] / noIters;
-        precTest[1] = precTest[1] / noIters;*/
+        else{
+            precVal[0] = 0; precVal[1] = 0;
+            precTest[0] = 0; precTest[1] = 0;
+            // Compute the accuracy for multiple permutations
+            int noIters = 100;
+            for (i = 0; i < noIters; i++){
+                printf("%d ", i);
+                // generate a permutation
+                rpermute(noVal, randPermVal); 
+                iterPrecVal = computePermuteMAP(valScore, val, randPermVal, noVal);
+
+                rpermute(noTest, randPermTest); 
+                iterPrecTest = computePermuteMAP(testScore, test, randPermTest, noTest);
+
+                // Updating the precVal, precTest
+                precVal[0] += iterPrecVal[0];
+                precVal[1] += iterPrecVal[1];
+                precTest[0] += iterPrecTest[0];
+                precTest[1] += iterPrecTest[1];
+            }
+            printf("\n");
+            // Normalizing for the mean
+            precVal[0] = precVal[0] / noIters;
+            precVal[1] = precVal[1] / noIters;
+            precTest[0] = precTest[0] / noIters;
+            precTest[1] = precTest[1] / noIters;
+        }
 
         // Get the maximum
         if(bestValAcc < precVal[0]){

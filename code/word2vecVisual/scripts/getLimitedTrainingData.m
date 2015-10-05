@@ -15,11 +15,12 @@ prsTemplate = fullfile(dataPath, 'PSR_features_%d.txt');
 numTemplate = fullfile(dataPath, 'float_features_%d.txt');
 % Choosing a part of the data
 % Number of instances per relation 2 : 2 : 20
-for noInst = [1, 5, 10, 15, 20]
+for noInst =  [14, 16, 18]
     trainIndices = [];
     fprintf('Current iteration : %d....\n\n\n', noInst);
     for indR = 1:length(uniqR)
-        trainIndices = [trainIndices; datasample(find(uniqInds == indR), noInst)];
+        trainIndices = [trainIndices; ...
+                        datasample(find(uniqInds == indR), noInst, 'Replace', false)];
     end
 
     % Shuffling the training indices to mimic randomness in data (needed?)
