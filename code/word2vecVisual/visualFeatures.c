@@ -155,11 +155,7 @@ struct featureWord constructFeatureWord(char* word){
     char* token = (char*) malloc(MAX_STRING);
     strcpy(token, word);
 
-    // Convert into lower case and continue search
-    int i;
-    for(i = 0; token[i]; i++) token[i] = tolower(token[i]);
-    int index = SearchVocab(token); 
-
+    // Initialize the feature word
     struct featureWord feature;
     feature.str = (char*) malloc(MAX_STRING);
     strcpy(feature.str, token);
@@ -171,57 +167,43 @@ struct featureWord constructFeatureWord(char* word){
     feature.embedS = NULL;
     feature.embedP = NULL;
     
-    // Do something if not in vocab
-    if(index == -1) {
-        //printf("Not in vocab -> %s : %s\n", word, "") ;
-        int count=0;
+    int count = 0, i;
 
-        // Split based on 's
-        char* first = multi_tok(token, "'s");
-        char* second = multi_tok(NULL, "'s");
+    // Split based on 's
+    char* first = multi_tok(token, "'s");
+    char* second = multi_tok(NULL, "'s");
 
-        // Join both the parts without the 's (from baseline: add it at the end)
-        if(second != NULL) token = strcat(first, strcat(second, " \'s"));
-        else token = first;
+    // Join both the parts without the 's (from baseline: add it at the end)
+    if(second != NULL) token = strcat(first, strcat(second, " \'s"));
+    else token = first;
 
-        char* temp = (char*) malloc(MAX_STRING);
-        strcpy(temp, token);
-        
-        // Remove ' ', ',', '.', '?', '!', '\', '/'
-        char* delim = " .,/!?\\";
-        token = strtok(token, delim);
-        // Going over the token to determine the number of parts
-        while(token != NULL){
-            count++;
-            token = strtok(NULL, delim);
-        }
+    char* temp = (char*) malloc(MAX_STRING);
+    strcpy(temp, token);
+    
+    // Remove ' ', ',', '.', '?', '!', '\', '/'
+    char* delim = " .,/!?\\";
+    token = strtok(token, delim);
+    // Going over the token to determine the number of parts
+    while(token != NULL){
+        count++;
+        token = strtok(NULL, delim);
+    }
 
-        // Nsmallow store the word components, looping over them
-        feature.index = (int*) malloc(count * sizeof(int));
-        feature.count = count;
-        
-        token = strtok(temp, delim);
-        count = 0;
-        while(token != NULL){
-            // Convert the token into lower case
-            for(i = 0; token[i]; i++) token[i] = tolower(token[i]);
-           
-            // Save the index
-            feature.index[count] = SearchVocab(token);
-            //if(feature.index[count] == -1)
-            //   printf("Word not found in dictionary => %s\t |  %s\n", token, word);
+    // Nsmallow store the word components, looping over them
+    feature.index = (int*) malloc(count * sizeof(int));
+    feature.count = count;
+    
+    token = strtok(temp, delim);
+    count = 0;
+    while(token != NULL){
+        // Convert the token into lower case
+        for(i = 0; token[i]; i++) token[i] = tolower(token[i]);
+       
+        // Save the index
+        feature.index[count] = SearchVocab(token);
 
-            //printf("%d \t", feature.index[count]);
-            token = strtok(NULL, delim);
-            count++;
-        }
-        //printf("\n");
-
-    } else{
-        //printf("In Vocab -> %s\n", word);
-        feature.count = 1;
-        feature.index = (int *) malloc(sizeof(int));
-        feature.index[0] = index;
+        token = strtok(NULL, delim);
+        count++;
     }
 
     return feature;

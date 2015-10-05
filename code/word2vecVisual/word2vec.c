@@ -31,11 +31,12 @@
 extern float prevTestAcc, prevValAcc;
 extern long noTest;
 
-// Variations
-int trainPhrases = 0;
-int trainMulti = 1;
-int clusterArg = 25;
-int usePCA = 0;
+// Variations 
+int trainPhrases = 0; // Handle phrases as a unit / separately
+int trainMulti = 1; // Train single / multiple models for P,R,S
+int clusterArg = 25; // Number of initial clusters to use
+int usePCA = 0;  // Reduce the dimensions through PCA
+int permuteMAP = 0; // Permute the data and compute mAP multiple times
 
 /***********************************************************************************/
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
@@ -634,8 +635,7 @@ void TrainModel() {
         readTestValFiles(valFile, testFile);
 
     // Saving the feature word vocabulary
-    saveFeatureWordVocab(vocabPath);
-    // Saving the embeddings, before refining
+    //saveFeatureWordVocab(vocabPath);
     
     // Store the basemodel test tuple scores and best model test tuple scores
     float* baseTestScores = (float*) malloc(sizeof(float) * noTest);
@@ -653,11 +653,13 @@ void TrainModel() {
         // Perform common sense task
         performCommonSenseTask(baseTestScores);
     }
-    if(trainMulti)
+    
+    // Saving the embeddings, before refining
+    /*if(trainMulti)
         saveMultiEmbeddings(prePath);
     else
         saveEmbeddings(prePath);
-    return;
+    return;*/
 
 
     // Reset valAccuracy as the first run doesnt count
@@ -695,10 +697,10 @@ void TrainModel() {
     }
 
     // Saving the embeddings, after refining
-    /*if(trainMulti)
+    if(trainMulti)
         saveMultiEmbeddings(postPath);
     else
-        saveEmbeddings(postPath);*/
+        saveEmbeddings(postPath);
 
     // Find test tuples with best improvement, for further visualization
     //findBestTestTuple(baseTestScores, bestTestScores);*/

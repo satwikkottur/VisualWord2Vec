@@ -20,6 +20,7 @@
 extern long long vocab_size, layer1_size;
 extern float *syn0, *syn1, *expTable;
 extern struct vocab_word* vocab;
+extern int permuteMAP;
 
 /************************************************************************/
 // Signatures of original functions
