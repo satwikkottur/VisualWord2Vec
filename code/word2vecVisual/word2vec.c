@@ -580,9 +580,9 @@ void TrainModel() {
     if (negative > 0) InitUnigramTable();
     start = clock();
     // [S] : Creates the threads for execution
-    //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+    for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
     // [S] : Waits for the completion of execution of the threads
-    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+    for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     //***************************************************************************************
     // [S] added
@@ -614,8 +614,8 @@ void TrainModel() {
     // Writing word2vec from file
     //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_save.txt";
     //saveWord2Vec(wordPath);
-    char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
-    loadWord2Vec(wordPath);
+    //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
+    //loadWord2Vec(wordPath);
 
     // Initializing the hash
     initFeatureHash();
@@ -658,9 +658,7 @@ void TrainModel() {
     /*if(trainMulti)
         saveMultiEmbeddings(prePath);
     else
-        saveEmbeddings(prePath);
-    return;*/
-
+        saveEmbeddings(prePath);*/
 
     // Reset valAccuracy as the first run doesnt count
     prevValAcc = 0; 
@@ -697,16 +695,16 @@ void TrainModel() {
     }
 
     // Saving the embeddings, after refining
-    if(trainMulti)
+    /*if(trainMulti)
         saveMultiEmbeddings(postPath);
     else
-        saveEmbeddings(postPath);
+        saveEmbeddings(postPath);*/
 
     // Find test tuples with best improvement, for further visualization
     //findBestTestTuple(baseTestScores, bestTestScores);*/
     /***************************************************************************************/
-    return
     // skip writing to the file
+    return;
     
     fo = fopen(output_file, "wb");
     if (classes == 0) {
