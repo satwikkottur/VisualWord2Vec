@@ -37,10 +37,15 @@ List of todos:
 
 CVPR:
 - Run Xiaos Visual paraphrasing(and fitb?) task for text baseline
-- Number of dimensions vs accuracy graph and interpretation (done, redo?)
-- Plot of accuracy vs number of training instances (done, redo?)
+    - Make the code faster (tough to debug, otherwise)
+    - Use ms_coco + vp training data together to train visual word2vec
+    - Train visual word2vec from scratch 
+    - Text alignment for paraphrases
+- Number of dimensions vs accuracy graph and interpretation (done)
+- Plot of accuracy vs number of training instances (done)
 - Reason out why our model works better, intuitively
 - Check for pairs whose distance increase/decreased the most
 - Check for triplets whose relative distance increased/decreased the most
 - Visualize and reason about the clusters formed initially
 - Run Visual + Textual ICCV model
+    - Validate current model through matlab code

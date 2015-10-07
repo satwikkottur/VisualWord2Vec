@@ -15,7 +15,7 @@ prsTemplate = fullfile(dataPath, 'PSR_features_%d.txt');
 numTemplate = fullfile(dataPath, 'float_features_%d.txt');
 % Choosing a part of the data
 % Number of instances per relation 2 : 2 : 20
-for noInst =  [14, 16, 18]
+for noInst =  [18]
     trainIndices = [];
     fprintf('Current iteration : %d....\n\n\n', noInst);
     for indR = 1:length(uniqR)
