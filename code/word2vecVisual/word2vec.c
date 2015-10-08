@@ -34,7 +34,7 @@ extern long noTest;
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
 int trainMulti = 1; // Train single / multiple models for P,R,S
-int clusterArg = 10; // Number of initial clusters to use
+int clusterArg = 25; // Number of initial clusters to use
 int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 
