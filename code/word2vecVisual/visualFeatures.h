@@ -89,6 +89,8 @@ void saveMultiFeatureEmbedding(struct featureWord, FILE*);
 
 // Save the vocab for the feature word
 void saveFeatureWordVocab(char*);
+// Save the vocab for the feature word(split into words)
+void saveFeatureWordVocabSplit(char*);
 
 // Saving tuple embeddings and tuple words in separate files
 void saveTupleEmbeddings(char*, char*, struct prsTuple*, float*, float*, int*, int);
@@ -108,7 +110,7 @@ int getFeatureWordHash(char*);
 void readVisualFeatureFile(char*);
 
 // Wrapper for kmeans
-void clusterVisualFeatures(int);
+void clusterVisualFeatures(int, char*);
 /*****************************************/
 // Common sense task
 int performCommonSenseTask(float*);

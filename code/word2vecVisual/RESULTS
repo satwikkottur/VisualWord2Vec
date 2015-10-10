@@ -160,16 +160,39 @@ Model : Individual words, Multi, 1222, 25
 16 :
     (73.88, 72.21) => (, 73.74)
 18 :
-    (73.86, 72.13) => (74.74, 73.33)
-    (73.81, 72.22) => 
-    Oct 8
-    (73.88, 72.21) => (
+    (73.88, 72.21) => (75.11, 73.68)
 20 : 
     (73.89, 72.22) => (75.92, 74.75)
 
 ================================================
 
-ICCV (Textual + visual) : 73.62 => 73.90
+ICCV (Textual + visual) : 
+    Single model : 
+        Baseline Text only : 72.22
+        Text only: 74.49
+
+        Baseline Vision + Text: 73.60
+        Vision + Text : 74.21
+
+    Multi model:
+        Baseline Text only : 72.22
+        Text only: 74.80
+
+        Baseline Vision + Text: 73.60
+        Vision + Text : 74.21
+
+================================================
+Wikipedia text training
+1222, Individual Words, Multi
+10:
+25: (64.41, 63.18) => (74.47, 73.47)
+35: 
+================================================
+VP task:
+Baseline text accuracies : 94.55, 94.60, 94.38, 94.38, 94.54
+VisualWord2Vec: 
+================================================
+
 
 ================================================
 Wikipedia text training

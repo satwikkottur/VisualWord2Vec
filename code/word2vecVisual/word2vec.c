@@ -31,6 +31,8 @@
 extern float prevTestAcc, prevValAcc;
 extern long noTest;
 
+extern float *syn0P, *syn0S, *syn0R;
+
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
 int trainMulti = 1; // Train single / multiple models for P,R,S
@@ -591,8 +593,8 @@ void TrainModel() {
     char* prePath = (char*) malloc(sizeof(char) * 100);
     char* vocabPath = (char*) malloc(sizeof(char) * 100);
     // Reading the file for relation word
-    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
-    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_18.txt";
+    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_18.txt";
 
     //char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
     sprintf(postPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post_%d_%d_%d_%d.txt", 
@@ -607,8 +609,8 @@ void TrainModel() {
     if(usePCA)
         visualPath = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
     else{
-        visualPath = "/home/satwik/VisualWord2Vec/data/float_features_18.txt";
-        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_18.txt";
+        visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
     }
 
     // Writing word2vec from file
@@ -627,15 +629,20 @@ void TrainModel() {
     //readClusterIdFile(clusterPath);
     // Clustering in C
     readVisualFeatureFile(visualPath);
-    clusterVisualFeatures(clusterArg);
-    
+    char clusterSavePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/cluster_id_save.txt";
+    // To save clusterId / distance, provide save path; else NULL
+    clusterVisualFeatures(clusterArg, NULL);
+    return;
+
     // Read the validation and test sets    
     if(noTest == 0)
         // Clean the strings for test and validation sets, store features
         readTestValFiles(valFile, testFile);
 
-    // Saving the feature word vocabulary
+    // Saving the feature word vocabulary(split simply means the corresponding components)
     //saveFeatureWordVocab(vocabPath);
+    //char splitPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/split_vocab.txt";  
+    //saveFeatureWordVocabSplit(splitPath);
     
     // Store the basemodel test tuple scores and best model test tuple scores
     float* baseTestScores = (float*) malloc(sizeof(float) * noTest);
@@ -653,6 +660,7 @@ void TrainModel() {
         // Perform common sense task
         performCommonSenseTask(baseTestScores);
     }
+
     
     // Saving the embeddings, before refining
     /*if(trainMulti)
@@ -704,7 +712,52 @@ void TrainModel() {
     //findBestTestTuple(baseTestScores, bestTestScores);*/
     /***************************************************************************************/
     // skip writing to the file
+
+    /***************************************************************************************/
+    // Write the three models separately (P,R,S)
+    // P 
+    char outputP[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/p_model.txt";
+    fo = fopen(outputP, "wb");
+    syn0 = syn0P;
+    // Save the word vectors
+    fprintf(fo, "%lld %lld\n", vocab_size, layer1_size);
+    for (a = 0; a < vocab_size; a++) {
+      fprintf(fo, "%s ", vocab[a].word);
+      if (binary) for (b = 0; b < layer1_size; b++) fwrite(&syn0[a * layer1_size + b], sizeof(real), 1, fo);
+      else for (b = 0; b < layer1_size; b++) fprintf(fo, "%lf ", syn0[a * layer1_size + b]);
+      fprintf(fo, "\n");
+    }
+    fclose(fo);
+    
+    // R
+    char outputR[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/r_model.txt";
+    fo = fopen(outputR, "wb");
+    syn0 = syn0R;
+    // Save the word vectors
+    fprintf(fo, "%lld %lld\n", vocab_size, layer1_size);
+    for (a = 0; a < vocab_size; a++) {
+      fprintf(fo, "%s ", vocab[a].word);
+      if (binary) for (b = 0; b < layer1_size; b++) fwrite(&syn0[a * layer1_size + b], sizeof(real), 1, fo);
+      else for (b = 0; b < layer1_size; b++) fprintf(fo, "%lf ", syn0[a * layer1_size + b]);
+      fprintf(fo, "\n");
+    }
+    fclose(fo);
+
+    // S
+    char outputS[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/s_model.txt";
+    fo = fopen(outputS, "wb");
+    syn0 = syn0S;
+    // Save the word vectors
+    fprintf(fo, "%lld %lld\n", vocab_size, layer1_size);
+    for (a = 0; a < vocab_size; a++) {
+      fprintf(fo, "%s ", vocab[a].word);
+      if (binary) for (b = 0; b < layer1_size; b++) fwrite(&syn0[a * layer1_size + b], sizeof(real), 1, fo);
+      else for (b = 0; b < layer1_size; b++) fprintf(fo, "%lf ", syn0[a * layer1_size + b]);
+      fprintf(fo, "\n");
+    }
+    fclose(fo);
     return;
+    /***************************************************************************************/
     
     fo = fopen(output_file, "wb");
     if (classes == 0) {

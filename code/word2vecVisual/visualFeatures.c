@@ -166,6 +166,7 @@ struct featureWord constructFeatureWord(char* word){
     feature.embedR = NULL;
     feature.embedS = NULL;
     feature.embedP = NULL;
+    feature.count = 0;
     
     int count = 0, i;
 
@@ -822,6 +823,19 @@ void saveFeatureWordVocab(char* fileName){
     fclose(filePt);
 }
 
+// Saving the feature vocab
+void saveFeatureWordVocabSplit(char* fileName){
+    FILE* filePt = fopen(fileName, "wb");
+    int i, j;
+
+    // Go through the vocab and save the embeddings
+    for(i = 0; i < featVocabSize; i++)
+        for(j = 0; j < featHashWords[i].count; j++)
+            fprintf(filePt, "%s\n", vocab[featHashWords[i].index[j]].word);
+
+    fclose(filePt);
+}
+
 // Saving tuples
 void saveTupleEmbeddings(char* tupleFile, char* embedFile, struct prsTuple* holder, float* baseScores, float* bestScores, int* members, int noMembers){
     // Compute the embeddings before saving
@@ -1136,7 +1150,7 @@ char *multi_tok(char *input, char *delimiter) {
 
 // Clustering kmeans wrapper
 // Source: http://yael.gforge.inria.fr/tutorial/tuto_kmeans.html
-void clusterVisualFeatures(int clusters){
+void clusterVisualFeatures(int clusters, char* savePath){
     int k = clusters;                           /* number of cluster to create */
     int d = visualFeatSize;                           /* dimensionality of the vectors */
     int n = noTrain;                         /* number of vectors */
@@ -1174,6 +1188,25 @@ void clusterVisualFeatures(int clusters){
     // Debugging the cId for the train tuples
     /*for (i = 0; i < n; i++)
      printf("%i\n", train[i].cId);*/
+
+     // Write the clusters to a file, if non-empty
+    if(savePath != NULL){
+        // Open the file
+        FILE* filePtr = fopen(savePath, "wb");
+
+        if(noTrain == 0){
+            printf("ClusterIds not available to save!\n");
+            exit(1);
+        }
+
+        // Save the cluster ids
+        int i;
+        for (i = 0; i < noTrain; i++)
+            fprintf(filePtr, "%d %f\n", train[i].cId, dis[i]);
+
+        // Close the file
+        fclose(filePtr); 
+    }
     
     // Assigning the number of clusters
     if(noClusters == 0){
