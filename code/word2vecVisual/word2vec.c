@@ -593,8 +593,9 @@ void TrainModel() {
     char* prePath = (char*) malloc(sizeof(char) * 100);
     char* vocabPath = (char*) malloc(sizeof(char) * 100);
     // Reading the file for relation word
-    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_18.txt";
+    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_R_120.txt";
 
     //char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
     sprintf(postPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post_%d_%d_%d_%d.txt", 
@@ -610,7 +611,8 @@ void TrainModel() {
         visualPath = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
     else{
         //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_18.txt";
-        visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+        visualPath = "/home/satwik/VisualWord2Vec/data/float_features_R_120.txt";
     }
 
     // Writing word2vec from file
@@ -632,7 +634,6 @@ void TrainModel() {
     char clusterSavePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/cluster_id_save.txt";
     // To save clusterId / distance, provide save path; else NULL
     clusterVisualFeatures(clusterArg, NULL);
-    return;
 
     // Read the validation and test sets    
     if(noTest == 0)
@@ -701,6 +702,7 @@ void TrainModel() {
             //noOverfit = performCommonSenseTask(NULL);
             noOverfit = performCommonSenseTask(bestTestScores);
     }
+    return;
 
     // Saving the embeddings, after refining
     /*if(trainMulti)

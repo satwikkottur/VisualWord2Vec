@@ -47,9 +47,13 @@ CVPR:
 - Check for pairs whose distance increase/decreased the most
 - Check for triplets whose relative distance increased/decreased the most
 - Visualize and reason about the clusters formed initially
-- Run Visual + Textual ICCV model
+    - Get the closest top images for each cluster (done)
+    - TSNE for P,R,S based on cluster
+    - TSNE for (P,R,S) tuple for each cluster
+    - TSNE for visual features
+- Run Visual + Textual ICCV model (done)
     - Validate single model through matlab code (done)
-    - Get the accuracy for multi model through matlab
-    - Get the overall Visual + Textual scores for single model
-    - Get the overall Visual + Textual scores for multi model
+    - Get the accuracy for multi model through matlab (done)
+    - Get the overall Visual + Textual scores for single model (done)
+    - Get the overall Visual + Textual scores for multi model (done)
 - Vary the number of relations and train the models
