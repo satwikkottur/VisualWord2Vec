@@ -13,6 +13,7 @@ cIds = dlmread(clustIdPath);
 % Show the TSNE for P,R,S
 % Read the tuples and feature files
 rootPath = '/home/satwik/VisualWord2Vec/';
+
 addpath(fullfile(rootPath, 'code/io/'));
 addpath(genpath(fullfile(rootPath, 'libs')));
 psrPath = fullfile(rootPath, 'data/PSR_features.txt');
@@ -28,7 +29,26 @@ noInitDims = [];
 perplexity = 50;
 
 % tsneEmbed = tsne(Rfeats, [], noDims, noInitDims, perplexity);
-figure(1); gscatter(tsneEmbed(:, 1), tsneEmbed(:, 2), cIds(:, 1))
+load('cluster-visualization.mat');
+% Visualizations based on visual features
+% Get the tuples
+tupleLabels = strcat('<', Plabel, ':', Slabel, ':', Rlabel, '>');
+
+%figure(1); gscatter(tsneEmbed(:, 1), tsneEmbed(:, 2), cIds(:, 1), [], ['o', 'x', 's', 'd'], 2)
+
+% PLot just one cluster
+noClusters = length(unique(cIds(:, 1)));
+for k = 1:noClusters
+    members = cIds(:, 1) == k;
+    figure(1); scatter(tsneEmbed(members, 1), tsneEmbed(members, 2))
+    dx = 0.1; dy = 0.1;
+    text(tsneEmbed(members, 1) + dx, tsneEmbed(members, 2) + dy, tupleLabels(members))
+    pause()
+end
+    %figure(1); gscatter(tsneEmbed(:, 1), tsneEmbed(:, 2), cIds(:, 1), [], ['o', 'x', 's', 'd'], 2)
+    %dx = 0.1; dy = 0.1;
+    %text(tsneEmbed(:, 1) + dx, tsneEmbed(:, 2) + dy, tupleLabels)
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Show the abstract images for each cluster
