@@ -3,6 +3,7 @@
 % showImgs = show the top images close to the cluster center
 % showPRS = show the tsne of P,R,S separately
 % showPRStog = sow the tsne of P,R,S together
+showImgs = false;
 
 % Read the file
 clustIdPath = '../modelsNdata/cluster_id_save.txt';
@@ -10,10 +11,24 @@ cIds = dlmread(clustIdPath);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Show the TSNE for P,R,S
+% Read the tuples and feature files
+rootPath = '/home/satwik/VisualWord2Vec/';
+addpath(fullfile(rootPath, 'code/io/'));
+addpath(genpath(fullfile(rootPath, 'libs')));
+psrPath = fullfile(rootPath, 'data/PSR_features.txt');
+featPath = fullfile(rootPath, 'data/float_features_withoutheader.txt');
 
+% Dont read if already exists in workspace
+if(~exist('Rfeats', 'var'))
+    [Plabel, Slabel, Rlabel, Rfeats] = readFromFile(psrPath, featPath);
+end
 
+noDims = 2;
+noInitDims = [];
+perplexity = 50;
 
-
+% tsneEmbed = tsne(Rfeats, [], noDims, noInitDims, perplexity);
+figure(1); gscatter(tsneEmbed(:, 1), tsneEmbed(:, 2), cIds(:, 1))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Show the abstract images for each cluster
