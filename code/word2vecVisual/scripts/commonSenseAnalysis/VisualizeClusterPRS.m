@@ -4,12 +4,13 @@
 % showPRStog = sow the tsne of P,R,S together
 
 % Read the file
-clustIdPath = '../modelsNdata/cluster_id_save.txt';
+clustIdPath = '../../modelsNdata/cluster_id_save.txt';
 cIds = dlmread(clustIdPath);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Show the TSNE for P,R,S
 % Read the tuples and feature files
+% Setting up paths
 rootPath = '/home/satwik/VisualWord2Vec/';
 
 addpath(fullfile(rootPath, 'code/io/'));
@@ -17,47 +18,20 @@ addpath(genpath(fullfile(rootPath, 'libs')));
 psrPath = fullfile(rootPath, 'data/PSR_features.txt');
 featPath = fullfile(rootPath, 'data/float_features_withoutheader.txt');
 
+rootPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual';
+modelPath = fullfile(rootPath, 'modelsNdata');
+
+preFile = fullfile(modelPath, 'backup', 'word2vec_pre_0_0_1_25.txt');
+postFile = fullfile(modelPath, 'backup', 'word2vec_post_0_0_1_25.txt');
+vocabFile = fullfile(modelPath, 'word2vec_vocab_0_0_1_25.txt');
+
 % Dont read if already exists in workspace
 if(~exist('Rfeats', 'var'))
     [Plabel, Slabel, Rlabel, Rfeats] = readFromFile(psrPath, featPath);
+    Plabel = lower(Plabel);
+    Rlabel = lower(Rlabel);
+    Slabel = lower(Slabel);
 end
-
-noDims = 2;
-noInitDims = [];
-perplexity = 50;
-
-% tsneEmbed = tsne(Rfeats, [], noDims, noInitDims, perplexity);
-load('cluster-visualization.mat');
-% Visualizations based on visual features
-% Get the tuples
-tupleLabels = strcat('<', Plabel, ':', Slabel, ':', Rlabel, '>');
-
-%figure(1); gscatter(tsneEmbed(:, 1), tsneEmbed(:, 2), cIds(:, 1), [], ['o', 'x', 's', 'd'], 2)
-
-% PLot just one cluster
-noClusters = length(unique(cIds(:, 1)));
-for k = 1:noClusters
-    members = cIds(:, 1) == k;
-    figure(1); scatter(tsneEmbed(members, 1), tsneEmbed(members, 2))
-    dx = 0.1; dy = 0.1;
-    text(tsneEmbed(members, 1) + dx, tsneEmbed(members, 2) + dy, tupleLabels(members))
-    pause()
-end
-    %figure(1); gscatter(tsneEmbed(:, 1), tsneEmbed(:, 2), cIds(:, 1), [], ['o', 'x', 's', 'd'], 2)
-    %dx = 0.1; dy = 0.1;
-    %text(tsneEmbed(:, 1) + dx, tsneEmbed(:, 2) + dy, tupleLabels)
-
-
-% Setting up paths
-rootPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual';
-modelPath = fullfile(rootPath, 'modelsNdata');
-addpath(genpath('/home/satwik/VisualWord2Vec/libs'));
-
-preFile = fullfile(modelPath, 'word2vec_pre_0_0_1_25.txt');
-postFile = fullfile(modelPath, 'word2vec_post_0_0_1_25.txt');
-vocabFile = fullfile(modelPath, 'word2vec_vocab_0_0_1_25.txt');
-
-verbose = false;
 
 if(~exist('preEmbed', 'var'))
     % Read the embeddings before / after refining along with vocab
@@ -65,57 +39,71 @@ if(~exist('preEmbed', 'var'))
                         readEmbedFile(preFile, postFile, vocabFile, true);
 end
 
-% Print first N tuples
-%noExp = length(sortInd);
-noExp = 100;
-featDim = 200;
-
 % Collect unique embeddings for top sorted tuples
 % Consider P,R,S separately
 % Collect the embeddings for top sorted tuples
+noInst = length(Plabel);
+noClusters = size(cIds, 1);
+featDim = 200;
+
 pLabels = {};
 rLabels = {};
 sLabels = {};
-uniqPreP = zeros(noExp, featDim);
-uniqPreR = zeros(noExp, featDim);
-uniqPreS = zeros(noExp, featDim);
-uniqPostP = zeros(noExp, featDim);
-uniqPostR = zeros(noExp, featDim);
-uniqPostS = zeros(noExp, featDim);
+pId = zeros(noInst, 1);
+rcId = zeros(noInst, 1);
+sId = zeros(noInst, 1);
+uniqPreP = zeros(noInst, featDim);
+uniqPreR = zeros(noInst, featDim);
+uniqPreS = zeros(noInst, featDim);
+uniqPostP = zeros(noInst, featDim);
+uniqPostR = zeros(noInst, featDim);
+uniqPostS = zeros(noInst, featDim);
 
-for i = 1:noExp
-    if verbose
-        fprintf('<%s , %s , %s> : %f %f\n', char(sortedTuples{1}(i)), ...
-                                            char(sortedTuples{2}(i)), ...
-                                            char(sortedTuples{3}(i)), ...
-                                            sortedTuples{4}(i), ...
-                                            sortedTuples{5}(i));
-    end
-
-    p = char(sortedTuples{1}(i));
-    r = char(sortedTuples{2}(i));
-    s = char(sortedTuples{3}(i));
-
+% Pre and post embeds for P,R,S for all the examples
+% Also get majority cluster for each of P, R, S
+for i = 1:noInst
+    % Check if already exists
+    p = Plabel{i};
+    r = Rlabel{i};
+    s = Slabel{i};
+    
     % P
     % New label, add it
     if(~ismember(p, pLabels))
-        pLabels = [pLabels, {p}];
-        uniqPreP(length(pLabels), :) = preEmbed.P(p);
-        uniqPostP(length(pLabels), :) = postEmbed.P(p);
+        % Check for all the dominant clusters current label is present
+        clusts = find(hist(cIds(strcmp(p, Plabel), 1), 1:noClusters) > 20 == 1);
+        for k = clusts
+            pLabels = [pLabels, {p}];
+            pId(length(pLabels)) = k;
+            uniqPreP(length(pLabels), :) = preEmbed.P(p);
+            uniqPostP(length(pLabels), :) = postEmbed.P(p);
+        end
     end
 
     % R
+    % New label, add it
     if(~ismember(r, rLabels))
-        rLabels = [rLabels, {r}];
-        uniqPreR(length(rLabels), :) = preEmbed.R(r);
-        uniqPostR(length(rLabels), :) = postEmbed.R(r);
+        % Check for all the dominant clusters current label is present
+        clusts = find(hist(cIds(strcmp(r, Rlabel), 1), 1:noClusters) > 20 == 1);
+        for k = clusts
+            rLabels = [rLabels, {r}];
+            rId(length(rLabels)) = k;
+            uniqPreR(length(pLabels), :) = preEmbed.R(r);
+            uniqPostR(length(pLabels), :) = postEmbed.R(r);
+        end
     end
 
     % S
+    % New label, add it
     if(~ismember(s, sLabels))
-        sLabels = [sLabels, {s}];
-        uniqPreS(length(sLabels), :) = preEmbed.S(s);
-        uniqPostS(length(sLabels), :) = postEmbed.S(s);
+        % Check for all the dominant clusters current label is present
+        clusts = find(hist(cIds(strcmp(s, Slabel), 1), 1:noClusters) > 20 == 1);
+        for k = clusts
+            sLabels = [sLabels, {s}];
+            sId(length(sLabels)) = k;
+            uniqPreS(length(pLabels), :) = preEmbed.S(s);
+            uniqPostS(length(pLabels), :) = postEmbed.S(s);
+        end
     end
 end
 
@@ -127,9 +115,38 @@ uniqPreS = uniqPreS(1:length(sLabels), :);
 uniqPostP = uniqPostP(1:length(pLabels), :);
 uniqPostR = uniqPostR(1:length(rLabels), :);
 uniqPostS = uniqPostS(1:length(sLabels), :);
+return
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Display the origina clusters in the visual feature space
+origClusts = false;
+if(origClusts)
+    noDims = 2;
+    noInitDims = [];
+    perplexity = 50;
+
+    tsneEmbed = tsne(Rfeats, [], noDims, noInitDims, perplexity);
+    load('cluster-visualization.mat');
+    % Visualizations based on visual features
+    % Get the tuples
+    tupleLabels = strcat('<', Plabel, ':', Slabel, ':', Rlabel, '>');
+
+    %figure(1); gscatter(tsneEmbed(:, 1), tsneEmbed(:, 2), cIds(:, 1), [], ['o', 'x', 's', 'd'], 2)
+
+    % PLot just one cluster
+    noClusters = length(unique(cIds(:, 1)));
+    for k = 1:noClusters
+        members = cIds(:, 1) == k;
+        figure(1); scatter(tsneEmbed(members, 1), tsneEmbed(members, 2))
+        dx = 0.1; dy = 0.1;
+        text(tsneEmbed(members, 1) + dx, tsneEmbed(members, 2) + dy, tupleLabels(members))
+        pause()
+    end
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Embed through t-sne (either individual / together)
-individual = false;
+individual = true;
 if(individual)
     noDims = 2;
     noInitDims = [];
