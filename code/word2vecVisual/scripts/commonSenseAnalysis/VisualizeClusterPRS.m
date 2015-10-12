@@ -11,14 +11,16 @@ cIds = dlmread(clustIdPath);
 % Show the TSNE for P,R,S
 % Read the tuples and feature files
 % Setting up paths
-rootPath = '/home/satwik/VisualWord2Vec/';
+%rootPath = '/home/satwik/VisualWord2Vec/';
+rootPath = '/Users/skottur/CMU/Personal/VisualWord2Vec/';
 
 addpath(fullfile(rootPath, 'code/io/'));
 addpath(genpath(fullfile(rootPath, 'libs')));
 psrPath = fullfile(rootPath, 'data/PSR_features.txt');
 featPath = fullfile(rootPath, 'data/float_features_withoutheader.txt');
 
-rootPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual';
+%rootPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual';
+rootPath = fullfile(rootPath, '/code/word2vecVisual');
 modelPath = fullfile(rootPath, 'modelsNdata');
 
 preFile = fullfile(modelPath, 'backup', 'word2vec_pre_0_0_1_25.txt');
@@ -28,9 +30,6 @@ vocabFile = fullfile(modelPath, 'word2vec_vocab_0_0_1_25.txt');
 % Dont read if already exists in workspace
 if(~exist('Rfeats', 'var'))
     [Plabel, Slabel, Rlabel, Rfeats] = readFromFile(psrPath, featPath);
-    Plabel = lower(Plabel);
-    Rlabel = lower(Rlabel);
-    Slabel = lower(Slabel);
 end
 
 if(~exist('preEmbed', 'var'))
@@ -71,7 +70,7 @@ for i = 1:noInst
     % New label, add it
     if(~ismember(p, pLabels))
         % Check for all the dominant clusters current label is present
-        clusts = find(hist(cIds(strcmp(p, Plabel), 1), 1:noClusters) > 20 == 1);
+        clusts = find(hist(cIds(strcmp(p, Plabel), 1), 1:noClusters) > 0);
         for k = clusts
             pLabels = [pLabels, {p}];
             pId(length(pLabels)) = k;
@@ -115,14 +114,13 @@ uniqPreS = uniqPreS(1:length(sLabels), :);
 uniqPostP = uniqPostP(1:length(pLabels), :);
 uniqPostR = uniqPostR(1:length(rLabels), :);
 uniqPostS = uniqPostS(1:length(sLabels), :);
-return
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Display the origina clusters in the visual feature space
 origClusts = false;
 if(origClusts)
     noDims = 2;
-    noInitDims = [];
+    noInitDims = 30;
     perplexity = 50;
 
     tsneEmbed = tsne(Rfeats, [], noDims, noInitDims, perplexity);

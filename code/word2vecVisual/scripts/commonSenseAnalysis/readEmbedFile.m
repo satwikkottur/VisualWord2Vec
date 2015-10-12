@@ -12,7 +12,7 @@ function[preEmbed, postEmbed, featureWords] = ...
     postEmbed = dlmread(postFile);
 
     fileId = fopen(vocabFile);
-    featureWords = textscan(fileId, '%s', 'Delimiter', '\n');
+    featureWords = textscan(fileId, '%s', 'Delimiter', '\n', 'whitespace', '');
     
     % First component has all the words, what we care about
     featureWords = featureWords{1};
@@ -35,7 +35,7 @@ function[preEmbed, postEmbed, featureWords] = ...
     postR = containers.Map();
     postS = containers.Map();
 
-    for i = 1:size(preEmbedP)
+    for i = 1:size(preEmbedP, 1)
         %fprintf('%d %d\n', i, size(preEmbedP));
         preP(featureWords{i}) = preEmbedP(i, :);
         preR(featureWords{i}) = preEmbedR(i, :);
