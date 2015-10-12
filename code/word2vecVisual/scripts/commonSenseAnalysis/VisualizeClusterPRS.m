@@ -4,7 +4,7 @@
 % showPRStog = sow the tsne of P,R,S together
 
 % Read the file
-clustIdPath = '../../modelsNdata/cluster_id_save.txt';
+clustIdPath = '../../modelsNdata/cluster_id_save_10.txt';
 cIds = dlmread(clustIdPath);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -49,7 +49,7 @@ pLabels = {};
 rLabels = {};
 sLabels = {};
 pId = zeros(noInst, 1);
-rcId = zeros(noInst, 1);
+rId = zeros(noInst, 1);
 sId = zeros(noInst, 1);
 uniqPreP = zeros(noInst, featDim);
 uniqPreR = zeros(noInst, featDim);
@@ -70,7 +70,10 @@ for i = 1:noInst
     % New label, add it
     if(~ismember(p, pLabels))
         % Check for all the dominant clusters current label is present
-        clusts = find(hist(cIds(strcmp(p, Plabel), 1), 1:noClusters) > 0);
+        clustHist = hist(cIds(strcmp(p, Plabel), 1), 1:noClusters);
+        %clusts = find(hist(cIds(strcmp(p, Plabel), 1), 1:noClusters) > 0);
+        % Take the mode
+        [~, clusts] = max(clustHist);
         for k = clusts
             pLabels = [pLabels, {p}];
             pId(length(pLabels)) = k;
@@ -83,12 +86,14 @@ for i = 1:noInst
     % New label, add it
     if(~ismember(r, rLabels))
         % Check for all the dominant clusters current label is present
-        clusts = find(hist(cIds(strcmp(r, Rlabel), 1), 1:noClusters) > 20 == 1);
+        clustHist = hist(cIds(strcmp(r, Rlabel), 1), 1:noClusters);
+        %clusts = find(hist(cIds(strcmp(r, Rlabel), 1), 1:noClusters) > 0);
+        [~, clusts] = max(clustHist);
         for k = clusts
             rLabels = [rLabels, {r}];
             rId(length(rLabels)) = k;
-            uniqPreR(length(pLabels), :) = preEmbed.R(r);
-            uniqPostR(length(pLabels), :) = postEmbed.R(r);
+            uniqPreR(length(rLabels), :) = preEmbed.R(r);
+            uniqPostR(length(rLabels), :) = postEmbed.R(r);
         end
     end
 
@@ -96,12 +101,14 @@ for i = 1:noInst
     % New label, add it
     if(~ismember(s, sLabels))
         % Check for all the dominant clusters current label is present
-        clusts = find(hist(cIds(strcmp(s, Slabel), 1), 1:noClusters) > 20 == 1);
+        clustHist = hist(cIds(strcmp(s, Slabel), 1), 1:noClusters);
+        %clusts = find(hist(cIds(strcmp(s, Slabel), 1), 1:noClusters) > 0);
+        [~, clusts] = max(clustHist);
         for k = clusts
             sLabels = [sLabels, {s}];
             sId(length(sLabels)) = k;
-            uniqPreS(length(pLabels), :) = preEmbed.S(s);
-            uniqPostS(length(pLabels), :) = postEmbed.S(s);
+            uniqPreS(length(sLabels), :) = preEmbed.S(s);
+            uniqPostS(length(sLabels), :) = postEmbed.S(s);
         end
     end
 end
@@ -115,6 +122,9 @@ uniqPostP = uniqPostP(1:length(pLabels), :);
 uniqPostR = uniqPostR(1:length(rLabels), :);
 uniqPostS = uniqPostS(1:length(sLabels), :);
 
+pId = pId(1:length(pLabels));
+rId = rId(1:length(rLabels));
+sId = sId(1:length(sLabels));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Display the origina clusters in the visual feature space
 origClusts = false;
@@ -124,7 +134,6 @@ if(origClusts)
     perplexity = 50;
 
     tsneEmbed = tsne(Rfeats, [], noDims, noInitDims, perplexity);
-    load('cluster-visualization.mat');
     % Visualizations based on visual features
     % Get the tuples
     tupleLabels = strcat('<', Plabel, ':', Slabel, ':', Rlabel, '>');
@@ -161,20 +170,24 @@ if(individual)
 
     % Displacement for points
     dx = 0.1; dy = 0.1;
-    figure(1); scatter(tsnePreP(:, 1), tsnePreP(:, 2))
-    text(tsnePreP(:, 1) + dx, tsnePreP(:, 2) + dy, pLabels)
-    figure(2); scatter(tsnePostP(:, 1), tsnePostP(:, 2))
-    text(tsnePostP(:, 1) + dx, tsnePostP(:, 2) + dy, pLabels)
+    figure(1); gscatter(tsnePreP(:, 1), tsnePreP(:, 2), pId, [], ...
+                                            [], 20)
+    %text(tsnePreP(:, 1) + dx, tsnePreP(:, 2) + dy, pLabels)
+    figure(2); gscatter(tsnePostP(:, 1), tsnePostP(:, 2), pId, [], ...
+                                            [], 20)
+    %text(tsnePostP(:, 1) + dx, tsnePostP(:, 2) + dy, pLabels)
 
-    figure(3); scatter(tsnePreS(:, 1), tsnePreS(:, 2))
-    text(tsnePreS(:, 1) + dx, tsnePreS(:, 2) + dy, sLabels)
-    figure(4); scatter(tsnePostS(:, 1), tsnePostS(:, 2))
-    text(tsnePostS(:, 1) + dx, tsnePostS(:, 2) + dy, sLabels)
+    figure(3); gscatter(tsnePreS(:, 1), tsnePreS(:, 2), sId, [], ...
+                                                    ['o', '+', 'x'], 5)
+    %text(tsnePreS(:, 1) + dx, tsnePreS(:, 2) + dy, sLabels)
+    figure(4); gscatter(tsnePostS(:, 1), tsnePostS(:, 2), sId, [], ...
+                                                    ['o', '+', 'x'], 5)
+    %text(tsnePostS(:, 1) + dx, tsnePostS(:, 2) + dy, sLabels)
 
-    figure(5); scatter(tsnePreR(:, 1), tsnePreR(:, 2))
-    text(tsnePreR(:, 1) + dx, tsnePreR(:, 2) + dy, rLabels)
-    figure(6); scatter(tsnePostR(:, 1), tsnePostR(:, 2))
-    text(tsnePostR(:, 1) + dx, tsnePostR(:, 2) + dy, rLabels)
+    figure(5); gscatter(tsnePreR(:, 1), tsnePreR(:, 2), rId, [], [], 20)
+    %text(tsnePreR(:, 1) + dx, tsnePreR(:, 2) + dy, rLabels)
+    figure(6); gscatter(tsnePostR(:, 1), tsnePostR(:, 2), rId, [], [], 20)
+    %text(tsnePostR(:, 1) + dx, tsnePostR(:, 2) + dy, rLabels)
 else
     noDims = 2;
     noInitDims = 50;
