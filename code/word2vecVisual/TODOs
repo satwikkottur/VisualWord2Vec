@@ -40,6 +40,10 @@ CVPR:
     - Make the code faster (tough to debug otherwise)
     - Use ms_coco + vp training data together to train visual word2vec (done) - doesn't work well
     - Train visual word2vec from scratch 
+        - Lemmatize MS COCO for refining
+        - Lemmatize abstract training sentences
+        - Extract visual features for abstract scenes
+        - Refine based on these visual features
     - Text alignment for paraphrases
 - Number of dimensions vs accuracy graph and interpretation (done)
 - Plot of accuracy vs number of training instances (done)

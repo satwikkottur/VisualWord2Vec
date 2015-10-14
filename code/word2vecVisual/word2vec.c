@@ -35,7 +35,7 @@ extern float *syn0P, *syn0S, *syn0R;
 
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
-int trainMulti = 1; // Train single / multiple models for P,R,S
+int trainMulti = 0; // Train single / multiple models for P,R,S
 int clusterArg = 25; // Number of initial clusters to use
 int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
@@ -582,9 +582,9 @@ void TrainModel() {
     if (negative > 0) InitUnigramTable();
     start = clock();
     // [S] : Creates the threads for execution
-    //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+    for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
     // [S] : Waits for the completion of execution of the threads
-    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+    for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     //***************************************************************************************
     // [S] added
@@ -593,9 +593,9 @@ void TrainModel() {
     char* prePath = (char*) malloc(sizeof(char) * 100);
     char* vocabPath = (char*) malloc(sizeof(char) * 100);
     // Reading the file for relation word
-    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_18.txt";
-    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_R_120.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_R_120.txt";
 
     //char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
     sprintf(postPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post_%d_%d_%d_%d.txt", 
@@ -611,15 +611,15 @@ void TrainModel() {
         visualPath = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
     else{
         //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_18.txt";
-        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
-        visualPath = "/home/satwik/VisualWord2Vec/data/float_features_R_120.txt";
+        visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_R_120.txt";
     }
 
     // Writing word2vec from file
     //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_save.txt";
     //saveWord2Vec(wordPath);
     char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
-    loadWord2Vec(wordPath);
+    //loadWord2Vec(wordPath);
 
     // Initializing the hash
     initFeatureHash();
@@ -702,7 +702,6 @@ void TrainModel() {
             //noOverfit = performCommonSenseTask(NULL);
             noOverfit = performCommonSenseTask(bestTestScores);
     }
-    return;
 
     // Saving the embeddings, after refining
     /*if(trainMulti)
@@ -714,11 +713,10 @@ void TrainModel() {
     //findBestTestTuple(baseTestScores, bestTestScores);*/
     /***************************************************************************************/
     // skip writing to the file
-
     /***************************************************************************************/
     // Write the three models separately (P,R,S)
     // P 
-    char outputP[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/p_model.txt";
+    /*char outputP[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/p_model.txt";
     fo = fopen(outputP, "wb");
     syn0 = syn0P;
     // Save the word vectors
@@ -757,8 +755,7 @@ void TrainModel() {
       else for (b = 0; b < layer1_size; b++) fprintf(fo, "%lf ", syn0[a * layer1_size + b]);
       fprintf(fo, "\n");
     }
-    fclose(fo);
-    return;
+    fclose(fo);*/
     /***************************************************************************************/
     
     fo = fopen(output_file, "wb");
