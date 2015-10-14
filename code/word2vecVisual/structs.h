@@ -31,4 +31,17 @@ struct vocab_word {
   int *point;
   char *word, *code, codelen;
 };
+
+// Structure to hold information about vp task
+struct trainSent{
+    // Actual sentences
+    char* sent;
+
+    // no of words recognized in the current vocab
+    int count;
+
+    // indices of the words recognized in the curent vocab
+    long* ind;
+};
+
 #endif

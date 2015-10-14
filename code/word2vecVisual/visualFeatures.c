@@ -527,10 +527,11 @@ void refineMultiNetworkPhrase(){
             exit(1);
         }
 
+        // Skip training P,S
         // Now collecting words for training
-        /*****************************************/
+        //*****************************************
         // Updating the weights for P
-        p = featHashWords[train[i].p];
+        /*p = featHashWords[train[i].p];
         wordCount = 0;
         
         for(c = 0; c < p.count; c++){
@@ -549,7 +550,7 @@ void refineMultiNetworkPhrase(){
         computeMultinomialPhrase(y, wordList, wordCount);
         // Propage the error the embeddings
         updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
-        /*****************************************/
+        //==========================================================
         // Updating the weights for S
         s = featHashWords[train[i].s];
         wordCount = 0;
@@ -569,7 +570,7 @@ void refineMultiNetworkPhrase(){
         computeMultinomialPhrase(y, wordList, wordCount);
         // Propage the error the embeddings
         updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
-        /*****************************************/
+        //==========================================================*/
         // Updating the weights for R
         r = featHashWords[train[i].r];
         wordCount = 0;

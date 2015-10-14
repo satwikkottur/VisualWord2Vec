@@ -26,6 +26,7 @@
 # include "structs.h"
 # include "visualFeatures.h"
 # include "debugFunctions.h"
+# include "vpFunctions.h"
 /***********************************************************************************/
 // Extern variables
 extern float prevTestAcc, prevValAcc;
@@ -35,7 +36,7 @@ extern float *syn0P, *syn0S, *syn0R;
 
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
-int trainMulti = 0; // Train single / multiple models for P,R,S
+int trainMulti = 1; // Train single / multiple models for P,R,S
 int clusterArg = 25; // Number of initial clusters to use
 int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
@@ -566,36 +567,23 @@ void *TrainModelThread(void *id) {
 // 6. Run the system for N = 10
 // 7. Get clustering into C code for avoiding writing into files
 //***************************************************************************************************
-//////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void TrainModel() {
-    long a, b, c, d;
-    FILE *fo;
-    pthread_t *pt = (pthread_t *)malloc(num_threads * sizeof(pthread_t));
-    printf("Starting training using file %s\n", train_file);
-    starting_alpha = alpha;
-    if (read_vocab_file[0] != 0) ReadVocab(); else LearnVocabFromTrainFile();
-    if (save_vocab_file[0] != 0) SaveVocab();
-    if (output_file[0] == 0) return;
-    InitNet();
-    // [S] : Create a unigram distribution table for negative sampling
-    if (negative > 0) InitUnigramTable();
-    start = clock();
-    // [S] : Creates the threads for execution
-    for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
-    // [S] : Waits for the completion of execution of the threads
-    for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
-
-    //***************************************************************************************
+// Function for common sense task
+void commonSenseWrapper(){
     // [S] added
     char* visualPath = (char*) malloc(sizeof(char) * 100);
     char* postPath = (char*) malloc(sizeof(char) * 100);
     char* prePath = (char*) malloc(sizeof(char) * 100);
     char* vocabPath = (char*) malloc(sizeof(char) * 100);
+
+    // Common sense task
     // Reading the file for relation word
-    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_lemma.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_18.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_R_120.txt";
+
+    char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_sentences_lemma.txt";
 
     //char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
     sprintf(postPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post_%d_%d_%d_%d.txt", 
@@ -619,7 +607,7 @@ void TrainModel() {
     //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_save.txt";
     //saveWord2Vec(wordPath);
     char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
-    //loadWord2Vec(wordPath);
+    loadWord2Vec(wordPath);
 
     // Initializing the hash
     initFeatureHash();
@@ -702,6 +690,7 @@ void TrainModel() {
             //noOverfit = performCommonSenseTask(NULL);
             noOverfit = performCommonSenseTask(bestTestScores);
     }
+    return;
 
     // Saving the embeddings, after refining
     /*if(trainMulti)
@@ -711,6 +700,55 @@ void TrainModel() {
 
     // Find test tuples with best improvement, for further visualization
     //findBestTestTuple(baseTestScores, bestTestScores);*/
+
+}
+
+// Function for visual paraphrase task
+void visualParaphraseWrapper(){
+    // Reading the file for training
+    char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_sentences_lemma.txt";
+    char visualPath[] = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+
+    // Loading word2vec file (from Xiao's baseline)
+    char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
+    loadWord2Vec(wordPath);
+
+    // Reading for the word features and visual features
+    readVPTrainSentences(featurePath);
+    readVPVisualFeatures(visualPath);
+    return;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void TrainModel() {
+    long a, b, c, d;
+    FILE *fo;
+    pthread_t *pt = (pthread_t *)malloc(num_threads * sizeof(pthread_t));
+    printf("Starting training using file %s\n", train_file);
+    starting_alpha = alpha;
+    if (read_vocab_file[0] != 0) ReadVocab(); else LearnVocabFromTrainFile();
+    if (save_vocab_file[0] != 0) SaveVocab();
+    if (output_file[0] == 0) return;
+    InitNet();
+    // [S] : Create a unigram distribution table for negative sampling
+    if (negative > 0) InitUnigramTable();
+    start = clock();
+    // [S] : Creates the threads for execution
+    //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+    // [S] : Waits for the completion of execution of the threads
+    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+
+    
+    //***************************************************************************************
+    // Common sense task
+    //commonSenseWrapper();
+    
+    // Visual paraphrase task
+    visualParaphraseWrapper();    
+    return;
+
+    //***************************************************************************************
     /***************************************************************************************/
     // skip writing to the file
     /***************************************************************************************/

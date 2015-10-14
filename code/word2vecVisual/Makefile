@@ -10,17 +10,23 @@ BIN = bin/
 
 #all: visualFeatures word2vec
 #	$(CC) visualFeatures.o word2vec.o -o word2vec $(CFLAGS)
-all: word2vec visualFeatures debugFunctions
+all: word2vec visualFeatures debugFunctions vpFunctions
 	$(MOVE)
-	$(CC) $(BIN)word2vec.o $(BIN)visualFeatures.o $(BIN)debugFunctions.o -o $(BIN)word2vec $(CFLAGS)
+	$(CC) $(BIN)word2vec.o $(BIN)visualFeatures.o $(BIN)debugFunctions.o $(BIN)vpFunctions.o -o $(BIN)word2vec $(CFLAGS)
 word2vec : word2vec.c
 	$(CC) -c word2vec.c $(CFLAGS)
 visualFeatures : visualFeatures.c
 	$(CC) -c visualFeatures.c $(CFLAGS)
 debugFunctions : debugFunctions.c
 	$(CC) -c debugFunctions.c $(CFLAGS)
+vpFunctions : vpFunctions.c
+	$(CC) -c vpFunctions.c $(CFLAGS)
 
 run:
+	make
+	./$(BIN)word2vec -train modelsNdata/coco_test.txt -output word2vec_output_makerun.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -read-vocab modelsNdata/large-vocab.txt
+
+vp:
 	make
 	./$(BIN)word2vec -train modelsNdata/coco_test.txt -output word2vec_output_makerun.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -read-vocab modelsNdata/large-vocab.txt
 
@@ -30,11 +36,11 @@ small:
 
 big:
 	make
-	#./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test_fs.txt -output modelsNdata/word2vec_after_refine.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
+	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test_lemma.txt -output modelsNdata/word2vec_after_refine_lemma.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 	#./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/enwik9 -output modelsNdata/word2vec_after_refine_bestmodel_wiki.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 4 -binary 0 -min-count 0
-#	./$(BIN)word2vec -train modelsNdata/coco_train_minus_cs_test.txt -output modelsNdata/word2vec_output_bestmodel_single.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -read-vocab modelsNdata/large-vocab.txt
+	#./$(BIN)word2vec -train modelsNdata/coco_train_minus_cs_test.txt -output modelsNdata/word2vec_output_bestmodel_single.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -read-vocab modelsNdata/large-vocab.txt
 	# Getting the visualword2vec for VP training + MS COCO
-	./$(BIN)word2vec -train modelsNdata/coco_vp_train.txt -output modelsNdata/word2vec_vp_train.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
+	#./$(BIN)word2vec -train modelsNdata/coco_vp_train.txt -output modelsNdata/word2vec_vp_train.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 
 newline:
 	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test_tokenized_stops.txt -output word2vec_output_newline.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
