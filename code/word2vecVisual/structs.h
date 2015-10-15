@@ -33,21 +33,21 @@ struct vocab_word {
 };
 
 // Structure to hold information about vp task
-struct trainSent{
+struct Sentence{
     // Actual sentences
     char* sent;
-
-    // no of words recognized in the current vocab
+    // no of tokens
     int count;
-
+    // no of words recognized in the current vocab
+    int actCount;
     // indices of the words recognized in the curent vocab
     long* index;
-
     // Training visual feature used for clustering
     float* vFeat;
-
     // Cluster Id for the feature
     int cId;
+    // Embeddings for the sentence
+    float* embed;
 };
 
 #endif

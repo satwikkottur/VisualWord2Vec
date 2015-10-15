@@ -14,7 +14,7 @@ float* valScore, *testScore; // Storing the scores for test and val
 // Storing the cosine distances between all the feature vocabulary (multimodel)
 float *cosDistP, *cosDistR, *cosDistS; 
 int verbose = 0; // Printing which function is being executed
-int noClusters = 0; // Number of clusters to be used
+//int noClusters = 0; // Number of clusters to be used // Make this extern: refineFunctions.h
 int visualFeatSize = 0; // Size of the visual features used
 float prevValAcc = 0, prevTestAcc = 0;
 
@@ -219,25 +219,6 @@ void initFeatureHash(){
     featHashInd = (int*) malloc(sizeof(int) * featHashSize);
     for(a = 0; a < featHashSize; a++)
         featHashInd[a] = -1;
-}
-
-// Initializing the refining
-void initRefining(){
-    long long a, b;
-    unsigned long long next_random = 1;
-
-    // Setup the network 
-    a = posix_memalign((void **)&syn1, 128, (long long)noClusters * layer1_size * sizeof(real));
-    if (syn1 == NULL) {
-        printf("Memory allocation failed\n"); 
-        exit(1);
-    }
-
-    // Initialize the last layer of weights
-    for (a = 0; a < noClusters; a++) for (b = 0; b < layer1_size; b++){
-        next_random = next_random * (unsigned long long)25214903917 + 11;
-        syn1[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
-    }
 }
 
 // Initializing the multi-model refining

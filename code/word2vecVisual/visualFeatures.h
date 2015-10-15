@@ -23,7 +23,8 @@ extern long long vocab_size, layer1_size;
 extern float *syn0, *syn1, *expTable;
 extern struct vocab_word* vocab;
 extern int permuteMAP;
-
+// From refineFunctions.h
+extern int noClusters;
 /************************************************************************/
 // Signatures of original functions
 /************************************************************************/
@@ -37,8 +38,7 @@ struct featureWord constructFeatureWord(char*);
 // Initializing the feature hash
 void initFeatureHash();
 
-// Initializing the refining of network
-void initRefining();
+// Initializing the refining of network (multiple)
 void initMultiRefining(); // Training multiple models
 
 // Reading the feature file
@@ -55,16 +55,6 @@ void refineNetworkPhrase();
 void refineMultiNetwork();
 // Function to refine the network for multi models using phrases
 void refineMultiNetworkPhrase();
-
-// Evaluate y_i for each output cluster
-void computeMultinomial(float*, int);
-// Evaluate y_i for all the phrases
-void computeMultinomialPhrase(float*, int*, int);
-    
-// Updating the weights 
-void updateWeights(float*, int, int);
-// Updating the weights for phrases
-void updateWeightsPhrase(float*, int*, int, int);
 
 //------------------------------------------------------------
 // Compute the embeddings for all the words

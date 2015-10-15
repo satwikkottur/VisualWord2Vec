@@ -19,8 +19,12 @@
 // Declaring the extern variables allowing separation of code
 extern long long vocab_size, layer1_size;
 extern float *syn0, *syn1, *expTable;
+extern long long vocab_size, layer1_size;
 
 /*******************************************/
+// Initializing the refining
+void initRefining();
+
 // Evaluate y_i for each output cluster
 void computeMultinomial(float*, int);
 

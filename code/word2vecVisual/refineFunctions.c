@@ -1,4 +1,24 @@
 # include "refineFunctions.h"
+int noClusters = 0;
+
+// Initializing the refining
+void initRefining(){
+    long long a, b;
+    unsigned long long next_random = 1;
+
+    // Setup the network 
+    a = posix_memalign((void **)&syn1, 128, (long long)noClusters * layer1_size * sizeof(float));
+    if (syn1 == NULL) {
+        printf("Memory allocation failed\n"); 
+        exit(1);
+    }
+
+    // Initialize the last layer of weights
+    for (a = 0; a < noClusters; a++) for (b = 0; b < layer1_size; b++){
+        next_random = next_random * (unsigned long long)25214903917 + 11;
+        syn1[a * layer1_size + b] = (((next_random & 0xFFFF) / (float)65536) - 0.5) / layer1_size;
+    }
+}
 
 // Evaluate y_i for each output cluster
 void computeMultinomial(float* y, int wordId){

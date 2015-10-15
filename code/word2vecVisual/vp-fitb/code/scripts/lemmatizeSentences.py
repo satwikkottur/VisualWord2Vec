@@ -68,16 +68,26 @@ def main(readPath, savePath, tokenPath):
 
 ###############################################################################
 # VP training dataset
-readPath = '../dumps/vp_train_sentences_raw.txt';
+'''readPath = '../dumps/vp_train_sentences_raw.txt';
 savePath = '../dumps/vp_train_sentences_lemma.txt';
 tokenPath = '../dumps/vp_train_tokens_lemma.txt';
+main(readPath, savePath, tokenPath);'''
 
 # MS COCO training set
-readPath = '/home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test.txt';
+'''readPath = '/home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test.txt';
 savePath = '/home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test_lemma.txt';
 tokenPath = '/home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test_lemma_tokens.txt';
+main(readPath, savePath, tokenPath);'''
 
+# VP all sentences
+readPath = '../dumps/vp_sentences_1.txt';
+savePath = '../dumps/vp_sentences1_lemma.txt';
+tokenPath = '../dumps/vp_sentence1_tokens_lemma.txt';
+main(readPath, savePath, tokenPath);
 
+readPath = '../dumps/vp_sentences_2.txt';
+savePath = '../dumps/vp_sentences2_lemma.txt';
+tokenPath = '../dumps/vp_sentence2_tokens_lemma.txt';
 main(readPath, savePath, tokenPath);
 ###############################################################################
 '''

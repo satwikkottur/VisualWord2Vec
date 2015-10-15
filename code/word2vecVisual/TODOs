@@ -53,15 +53,21 @@ Run Xiaos Visual paraphrasing(and fitb?) task for text baseline
 ---------------------------------------------------------------
     - Make the code faster (tough to debug otherwise)
     - Use ms_coco + vp training data together to train visual word2vec (done) - doesn't work well
-    - Train visual word2vec from scratch 
-        - Lemmatize MS COCO for refining
+    - Train visual word2vec from scratch (done)
+        - Lemmatize MS COCO for refining (done)
         - Lemmatize abstract training sentences (done)
         - Extract visual features for abstract scenes (done)
-        - Refine based on these visual features
+        - Refine based on these visual features (done)
+    - Dump all VP sentences : sentences_1, sentences_2 (done)
+    - Lemmatize them (done)
+    - Compute the word2vec features from C (done)
+    - Read word2vec features in matlab
+    - Confirm the original accuracy with by-pass
+    - Get VP into the loop to stop word2vec refining
     - Text alignment for paraphrases
 - Correct P,R,S training data from inflections using inverse map (done)
 - Compute the word overlap statistics for 3-4 separate cases
-- Setup system for refining over sentences for VP task
+- Setup system for refining over sentences for VP task (done)
 
 - Reason out why our model works better, intuitively
 - Check for pairs whose distance increase/decreased the most
