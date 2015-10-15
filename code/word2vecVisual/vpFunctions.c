@@ -165,7 +165,7 @@ void computeSentenceEmbeddings(struct Sentence* collection, long noSents){
             collection[i].embed = (float*) malloc(sizeof(float) * layer1_size);
         
         // Store the mean 
-        memcpy(collection[i].embed, mean, layer1_size);
+        memcpy(collection[i].embed, mean, layer1_size * sizeof(float));
     }
 
     free(mean);
@@ -250,10 +250,12 @@ void tokenizeTrainSentences(){
 void writeVPSentenceEmbeddings(){
     // Path to the sentences_1
     char readSent1[] = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma.txt";
-    char writeSent1[] = "/home/satwik/VisualWord2Vec/data/vp_orig_features_1.txt";
+    char writeSent1[] = "/home/satwik/VisualWord2Vec/data/vp_30_features_1.txt";
+    //char writeSent1[] = "/home/satwik/VisualWord2Vec/data/vp_orig_features_1.txt";
     // Path to the sentences_2
     char readSent2[] = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma.txt";
-    char writeSent2[] = "/home/satwik/VisualWord2Vec/data/vp_orig_features_2.txt";
+    char writeSent2[] = "/home/satwik/VisualWord2Vec/data/vp_30_features_2.txt";
+    //char writeSent2[] = "/home/satwik/VisualWord2Vec/data/vp_orig_features_2.txt";
     
     struct Sentence* sentences1, *sentences2;
     long noSents1, noSents2;
@@ -261,6 +263,10 @@ void writeVPSentenceEmbeddings(){
     // read sentences
     sentences1 = *readSentences(readSent1, &noSents1);
     sentences2 = *readSentences(readSent2, &noSents2);
+
+    // Tokenize sentences
+    tokenizeSentences(sentences1, noSents1);
+    tokenizeSentences(sentences2, noSents2);
 
     // compute embeddings
     computeSentenceEmbeddings(sentences1, noSents1);

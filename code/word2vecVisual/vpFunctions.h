@@ -20,6 +20,7 @@ int SearchVocab(char* word);
 // Variables from refineFunctions.h
 extern int noClusters;
 extern long long layer1_size;
+extern float* syn0;
 
 //*********************************************//
 // Genetic sentence related functions

@@ -732,7 +732,7 @@ void visualParaphraseWrapper(){
     // Initializing the refining network
     initRefining();
 
-    for(noIters = 0; noIters < 0; noIters++){
+    for(noIters = 0; noIters < 30; noIters++){
         // Refining the embeddings
         refineNetworkVP();
     }
