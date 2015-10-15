@@ -45,6 +45,9 @@ struct trainSent{
 
     // Training visual feature used for clustering
     float* vFeat;
+
+    // Cluster Id for the feature
+    int cId;
 };
 
 #endif

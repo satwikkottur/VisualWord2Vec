@@ -4,6 +4,7 @@
 // Globals for the current scope
 long noTrainVP = 0;
 int vpFeatSize = 0;
+int noClustersVP = 0;
 struct trainSent* train;
 
 // Read the training sentences for VP task
@@ -154,8 +155,82 @@ void tokenizeTrainSentences(){
            
             // Save the index
             train[i].index[count] = SearchVocab(line);
+            //if(train[i].index[count] == -1)
+            //    printf("%s\n", line);
             line = strtok(NULL, delim);
             count++;
         }
     }
 }
+
+// FUnction to cluster visual features
+// Clustering kmeans wrapper
+// Source: http://yael.gforge.inria.fr/tutorial/tuto_kmeans.html
+void clusterVPVisualFeatures(int clusters, char* savePath){
+    int k = clusters;                           /* number of cluster to create */
+    int d = vpFeatSize;                           /* dimensionality of the vectors */
+    int n = noTrainVP;                         /* number of vectors */
+    //int nt = 1;                           /* number of threads to use */
+    int niter = 0;                        /* number of iterations (0 for convergence)*/
+    int redo = 1;                         /* number of redo */
+    
+    // Populate the features
+    float * v = fvec_new (d * n);    /* random set of vectors */
+    long i, j, offset;
+    for (i = 0; i < n; i++){
+        offset = i * d;
+        for(j = 0; j < d; j++)
+            v[offset + j] = (float) train[i].vFeat[j];
+    }
+    
+    /* variables are allocated externaly */
+    float * centroids = fvec_new (d * k); /* output: centroids */
+    float * dis = fvec_new (n);           /* point-to-cluster distance */
+    int * assign = ivec_new (n);          /* quantization index of each point */
+    int * nassign = ivec_new (k);         /* output: number of vectors assigned to each centroid */
+    
+    double t1 = getmillisecs();
+    // Cluster the features
+    kmeans (d, n, k, niter, v, 1, 1, redo, centroids, dis, assign, nassign);
+    double t2 = getmillisecs();
+    
+    printf ("kmeans performed in %.3fs\n\n", (t2 - t1)  / 1000);
+    //ivec_print (nassign, k);
+    
+    // Write the cluster ids to the prsTuple structure
+    for (i = 0; i < n; i++)
+        train[i].cId = assign[i] + 1;
+    
+    // Debugging the cId for the train tuples
+    /*for (i = 0; i < n; i++)
+     printf("%i\n", train[i].cId);*/
+
+     // Write the clusters to a file, if non-empty
+    if(savePath != NULL){
+        // Open the file
+        FILE* filePtr = fopen(savePath, "wb");
+
+        if(noTrainVP == 0){
+            printf("ClusterIds not available to save!\n");
+            exit(1);
+        }
+
+        // Save the cluster ids
+        int i;
+        for (i = 0; i < noTrainVP; i++)
+            fprintf(filePtr, "%d %f\n", train[i].cId, dis[i]);
+
+        // Close the file
+        fclose(filePtr); 
+    }
+    
+    // Assigning the number of clusters
+    if(noClustersVP == 0){
+        noClustersVP = clusters;
+    }
+    
+    // Free memory
+    free(v); free(centroids); free(dis); free(assign); free(nassign);
+}
+
+// Refine the network based on the cluster id

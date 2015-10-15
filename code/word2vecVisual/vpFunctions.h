@@ -24,4 +24,6 @@ void readVPTrainSentences(char*);
 // Reading the visual features
 void readVPVisualFeatures(char*);
 
+// Clustering the visual features for the task
+void clusterVPVisualFeatures(int, char*);
 #endif

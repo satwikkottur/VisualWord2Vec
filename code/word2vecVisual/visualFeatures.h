@@ -16,6 +16,7 @@
 # include "structs.h"
 # include "macros.h"
 # include "helperFunctions.h"
+# include "refineFunctions.h"
 
 // Declaring the extern variables allowing separation of code
 extern long long vocab_size, layer1_size;
