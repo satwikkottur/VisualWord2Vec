@@ -15,6 +15,7 @@
 # include <yael/machinedeps.h>
 # include "structs.h"
 # include "macros.h"
+# include "helperFunctions.h"
 
 // Declaring the extern variables allowing separation of code
 extern long long vocab_size, layer1_size;
@@ -44,9 +45,6 @@ void readFeatureFile(char*);
 
 // Reading the cluster id file
 void readClusterIdFile(char*);
-
-// Multi character spliting
-char* multi_tok(char*, char*);
 
 // Function to refine the network through clusters
 void refineNetwork();
@@ -130,11 +128,6 @@ void computeMultiTestValScores(struct prsTuple*, long, float, float*);
 float* computeMAP(float*, struct prsTuple*, long);
 // Computing the mean AP and basic precision, with a permutation specified
 float* computePermuteMAP(float*, struct prsTuple*, int*, long);
-// Saving the word2vec vectors for further use
-void saveWord2Vec(char*);
-// Loading the word2vec vectors for further use
-void loadWord2Vec(char*);
-
 /*****************************************/
 // Visualization and qualitative analysis
 // Get the best test tuples with maximum improvement

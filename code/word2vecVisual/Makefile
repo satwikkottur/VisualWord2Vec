@@ -10,9 +10,9 @@ BIN = bin/
 
 #all: visualFeatures word2vec
 #	$(CC) visualFeatures.o word2vec.o -o word2vec $(CFLAGS)
-all: word2vec visualFeatures debugFunctions vpFunctions
+all: word2vec visualFeatures debugFunctions vpFunctions helperFunctions
 	$(MOVE)
-	$(CC) $(BIN)word2vec.o $(BIN)visualFeatures.o $(BIN)debugFunctions.o $(BIN)vpFunctions.o -o $(BIN)word2vec $(CFLAGS)
+	$(CC) $(BIN)word2vec.o $(BIN)visualFeatures.o $(BIN)debugFunctions.o $(BIN)vpFunctions.o $(BIN)helperFunctions.o -o $(BIN)word2vec $(CFLAGS)
 word2vec : word2vec.c
 	$(CC) -c word2vec.c $(CFLAGS)
 visualFeatures : visualFeatures.c
@@ -21,6 +21,8 @@ debugFunctions : debugFunctions.c
 	$(CC) -c debugFunctions.c $(CFLAGS)
 vpFunctions : vpFunctions.c
 	$(CC) -c vpFunctions.c $(CFLAGS)
+helperFunctions : helperFunctions.c
+	$(CC) -c helperFunctions.c $(CFLAGS)
 
 run:
 	make

@@ -1,7 +1,7 @@
 % Script to get the features from abstract dataset, concatenate all the feature files
 
 dataPath = '/home/satwik/AbstractScenes_v1.1/VisualFeatures/';
-savePath = '/home/satwik/VisualWord2Vec/data/abstract_features_again.txt';
+savePath = '/home/satwik/VisualWord2Vec/data/abstract_features.txt';
 
 % Get the listing of the feature files
 listing = dir(fullfile(dataPath, '*.txt'));
@@ -25,6 +25,12 @@ end
 features = horzcat(features{1:noFeatFiles});
 noTrain = size(features, 1);
 noDims = size(features, 2);
+
+% Four sentences are empty, find their indices and remove them from the features before sving
+load();
+
+toRemove = [];
+features(toRemove) = [];
 
 % Save the features to txt file
 % First line is number of features

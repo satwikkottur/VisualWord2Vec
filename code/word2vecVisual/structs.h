@@ -41,7 +41,10 @@ struct trainSent{
     int count;
 
     // indices of the words recognized in the curent vocab
-    long* ind;
+    long* index;
+
+    // Training visual feature used for clustering
+    float* vFeat;
 };
 
 #endif

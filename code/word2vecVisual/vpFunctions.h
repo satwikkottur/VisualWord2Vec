@@ -12,8 +12,12 @@
 
 # include "structs.h"
 # include "macros.h"
+# include "helperFunctions.h"
+//*********************************************//
+//// Functions from original word2vec
+int SearchVocab(char* word);
 
-
+//*********************************************//
 // Reading the training sentences
 void readVPTrainSentences(char*);
 

@@ -27,6 +27,7 @@
 # include "visualFeatures.h"
 # include "debugFunctions.h"
 # include "vpFunctions.h"
+# include "helperFunctions.h"
 /***********************************************************************************/
 // Extern variables
 extern float prevTestAcc, prevValAcc;
@@ -706,8 +707,11 @@ void commonSenseWrapper(){
 // Function for visual paraphrase task
 void visualParaphraseWrapper(){
     // Reading the file for training
-    char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_sentences_lemma.txt";
-    char visualPath[] = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+    char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_debug.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_full.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_sentences_lemma.txt";
+    //char visualPath[] = "/home/satwik/VisualWord2Vec/data/abstract_features_train.txt";
+    char visualPath[] = "/home/satwik/VisualWord2Vec/data/abstract_features_debug.txt";
 
     // Loading word2vec file (from Xiao's baseline)
     char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
@@ -716,6 +720,8 @@ void visualParaphraseWrapper(){
     // Reading for the word features and visual features
     readVPTrainSentences(featurePath);
     readVPVisualFeatures(visualPath);
+    // Tokenizing the training sentences
+    tokenizeTrainSentences();
     return;
 }
 
