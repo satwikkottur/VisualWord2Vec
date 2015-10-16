@@ -4,7 +4,7 @@
 // Globals for the current scope
 long noTrainVP = 0;
 int vpFeatSize = 0;
-struct Sentence* train;
+struct Sentence* trainSents;
 
 /***************************************************/
 // Read the sentences
@@ -44,6 +44,9 @@ struct Sentence** readSentences(char* featurePath, long* noSents){
 
         // Assign other members as needed
         collection[i].embed = NULL;
+
+        // Assign some gt
+        collection[i].gt = -1;
     }
     // Store the number of sentences
     *noSents = sentCount;
@@ -176,7 +179,7 @@ void computeSentenceEmbeddings(struct Sentence* collection, long noSents){
 void readVPTrainSentences(char* featurePath){
     long noSents = 0;
     // Use readSentences
-    train = *readSentences(featurePath, &noSents);
+    trainSents = *readSentences(featurePath, &noSents);
 
     if(noTrainVP != 0){
         if(noTrainVP != noSents){
@@ -205,14 +208,14 @@ void readVPVisualFeatures(char* visualPath){
     float feature;
     while(fscanf(filePt, "%f", &feature) != EOF){
         // Allocate memory
-        train[noLines].vFeat = (float*) malloc(sizeof(float) * featDim);
+        trainSents[noLines].vFeat = (float*) malloc(sizeof(float) * featDim);
        
         // First entry
-        train[noLines].vFeat[0] = feature;
+        trainSents[noLines].vFeat[0] = feature;
 
         for (i = 1; i < featDim; i++){
             fscanf(filePt, "%f", &feature);
-            train[noLines].vFeat[i] = feature;
+            trainSents[noLines].vFeat[i] = feature;
         }
     
         noLines++;
@@ -233,14 +236,14 @@ void readVPVisualFeatures(char* visualPath){
 // Function to tokenize the training sentences and link to word2vec vocab
 void tokenizeTrainSentences(){
     // Use tokenizeSentences
-    tokenizeSentences(train, noTrainVP);
+    tokenizeSentences(trainSents, noTrainVP);
 
     // Debug
     /*long i, j;
     for (i = 0; i < noTrainVP; i++){
         printf("%s\n", train[i].sent);
         for (j = 0; j < train[i].count; j++){
-            printf("%ld ", train[i].index[j]);
+            printf("%ld ", trainSents[i].index[j]);
         }
         printf("\n");
     }*/
@@ -294,7 +297,7 @@ void clusterVPVisualFeatures(int clusters, char* savePath){
     for (i = 0; i < n; i++){
         offset = i * d;
         for(j = 0; j < d; j++)
-            v[offset + j] = (float) train[i].vFeat[j];
+            v[offset + j] = (float) trainSents[i].vFeat[j];
     }
     
     /* variables are allocated externaly */
@@ -313,11 +316,11 @@ void clusterVPVisualFeatures(int clusters, char* savePath){
     
     // Write the cluster ids to the prsTuple structure
     for (i = 0; i < n; i++)
-        train[i].cId = assign[i] + 1;
+        trainSents[i].cId = assign[i] + 1;
     
-    // Debugging the cId for the train tuples
+    // Debugging the cId for the trainSents tuples
     /*for (i = 0; i < n; i++)
-     printf("%i\n", train[i].cId);*/
+     printf("%i\n", trainSents[i].cId);*/
 
      // Write the clusters to a file, if non-empty
     if(savePath != NULL){
@@ -332,7 +335,7 @@ void clusterVPVisualFeatures(int clusters, char* savePath){
         // Save the cluster ids
         int i;
         for (i = 0; i < noTrainVP; i++)
-            fprintf(filePtr, "%d %f\n", train[i].cId, dis[i]);
+            fprintf(filePtr, "%d %f\n", trainSents[i].cId, dis[i]);
 
         // Close the file
         fclose(filePtr); 
@@ -366,19 +369,19 @@ void refineNetworkVP(){
         // printf("Training %ld instance ....\n", i);
         
         // Checking possible fields to avoid segmentation error
-        if(train[i].cId < 1 || train[i].cId > noClusters) {
-            printf("\nCluster id (%d) for %ld instance invalid!\n", train[i].cId, i);
+        if(trainSents[i].cId < 1 || trainSents[i].cId > noClusters) {
+            printf("\nCluster id (%d) for %ld instance invalid!\n", trainSents[i].cId, i);
             exit(1);
         }
 
         // Now collecting words for training
         wordCount = 0;
         
-        for(c = 0; c < train[i].count; c++){
+        for(c = 0; c < trainSents[i].count; c++){
             // If not in vocab, continue
-            if(train[i].index[c] == -1) continue;
+            if(trainSents[i].index[c] == -1) continue;
 
-            wordList[wordCount] = train[i].index[c];
+            wordList[wordCount] = trainSents[i].index[c];
             // Getting the actual count of words
             wordCount++;
         }
@@ -386,7 +389,12 @@ void refineNetworkVP(){
         computeMultinomialPhrase(y, wordList, wordCount);
         
         // Propage the error the embeddings
-        updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
+        updateWeightsPhrase(y, wordList, wordCount, trainSents[i].cId);
     }
 }
 
+void testing(){
+    computeSentenceEmbeddings(trainSents, noTrainVP);
+
+    setupTrainFrameWork();
+}

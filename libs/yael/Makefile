@@ -2,7 +2,7 @@
 
 include makefile.inc
 
-CC=gcc 
+CC=g++
 
 
 ALLDIRS=yael progs

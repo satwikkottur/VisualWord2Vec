@@ -14,6 +14,7 @@
 # include "macros.h"
 # include "helperFunctions.h"
 # include "refineFunctions.h"
+# include "liblinearWrapper.h" 
 //*********************************************//
 //// Functions from original word2vec
 int SearchVocab(char* word);
@@ -57,4 +58,6 @@ void writeVPSentenceEmbeddings();
 //*********************************************//
 // Refine the network for the VP task
 void refineNetworkVP();
+
+void testing();
 #endif

@@ -46,6 +46,9 @@ struct Sentence{
     float* vFeat;
     // Cluster Id for the feature
     int cId;
+    // Ground truth whether the sentence/corresponding is truth or not
+    int gt;
+
     // Embeddings for the sentence
     float* embed;
 };

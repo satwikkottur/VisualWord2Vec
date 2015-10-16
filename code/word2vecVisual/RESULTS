@@ -230,5 +230,5 @@ Wikipedia text training
 ================================================
 VP task:
 Baseline text accuracies : 94.55, 94.60, 94.38, 94.38, 94.54
-VisualWord2Vec: 
+VisualWord2Vec: 94.67
 ================================================

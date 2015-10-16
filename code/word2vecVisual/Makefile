@@ -1,9 +1,14 @@
-CC = gcc
+CC = @gcc
 #Using -Ofast instead of -O3 might result in faster code, but is supported only by newer GCC versions
 #CFLAGS = -lm -pthread -O3 -march=native -Wall -funroll-loops -Wno-unused-result
+# Liblinear path
+LINEARPATH=/home/satwik/VisualWord2Vec/libs/liblinear-1.94/
+LIBLINEAR=$(LINEARPATH)linear.o $(LINEARPATH)tron.o $(LINEARPATH)blas/blas.a
+BLAS=$(LINEARPATH)blas/blas.a
+
 YAEL = -I /home/satwik/VisualWord2Vec/libs/yael -L /home/satwik/VisualWord2Vec/libs/yael/yael -lyael
 
-CFLAGS = -lm -pthread -O3 -march=native -Wall -funroll-loops -Wno-unused-value $(YAEL)
+CFLAGS = -lm -pthread -O3 -march=native -Wall -lstdc++ -funroll-loops -Wno-unused-value $(YAEL) 
 
 MOVE=mv *.o $(BIN)
 BIN = bin/
@@ -12,8 +17,8 @@ BIN = bin/
 #	$(CC) visualFeatures.o word2vec.o -o word2vec $(CFLAGS)
 all: project
 
-project: $(BIN)word2vec.o $(BIN)visualFeatures.o $(BIN)debugFunctions.o $(BIN)vpFunctions.o $(BIN)helperFunctions.o $(BIN)refineFunctions.o
-	$(CC) $(BIN)word2vec.o $(BIN)visualFeatures.o $(BIN)debugFunctions.o $(BIN)vpFunctions.o $(BIN)helperFunctions.o $(BIN)refineFunctions.o -o $(BIN)word2vec $(CFLAGS)
+project: $(BIN)word2vec.o $(BIN)visualFeatures.o $(BIN)debugFunctions.o $(BIN)vpFunctions.o $(BIN)helperFunctions.o $(BIN)refineFunctions.o $(BIN)liblinearWrapper.o $(LIBLINEAR)
+	$(CC) $(BIN)word2vec.o $(BIN)visualFeatures.o $(BIN)debugFunctions.o $(BIN)vpFunctions.o $(BIN)helperFunctions.o $(BIN)refineFunctions.o $(BIN)liblinearWrapper.o $(LIBLINEAR) -o $(BIN)word2vec $(CFLAGS)
 $(BIN)word2vec.o : word2vec.c
 	$(CC) -c word2vec.c -o $(BIN)word2vec.o $(CFLAGS)
 $(BIN)visualFeatures.o : visualFeatures.c
@@ -26,6 +31,8 @@ $(BIN)helperFunctions.o : helperFunctions.c
 	$(CC) -c helperFunctions.c -o $(BIN)helperFunctions.o $(CFLAGS)
 $(BIN)refineFunctions.o : refineFunctions.c
 	$(CC) -c refineFunctions.c -o $(BIN)refineFunctions.o $(CFLAGS)
+$(BIN)liblinearWrapper.o : liblinearWrapper.c
+	$(CC) -c liblinearWrapper.c -o $(BIN)liblinearWrapper.o $(CFLAGS) $(BLAS)
 
 run:
 	make
