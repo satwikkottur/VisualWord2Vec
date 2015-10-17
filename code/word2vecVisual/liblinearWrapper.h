@@ -31,6 +31,8 @@ void setupTrainFrameWork();
 void createProblem(struct Sentence*, long);
 // Modifying the problem
 void modifyProblem(struct Sentence*, long);
+// Creating the parameters
+void createParameter();
 // Create each training instance
 struct feature_node* createFeatureNodeList(struct Sentence, int);
 # endif
