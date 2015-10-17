@@ -14,7 +14,7 @@
 // Hence, written as a separate file
 
 extern struct featureWord* featHashWords;
-extern struct prsTuple* train;
+extern struct prsTuple* trainTuples;
 extern long noTrain;
 extern int noCluster;
 extern int visualFeatSize;

@@ -396,5 +396,5 @@ void refineNetworkVP(){
 void testing(){
     computeSentenceEmbeddings(trainSents, noTrainVP);
 
-    setupTrainFrameWork();
+    performVPTask();
 }

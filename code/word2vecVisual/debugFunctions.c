@@ -7,9 +7,9 @@ void debugVisualFeatureRead(char* fileName){
     int i, j;
     for(i = 0; i < noTrain; i++){
         for(j = 0; j < visualFeatSize-1; j++)
-            fprintf(filePt, "%f ", train[i].feat[j]);
+            fprintf(filePt, "%f ", trainTuples[i].feat[j]);
        
-        fprintf(filePt, "%f\n", train[i].feat[visualFeatSize-1]);
+        fprintf(filePt, "%f\n", trainTuples[i].feat[visualFeatSize-1]);
     }
 
     fclose(filePt);
@@ -21,9 +21,9 @@ void debugPRSFeatureRead(char* fileName){
     // Debugging by saving the PRS back into file and manually checking
     long i;
     for(i = 0; i < noTrain; i++){
-        fprintf(filePt, "<%s:%s:%s>\n", featHashWords[train[i].p].str, 
-                                        featHashWords[train[i].s].str,
-                                        featHashWords[train[i].r].str);
+        fprintf(filePt, "<%s:%s:%s>\n", featHashWords[trainTuples[i].p].str, 
+                                        featHashWords[trainTuples[i].s].str,
+                                        featHashWords[trainTuples[i].r].str);
     }
 
     fclose(filePt);

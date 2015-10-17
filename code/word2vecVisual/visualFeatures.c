@@ -18,7 +18,7 @@ int verbose = 0; // Printing which function is being executed
 int visualFeatSize = 0; // Size of the visual features used
 float prevValAcc = 0, prevTestAcc = 0;
 
-struct prsTuple *train, *test, *val;
+struct prsTuple *trainTuples, *test, *val;
 float *syn0P, *syn0S, *syn0R;
 float *syn1P, *syn1S, *syn1R;
 
@@ -51,14 +51,14 @@ void readFeatureFile(char* filePath){
         noTuples = forcedTrainSize;
 
     // Initialize and save the feature words
-    train = (struct prsTuple*) malloc(sizeof(struct prsTuple) * noTuples);
+    trainTuples = (struct prsTuple*) malloc(sizeof(struct prsTuple) * noTuples);
     // Read and store the contents
     for(i = 0; i < noTuples; i++){
         if(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]>\n", pWord, sWord, rWord) != EOF){
             // Getting the indices for p, s, r
-            train[i].p = addFeatureWord(pWord);
-            train[i].r = addFeatureWord(rWord);
-            train[i].s = addFeatureWord(sWord);
+            trainTuples[i].p = addFeatureWord(pWord);
+            trainTuples[i].r = addFeatureWord(rWord);
+            trainTuples[i].s = addFeatureWord(sWord);
         }
     }
 
@@ -87,7 +87,7 @@ void readClusterIdFile(char* clusterPath){
     int i = 0, clusterId;
     while(fscanf(filePt, "%d\n", &clusterId) != EOF){
         //if(train[i].cId == -1) train[i].cId = clusterId;
-        train[i].cId = clusterId;
+        trainTuples[i].cId = clusterId;
         i++;
     }
 
@@ -123,14 +123,14 @@ void readVisualFeatureFile(char* fileName){
 
     // Reading till EOF
     while(fscanf(filePt, "%f", &feature) != EOF){
-        train[noLines].feat = (float*) malloc(sizeof(float) * visualFeatSize);
+        trainTuples[noLines].feat = (float*) malloc(sizeof(float) * visualFeatSize);
         // Save the already read feature
-        train[noLines].feat[0] = feature;
+        trainTuples[noLines].feat[0] = feature;
 
         for(i = 1; i < visualFeatSize; i++){
             //printf("%f ", feature);
             fscanf(filePt, "%f", &feature);
-            train[noLines].feat[i] = feature;
+            trainTuples[noLines].feat[i] = feature;
         }
         //printf("%f\n", feature);
 
@@ -278,15 +278,15 @@ void refineNetwork(){
         //printf("Training %lld instance ....\n", i);
         
         // Checking possible fields to avoid segmentation error
-        if(train[i].cId < 1 || train[i].cId > noClusters) {
-            printf("\nCluster id (%d) for %lld instance invalid!\n", train[i].cId, i);
+        if(trainTuples[i].cId < 1 || trainTuples[i].cId > noClusters) {
+            printf("\nCluster id (%d) for %lld instance invalid!\n", trainTuples[i].cId, i);
             exit(1);
         }
 
         //printf("Counts : %d %d %d\n", train[i].p.count, train[i].s.count, train[i].r.count);
 
         // Updating the weights for P
-        p = featHashWords[train[i].p];
+        p = featHashWords[trainTuples[i].p];
         for(c = 0; c < p.count; c++){
             // If not in vocab, continue
             if(p.index[c] == -1) continue;
@@ -295,11 +295,11 @@ void refineNetwork(){
             // Predict the cluster
             computeMultinomial(y, p.index[c]);
             // Propage the error to the PRS features
-            updateWeights(y, p.index[c], train[i].cId);
+            updateWeights(y, p.index[c], trainTuples[i].cId);
         }
         
         // Updating the weights for S
-        s = featHashWords[train[i].s];
+        s = featHashWords[trainTuples[i].s];
         for(c = 0; c < s.count; c++){
             // If not in vocab, continue
             if(s.index[c] == -1) continue;
@@ -308,11 +308,11 @@ void refineNetwork(){
             // Predict the cluster
             computeMultinomial(y, s.index[c]);
             // Propage the error to the PRS features
-            updateWeights(y, s.index[c], train[i].cId);
+            updateWeights(y, s.index[c], trainTuples[i].cId);
         }
 
         // Updating the weights for R
-        r = featHashWords[train[i].r];
+        r = featHashWords[trainTuples[i].r];
         for(c = 0; c < r.count; c++){
             // If not in vocab, continue
             if(r.index[c] == -1) continue;
@@ -321,7 +321,7 @@ void refineNetwork(){
             // Predict the cluster
             computeMultinomial(y, r.index[c]);
             // Propage the error to the PRS features
-            updateWeights(y, r.index[c], train[i].cId);
+            updateWeights(y, r.index[c], trainTuples[i].cId);
         }
     }
 }
@@ -344,15 +344,15 @@ void refineMultiNetwork(){
         //    printf("Training %lld instance ....\n", i);
         
         // Checking possible fields to avoid segmentation error
-        if(train[i].cId < 1 || train[i].cId > noClusters) {
-            printf("\nCluster id (%d) for %lld instance invalid!\n", train[i].cId, i);
+        if(trainTuples[i].cId < 1 || trainTuples[i].cId > noClusters) {
+            printf("\nCluster id (%d) for %lld instance invalid!\n", trainTuples[i].cId, i);
             exit(1);
         }
 
         //printf("Counts : %d %d %d\n", train[i].p.count, train[i].s.count, train[i].r.count);
 
         // Updating the weights for P
-        p = featHashWords[train[i].p];
+        p = featHashWords[trainTuples[i].p];
         for(c = 0; c < p.count; c++){
             // If not in vocab, continue
             if(p.index[c] == -1) continue;
@@ -365,11 +365,11 @@ void refineMultiNetwork(){
             // Predict the cluster
             computeMultinomial(y, p.index[c]);
             // Propage the error to the PRS features
-            updateWeights(y, p.index[c], train[i].cId);
+            updateWeights(y, p.index[c], trainTuples[i].cId);
         }
         
         // Updating the weights for S
-        s = featHashWords[train[i].s];
+        s = featHashWords[trainTuples[i].s];
         for(c = 0; c < s.count; c++){
             // If not in vocab, continue
             if(s.index[c] == -1) continue;
@@ -382,11 +382,11 @@ void refineMultiNetwork(){
             // Predict the cluster
             computeMultinomial(y, s.index[c]);
             // Propage the error to the PRS features
-            updateWeights(y, s.index[c], train[i].cId);
+            updateWeights(y, s.index[c], trainTuples[i].cId);
         }
 
         // Updating the weights for R
-        r = featHashWords[train[i].r];
+        r = featHashWords[trainTuples[i].r];
         for(c = 0; c < r.count; c++){
             // If not in vocab, continue
             if(r.index[c] == -1) continue;
@@ -399,7 +399,7 @@ void refineMultiNetwork(){
             // Predict the cluster
             computeMultinomial(y, r.index[c]);
             // Propage the error to the PRS features
-            updateWeights(y, r.index[c], train[i].cId);
+            updateWeights(y, r.index[c], trainTuples[i].cId);
         }
     }
 }
@@ -423,15 +423,15 @@ void refineNetworkPhrase(){
         //printf("Training %lld instance ....\n", i);
         
         // Checking possible fields to avoid segmentation error
-        if(train[i].cId < 1 || train[i].cId > noClusters) {
-            printf("\nCluster id (%d) for %lld instance invalid!\n", train[i].cId, i);
+        if(trainTuples[i].cId < 1 || trainTuples[i].cId > noClusters) {
+            printf("\nCluster id (%d) for %lld instance invalid!\n", trainTuples[i].cId, i);
             exit(1);
         }
 
         // Now collecting words for training
         /*****************************************/
         // Updating the weights for P
-        p = featHashWords[train[i].p];
+        p = featHashWords[trainTuples[i].p];
         wordCount = 0;
         
         for(c = 0; c < p.count; c++){
@@ -445,10 +445,10 @@ void refineNetworkPhrase(){
         // Predict the cluster
         computeMultinomialPhrase(y, wordList, wordCount);
         // Propage the error the embeddings
-        updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
+        updateWeightsPhrase(y, wordList, wordCount, trainTuples[i].cId);
         /*****************************************/
         // Updating the weights for S
-        s = featHashWords[train[i].s];
+        s = featHashWords[trainTuples[i].s];
         wordCount = 0;
         
         for(c = 0; c < s.count; c++){
@@ -462,10 +462,10 @@ void refineNetworkPhrase(){
         // Predict the cluster
         computeMultinomialPhrase(y, wordList, wordCount);
         // Propage the error the embeddings
-        updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
+        updateWeightsPhrase(y, wordList, wordCount, trainTuples[i].cId);
         /*****************************************/
         // Updating the weights for R
-        r = featHashWords[train[i].r];
+        r = featHashWords[trainTuples[i].r];
         wordCount = 0;
         
         for(c = 0; c < r.count; c++){
@@ -479,7 +479,7 @@ void refineNetworkPhrase(){
         // Predict the cluster
         computeMultinomialPhrase(y, wordList, wordCount);
         // Propage the error the embeddings
-        updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
+        updateWeightsPhrase(y, wordList, wordCount, trainTuples[i].cId);
         /*****************************************/
     }
 }
@@ -503,8 +503,8 @@ void refineMultiNetworkPhrase(){
         //printf("Training %lld instance ....\n", i);
         
         // Checking possible fields to avoid segmentation error
-        if(train[i].cId < 1 || train[i].cId > noClusters) {
-            printf("\nCluster id (%d) for %lld instance invalid!\n", train[i].cId, i);
+        if(trainTuples[i].cId < 1 || trainTuples[i].cId > noClusters) {
+            printf("\nCluster id (%d) for %lld instance invalid!\n", trainTuples[i].cId, i);
             exit(1);
         }
 
@@ -533,7 +533,7 @@ void refineMultiNetworkPhrase(){
         updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
         //==========================================================
         // Updating the weights for S
-        s = featHashWords[train[i].s];
+        s = featHashWords[trainTuples[i].s];
         wordCount = 0;
         
         for(c = 0; c < s.count; c++){
@@ -550,10 +550,10 @@ void refineMultiNetworkPhrase(){
         // Predict the cluster
         computeMultinomialPhrase(y, wordList, wordCount);
         // Propage the error the embeddings
-        updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
+        updateWeightsPhrase(y, wordList, wordCount, trainTuples[i].cId);
         //==========================================================*/
         // Updating the weights for R
-        r = featHashWords[train[i].r];
+        r = featHashWords[trainTuples[i].r];
         wordCount = 0;
         
         for(c = 0; c < r.count; c++){
@@ -570,7 +570,7 @@ void refineMultiNetworkPhrase(){
         // Predict the cluster
         computeMultinomialPhrase(y, wordList, wordCount);
         // Propage the error the embeddings
-        updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
+        updateWeightsPhrase(y, wordList, wordCount, trainTuples[i].cId);
         /*****************************************/
     }
 }
@@ -960,7 +960,7 @@ void clusterVisualFeatures(int clusters, char* savePath){
     for (i = 0; i < n; i++){
         offset = i * d;
         for(j = 0; j < d; j++)
-            v[offset + j] = (float) train[i].feat[j];
+            v[offset + j] = (float) trainTuples[i].feat[j];
     }
     
     /* variables are allocated externaly */
@@ -979,7 +979,7 @@ void clusterVisualFeatures(int clusters, char* savePath){
     
     // Write the cluster ids to the prsTuple structure
     for (i = 0; i < n; i++)
-        train[i].cId = assign[i] + 1;
+        trainTuples[i].cId = assign[i] + 1;
     
     // Debugging the cId for the train tuples
     /*for (i = 0; i < n; i++)
@@ -998,7 +998,7 @@ void clusterVisualFeatures(int clusters, char* savePath){
         // Save the cluster ids
         int i;
         for (i = 0; i < noTrain; i++)
-            fprintf(filePtr, "%d %f\n", train[i].cId, dis[i]);
+            fprintf(filePtr, "%d %f\n", trainTuples[i].cId, dis[i]);
 
         // Close the file
         fclose(filePtr); 
@@ -1422,13 +1422,13 @@ void computeTestValScores(struct prsTuple* holder, long noInst, float threshold,
         // For each training instance, find score, ReLU and max
         for(b = 0; b < noTrain; b++){
             // Get P score
-            pScore = cosDist[featVocabSize * train[b].p + holder[a].p];
+            pScore = cosDist[featVocabSize * trainTuples[b].p + holder[a].p];
             
             // Get R score
-            rScore = cosDist[featVocabSize * train[b].r + holder[a].r];
+            rScore = cosDist[featVocabSize * trainTuples[b].r + holder[a].r];
             
             // Get S score
-            sScore = cosDist[featVocabSize * train[b].s + holder[a].s];
+            sScore = cosDist[featVocabSize * trainTuples[b].s + holder[a].s];
            
             // ReLU
             curScore = pScore + rScore + sScore - threshold;
@@ -1456,13 +1456,13 @@ void computeMultiTestValScores(struct prsTuple* holder, long noInst, float thres
         // For each training instance, find score, ReLU and max
         for(b = 0; b < noTrain; b++){
             // Get P score
-            pScore = cosDistP[featVocabSize * train[b].p + holder[a].p];
+            pScore = cosDistP[featVocabSize * trainTuples[b].p + holder[a].p];
             
             // Get R score
-            rScore = cosDistR[featVocabSize * train[b].r + holder[a].r];
+            rScore = cosDistR[featVocabSize * trainTuples[b].r + holder[a].r];
             
             // Get S score
-            sScore = cosDistS[featVocabSize * train[b].s + holder[a].s];
+            sScore = cosDistS[featVocabSize * trainTuples[b].s + holder[a].s];
            
             // ReLU
             curScore = pScore + rScore + sScore - threshold;

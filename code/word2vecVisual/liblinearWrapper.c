@@ -4,12 +4,14 @@
 // Define the problem
 
 // Define the training and test points
-struct feature_node** trainNodes, **testNodes;
+struct feature_node** testNodes; // storing test instances for liblinear
+int* gtTest; // Ground truth for the test instances
+long noTestInst; // Number of test instances
 struct problem* curProblem = NULL; // Current probem to solve using svm
 struct parameter* curParam = NULL; // Current parameters for traing svm
 
 // Setting up the whole framework for liblinear SVMs
-void setupTrainFrameWork(){
+void performVPTask(){
     // Create the problem from the data
     createProblem(trainSents, noTrainVP);
 
@@ -26,11 +28,27 @@ void setupTrainFrameWork(){
         printf("\nParameters validated!\n");
 
     // Train the SVM
-    train(curProblem, curParam);
+    struct model* trainedModel = train(curProblem, curParam);
     printf("Trained model\n");
 
-    // Cross validate the SVM
+    // Find the best parameter C using cross-validation
+    double bestAcc, bestC;
+    double startC = 0.0001;
+    double maxC = 1;
+    int noFolds = 5;
+    find_parameter_C(curProblem, curParam, noFolds, startC, maxC, &bestAcc, &bestC);
+    printf("Best C: %f\nBest Acc:%f\n", bestC, bestAcc);
 
+    // Test for instances
+    float accuracy = computeAccuracy(trainedModel, curProblem->x, curProblem->y, curProblem->l);
+    //float accuracy = computeAccuracy(trainedModel, testNodes, gtTest, noTestInst);
+    
+
+    // Free the memory
+    free_and_destroy_model(&trainedModel);
+    free(curParam);
+    free(curProblem);
+    //free(testNodes);
 }
 
 // Creating the problem structure for liblinear
@@ -50,7 +68,7 @@ void createProblem(struct Sentence* trainInsts, long noTrain){
         curProblem->x[i] = createFeatureNodeList(trainInsts[i], vpFeatSize);
         
         // store the class for each point
-        curProblem->y[i] = 1;//(double)(i%2); // Assign random gt
+        curProblem->y[i] = (i%2);//(double)(i%2); // Assign random gt
         //curProblem->y[i] = trainInsts[i].gt;
     }
 }
@@ -89,4 +107,26 @@ struct feature_node* createFeatureNodeList(struct Sentence sent, int featSize){
     featList[featSize].index = -1;
 
     return featList;
+}
+
+// Computing the accuracy for the test set, given the model
+float computeAccuracy(struct model* trainedModel, struct feature_node** insts, int* gt, long noInsts){
+    // Initialize accuracy
+    //float accuracy;
+    int noCorrect = 0;
+    float predictClass;
+    double score;
+    // Loop through all the instances and predict
+    long i;
+    for(i = 0; i < noInsts; i++){
+        // Predict the class
+        predict_values(trainedModel, insts[i], &score);
+        printf("%f\n", score);
+
+        // Compute accuracy
+        //if(gt[i] == predictClass) noCorrect++;
+    }
+
+    //return (float)noCorrect/noInsts;
+    return 1.0;
 }
