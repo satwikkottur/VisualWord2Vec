@@ -146,6 +146,7 @@ void writeSentenceEmbeddings(char* saveName, struct Sentence* collection, long n
 // Compute the sentence embeddings
 // Mean of the embeddings of all the words that are present in the vocab
 void computeSentenceEmbeddings(struct Sentence* collection, long noSents){
+    printf("\nComputing the sentence embeddings!\n");
     float* mean = (float*) calloc(layer1_size, sizeof(float));
     long i, w, d, offset;
 
@@ -238,8 +239,6 @@ void readVPAbstractVisualFeatures(char* visualPath){
     fclose(filePt);
 }
 
-// Read other features for vp sentences
-
 // Function to tokenize the training sentences and link to word2vec vocab
 void tokenizeTrainSentences(){
     // Use tokenizeSentences
@@ -291,15 +290,15 @@ void writeVPSentenceEmbeddings(){
 void readVPSentences(){
     // First read the sentences
     // Path to the sentences_1
-    char readSent1[] = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma.txt";
+    char readSent1[] = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma_debug.txt";
     // Path to the sentences_2
-    char readSent2[] = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma.txt";
+    char readSent2[] = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma_debug.txt";
     
     // read sentences
     long noSents1, noSents2;
     sentences1 = *readSentences(readSent1, &noSents1);
     sentences2 = *readSentences(readSent2, &noSents2);
-    printf("Sentences for VP read!\n");
+    printf("\nSentences for VP read!\n");
     if(noSents1 != noSents2){
         printf("Number of sentences dont match!\n");
         exit(1);
@@ -312,36 +311,38 @@ void readVPSentences(){
 
     // Read the features
     readVPSentenceFeatures();
-
-    // Get the word2vec features as well
-
-    // Populate the SentencePair struct
-    long i;
-    sentPairs = (struct SentencePair*) malloc(sizeof(struct SentencePair) * noSents1);
-    for (i = 0; i < noSents1, i++){
-        sentPairs[i].sent1 = &sentences1[i];
-        sentPairs[i].sent2 = &sentences2[i]; 
-
-        // Features
-    }
 }
 
+// Reading the features
 void readVPSentenceFeatures(){
+    printf("\nReading other features for the sentences!\n");
     // Files for co-occurance features
-    char cocFeat1[] = "/home/satwik/VisualWord2Vec/data/vp_feature_coc_1.txt";
-    char cocFeat2[] = "/home/satwik/VisualWord2Vec/data/vp_feature_coc_2.txt";
+    char cocFeat1[] = "/home/satwik/VisualWord2Vec/data/vp_features_coc_1_debug.txt";
+    char cocFeat2[] = "/home/satwik/VisualWord2Vec/data/vp_features_coc_2_debug.txt";
 
     // Files for total frequency features
-    char tfFeat1[] = "/home/satwik/VisualWord2Vec/data/vp_feature_tf_1.txt";
-    char tfFeat2[] = "/home/satwik/VisualWord2Vec/data/vp_feature_tf_2.txt";
+    char tfFeat1[] = "/home/satwik/VisualWord2Vec/data/vp_features_tf_1_debug.txt";
+    char tfFeat2[] = "/home/satwik/VisualWord2Vec/data/vp_features_tf_2_debug.txt";
+
+    // Also read the ground truth file, test/train split
+    char gtPath[] = "/home/satwik/VisualWord2Vec/data/vp_ground_truth_debug.txt";
+    char splitPath[] = "/home/satwik/VisualWord2Vec/data/vp_split_debug.txt";
+    FILE* gtFile = fopen(gtPath, "rb");
 
     // Read the dimensions and check for match in both the cases
-    FILE* cocFile1 = fopen(cocFeat1, "wb");
-    FILE* cocFile2 = fopen(cocFeat2, "wb");
-    FILE* tfFile1 = fopen(tfFeat1, "wb");
-    FILE* tfFile2 = fopen(tfFeat2, "wb");
+    FILE* cocFile1 = fopen(cocFeat1, "rb");
+    FILE* cocFile2 = fopen(cocFeat2, "rb");
+    FILE* tfFile1 = fopen(tfFeat1, "rb");
+    FILE* tfFile2 = fopen(tfFeat2, "rb");
 
-    int featDim11, featDim21, featDim12, featDim22;
+    // Checking for sanity
+    if(cocFile1 == NULL || cocFile2 == NULL || 
+        tfFile1 == NULL || tfFile2 == NULL || gtFile == NULL){
+        printf("\nFiles dont exist to read the features!\n");
+        exit(1);
+    }
+
+    int featDim11 = 1, featDim21 = 2, featDim12 = 3, featDim22 = 4;
     fscanf(cocFile1, "%d\n", &featDim11);
     fscanf(cocFile2, "%d\n", &featDim12);
     fscanf(tfFile1, "%d\n", &featDim21);
@@ -349,11 +350,12 @@ void readVPSentenceFeatures(){
 
     // Reading the dimensions
     if(featDim11 != featDim12 || featDim21 != featDim22){
-        printf("Feature dimensions dont match ! \n");
+        printf("Feature dimensions dont match !\n(%d, %d), (%d, %d)\n", 
+                                    featDim12, featDim11, featDim21, featDim22);
         exit(1);
     }
     else{
-        printf("Features of size : %d %d read!\n", featDim11, featDim22);
+        printf("\nFeatures of size : %d %d read!\n", featDim11, featDim22);
     }
 
     long i, d;
@@ -362,10 +364,8 @@ void readVPSentenceFeatures(){
     int totalFeatSize = otherFeatSize + layer1_size;
 
     // Allocate sufficient memory for each of the features
-    sentPairs = (struct SentencePair*) malloc(sizeof(struct SentencePair) * noSentPairs);
     for(i = 0; i < noSentPairs; i++){
         // Allocating memory for the features
-        sentPairs[i].feature = (float*) malloc(sizeof(float) * totalFeatSize * 2);
         sentences1[i].otherFeats = (float*) malloc(sizeof(float) * otherFeatSize);
         sentences2[i].otherFeats = (float*) malloc(sizeof(float) * otherFeatSize);
         
@@ -387,26 +387,43 @@ void readVPSentenceFeatures(){
                 sentences2[i].otherFeats[d] = feature;
         }
     }
+    
 
     // Compute the features for the sentence pairs
     sentPairs = (struct SentencePair*) malloc(sizeof(struct SentencePair) * noSentPairs);
-    long index;
+    long index = 0; 
+    int gtruth;
     for(i = 0; i < noSentPairs; i++){
         // Allocating memory for the features
         sentPairs[i].feature = (float*) malloc(sizeof(float) * totalFeatSize * 2);
+        
+        // Setting the sentence pairs
         sentPairs[i].sent1 = &sentences1[i];
         sentPairs[i].sent2 = &sentences2[i];
 
         // Haar like maps for the features
-        for(d = 0; d < otherFeatSize; d++)
+        for(d = 0; d < otherFeatSize; d++){
+            // Offset leave word2vec features space
             index = d + 2*layer1_size;
             sentPairs[i].feature[index] = sentences1[i].otherFeats[d] + 
                                         sentences2[i].otherFeats[d];
+        }
 
-        for(d = otherFeatSize; d < 2 * otherFeatSize; d++)
-            index = d + 2*layer1_size;
+        for(d = 0; d < otherFeatSize; d++){
+            // Offset to leave word2vec, otherFeatSize (sum)
+            index = d + 2*layer1_size + otherFeatSize;
             sentPairs[i].feature[index] = fabs(sentences1[i].otherFeats[d] -
                                         sentences2[i].otherFeats[d]);
+        }
+
+        // Reading the ground truth
+        fscanf(gtFile, "%d\n", &gtruth);
+        // Check for consistency
+        if(!(gtruth == 1 || gtruth == 0)){
+            printf("Ground truth unexpected!\n");
+            exit(1);
+        }
+        sentPairs[i].gt = gtruth;
     }
 
     // close the file
@@ -414,6 +431,27 @@ void readVPSentenceFeatures(){
     fclose(cocFile2);
     fclose(tfFile1);
     fclose(tfFile2);
+    fclose(gtFile);
+}
+
+// Computing the feaures for the sentences, assume the current embeddings to be updated
+void computeSentenceFeatures(){
+    printf("\nComputing the features for sentences!\n");
+    int d;
+    long i;
+    
+    // Go through all the pairs and compute the embeddings 
+    for(i = 0; i < noSentPairs; i++){
+        // Get sum features
+        for(d = 0; d < layer1_size; d++)
+            sentPairs[i].feature[d] = 
+                    sentences1[i].embed[d] + sentences2[i].embed[d];
+
+        // Get abs difference features
+        for(d = 0; d < layer1_size; d++)
+            sentPairs[i].feature[d + layer1_size] = 
+                    fabs(sentences1[i].embed[d] - sentences2[i].embed[d]);
+    }
 }
 
 // Reading all the sentences along with features
@@ -530,9 +568,19 @@ void refineNetworkVP(){
     }
 }
 
-void testing(){
-    computeSentenceEmbeddings(trainSents, noTrainVP);
+// Perform the visual paraphrasing task
+void performVPTask(){
+    // Read the sentence pairs if not read before
+    if(noSentPairs == 0)
+        readVPSentences();
+        
+    // Re-compute the embeddings for all the sentences
+    computeSentenceEmbeddings(sentences1, noSentPairs);
+    computeSentenceEmbeddings(sentences2, noSentPairs);
 
-    readVPSentences();
-    performVPTask();
+    // Re-compute features for sentence pairs
+    computeSentenceFeatures();
+
+    // Learn the model and return the accuracy
+    //learnClassificationModel();
 }

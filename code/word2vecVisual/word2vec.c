@@ -719,17 +719,17 @@ void visualParaphraseWrapper(){
 
     // Reading for the word features and visual features
     readVPTrainSentences(featurePath);
-    readVPVisualFeatures(visualPath);
-
+    readVPAbstractVisualFeatures(visualPath);
+    
     // Tokenizing the training sentences
     tokenizeTrainSentences();
 
     // Compute embeddings
-    testing();
+    performVPTask();
     return;
 
     // Clustering the visual features
-    clusterVPVisualFeatures(clusterArg, NULL);
+    clusterVPAbstractVisualFeatures(clusterArg, NULL);
 
     // Begin the refining
     int noIters;

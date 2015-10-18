@@ -25,7 +25,7 @@ extern long noTrainVP;
 
 // Setup the training, model, param and other variables liblinear expects,
 // in its format
-void performVPTask();
+void learnClassificationModel();
 // Create the problem for the training data
 void createProblem(struct Sentence*, long);
 // Modifying the problem

@@ -57,11 +57,15 @@ void clusterVPAbstractVisualFeatures(int, char*);
 // Tokenizing training sentences
 void tokenizeTrainSentences();
 
+// Computing the features for the sentences
+void computeSentenceFeatures();
+
 // Save word2vec embeddings for all the VP sentences
 void writeVPSentenceEmbeddings();
 //*********************************************//
 // Refine the network for the VP task
 void refineNetworkVP();
 
-void testing();
+// Perform the VP task
+void performVPTask();
 #endif

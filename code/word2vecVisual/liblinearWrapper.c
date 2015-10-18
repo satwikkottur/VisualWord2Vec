@@ -9,7 +9,7 @@ struct problem* curProblem = NULL; // Current probem to solve using svm
 struct parameter* curParam = NULL; // Current parameters for traing svm
 
 // Setting up the whole framework for liblinear SVMs
-void performVPTask(){
+void learnClassificationModel(){
     // Create the problem from the data
     createProblem(trainSents, noTrainVP);
 
