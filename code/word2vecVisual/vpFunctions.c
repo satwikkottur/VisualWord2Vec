@@ -4,6 +4,7 @@
 // Globals for the current scope
 long noTrainVP = 0;
 int vpFeatSize = 0;
+int otherFeatSize = 0; // The size of the other features
 struct Sentence* trainSents; // Training sentences (mixed of set1, set2 + training + gt==1)
 struct Sentence* sentences1; // Set of sentences 1
 struct Sentence* sentences2; // Set of sentences 2 
@@ -298,10 +299,12 @@ void readVPSentences(){
     long noSents1, noSents2;
     sentences1 = *readSentences(readSent1, &noSents1);
     sentences2 = *readSentences(readSent2, &noSents2);
+    printf("Sentences for VP read!\n");
     if(noSents1 != noSents2){
         printf("Number of sentences dont match!\n");
         exit(1);
     }
+    noSentPairs = noSents1;
 
     // Tokenize sentences
     tokenizeSentences(sentences1, noSents1);
@@ -325,13 +328,92 @@ void readVPSentences(){
 
 void readVPSentenceFeatures(){
     // Files for co-occurance features
-    char cocFeat1[] = "";
-    char cocFeat2[] = "";
+    char cocFeat1[] = "/home/satwik/VisualWord2Vec/data/vp_feature_coc_1.txt";
+    char cocFeat2[] = "/home/satwik/VisualWord2Vec/data/vp_feature_coc_2.txt";
+
     // Files for total frequency features
-    //
+    char tfFeat1[] = "/home/satwik/VisualWord2Vec/data/vp_feature_tf_1.txt";
+    char tfFeat2[] = "/home/satwik/VisualWord2Vec/data/vp_feature_tf_2.txt";
+
     // Read the dimensions and check for match in both the cases
+    FILE* cocFile1 = fopen(cocFeat1, "wb");
+    FILE* cocFile2 = fopen(cocFeat2, "wb");
+    FILE* tfFile1 = fopen(tfFeat1, "wb");
+    FILE* tfFile2 = fopen(tfFeat2, "wb");
+
+    int featDim11, featDim21, featDim12, featDim22;
+    fscanf(cocFile1, "%d\n", &featDim11);
+    fscanf(cocFile2, "%d\n", &featDim12);
+    fscanf(tfFile1, "%d\n", &featDim21);
+    fscanf(tfFile2, "%d\n", &featDim22);
+
+    // Reading the dimensions
+    if(featDim11 != featDim12 || featDim21 != featDim22){
+        printf("Feature dimensions dont match ! \n");
+        exit(1);
+    }
+    else{
+        printf("Features of size : %d %d read!\n", featDim11, featDim22);
+    }
+
+    long i, d;
+    float feature;
+    otherFeatSize = featDim11 + featDim21;
+    int totalFeatSize = otherFeatSize + layer1_size;
+
     // Allocate sufficient memory for each of the features
-    // Compute the 
+    sentPairs = (struct SentencePair*) malloc(sizeof(struct SentencePair) * noSentPairs);
+    for(i = 0; i < noSentPairs; i++){
+        // Allocating memory for the features
+        sentPairs[i].feature = (float*) malloc(sizeof(float) * totalFeatSize * 2);
+        sentences1[i].otherFeats = (float*) malloc(sizeof(float) * otherFeatSize);
+        sentences2[i].otherFeats = (float*) malloc(sizeof(float) * otherFeatSize);
+        
+        // Co-occurance feature
+        for(d = 0; d < featDim11; d++){
+            if(fscanf(cocFile1, "%f", &feature) != EOF)
+                sentences1[i].otherFeats[d] = feature;
+                
+            if(fscanf(cocFile2, "%f", &feature) != EOF)
+                sentences2[i].otherFeats[d] = feature;
+        }
+
+        // Total frequency feature
+        for(d = featDim11; d < otherFeatSize; d++){
+            if(fscanf(tfFile1, "%f", &feature) != EOF)
+                sentences1[i].otherFeats[d] = feature;
+                
+            if(fscanf(tfFile2, "%f", &feature) != EOF)
+                sentences2[i].otherFeats[d] = feature;
+        }
+    }
+
+    // Compute the features for the sentence pairs
+    sentPairs = (struct SentencePair*) malloc(sizeof(struct SentencePair) * noSentPairs);
+    long index;
+    for(i = 0; i < noSentPairs; i++){
+        // Allocating memory for the features
+        sentPairs[i].feature = (float*) malloc(sizeof(float) * totalFeatSize * 2);
+        sentPairs[i].sent1 = &sentences1[i];
+        sentPairs[i].sent2 = &sentences2[i];
+
+        // Haar like maps for the features
+        for(d = 0; d < otherFeatSize; d++)
+            index = d + 2*layer1_size;
+            sentPairs[i].feature[index] = sentences1[i].otherFeats[d] + 
+                                        sentences2[i].otherFeats[d];
+
+        for(d = otherFeatSize; d < 2 * otherFeatSize; d++)
+            index = d + 2*layer1_size;
+            sentPairs[i].feature[index] = fabs(sentences1[i].otherFeats[d] -
+                                        sentences2[i].otherFeats[d]);
+    }
+
+    // close the file
+    fclose(cocFile1);
+    fclose(cocFile2);
+    fclose(tfFile1);
+    fclose(tfFile2);
 }
 
 // Reading all the sentences along with features
@@ -451,5 +533,6 @@ void refineNetworkVP(){
 void testing(){
     computeSentenceEmbeddings(trainSents, noTrainVP);
 
+    readVPSentences();
     performVPTask();
 }
