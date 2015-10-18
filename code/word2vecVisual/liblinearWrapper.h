@@ -11,7 +11,7 @@
 # include <ctype.h>
 
 // For liblinear
-# include "/home/satwik/VisualWord2Vec/libs/liblinear-1.94/linear.h"
+# include "/home/satwik/VisualWord2Vec/libs/liblinear-2.1/linear.h"
 # include "structs.h"
 # include "macros.h"
 
@@ -19,7 +19,7 @@
 /*****/
 // External variables
 extern struct Sentence* trainSents;
-extern int vpFeatSize;
+extern long long layer1_size;
 extern long noTrainVP;
 //extern struct
 

@@ -51,6 +51,21 @@ struct Sentence{
 
     // Embeddings for the sentence
     float* embed;
+
+    // Other visual features
+    float* otherFeats;
 };
 
+// Structure for holding the pair of sentences used in VP task
+struct SentencePair{
+    // Pair of sentences
+    struct sentence* sent1;
+    struct sentence* sent2;
+
+    // Ground truth of the pair
+    int gt;
+
+    // Features (word2vec, coc, tf) in that order
+    float* feature;
+};
 #endif

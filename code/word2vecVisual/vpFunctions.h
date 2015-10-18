@@ -44,11 +44,15 @@ void tokenizeSentences(struct Sentence*, long);
 // Reading the training sentences
 void readVPTrainSentences(char*);
 
-// Reading the visual features
-void readVPVisualFeatures(char*);
+// Reading all sentences along with features
+void readVPSentences();
+void readVPSentenceFeatures();
 
-// Clustering the visual features for the task
-void clusterVPVisualFeatures(int, char*);
+// Reading the visual features (abstract)
+void readVPAbstractVisualFeatures(char*);
+
+// Clustering the visual features for the task (abstract)
+void clusterVPAbstractVisualFeatures(int, char*);
 
 // Tokenizing training sentences
 void tokenizeTrainSentences();

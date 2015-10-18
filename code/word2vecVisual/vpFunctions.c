@@ -4,7 +4,11 @@
 // Globals for the current scope
 long noTrainVP = 0;
 int vpFeatSize = 0;
-struct Sentence* trainSents;
+struct Sentence* trainSents; // Training sentences (mixed of set1, set2 + training + gt==1)
+struct Sentence* sentences1; // Set of sentences 1
+struct Sentence* sentences2; // Set of sentences 2 
+struct SentencePair* sentPairs; // Dataset of pairs of sentences
+long noSentPairs; // Number of sentences pairs
 
 /***************************************************/
 // Read the sentences
@@ -191,7 +195,7 @@ void readVPTrainSentences(char* featurePath){
 }
 
 // Read the visual features for VP task
-void readVPVisualFeatures(char* visualPath){
+void readVPAbstractVisualFeatures(char* visualPath){
     FILE* filePt = fopen(visualPath, "rb");
 
     if(filePt == NULL){
@@ -232,6 +236,8 @@ void readVPVisualFeatures(char* visualPath){
     // Closing the file
     fclose(filePt);
 }
+
+// Read other features for vp sentences
 
 // Function to tokenize the training sentences and link to word2vec vocab
 void tokenizeTrainSentences(){
@@ -280,10 +286,59 @@ void writeVPSentenceEmbeddings(){
     writeSentenceEmbeddings(writeSent2, sentences2, noSents2);
 }
 
+// Read all sentences along with features
+void readVPSentences(){
+    // First read the sentences
+    // Path to the sentences_1
+    char readSent1[] = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma.txt";
+    // Path to the sentences_2
+    char readSent2[] = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma.txt";
+    
+    // read sentences
+    long noSents1, noSents2;
+    sentences1 = *readSentences(readSent1, &noSents1);
+    sentences2 = *readSentences(readSent2, &noSents2);
+    if(noSents1 != noSents2){
+        printf("Number of sentences dont match!\n");
+        exit(1);
+    }
+
+    // Tokenize sentences
+    tokenizeSentences(sentences1, noSents1);
+    tokenizeSentences(sentences2, noSents2);
+
+    // Read the features
+    readVPSentenceFeatures();
+
+    // Get the word2vec features as well
+
+    // Populate the SentencePair struct
+    long i;
+    sentPairs = (struct SentencePair*) malloc(sizeof(struct SentencePair) * noSents1);
+    for (i = 0; i < noSents1, i++){
+        sentPairs[i].sent1 = &sentences1[i];
+        sentPairs[i].sent2 = &sentences2[i]; 
+
+        // Features
+    }
+}
+
+void readVPSentenceFeatures(){
+    // Files for co-occurance features
+    char cocFeat1[] = "";
+    char cocFeat2[] = "";
+    // Files for total frequency features
+    //
+    // Read the dimensions and check for match in both the cases
+    // Allocate sufficient memory for each of the features
+    // Compute the 
+}
+
+// Reading all the sentences along with features
 // Function to cluster visual features
 // Clustering kmeans wrapper
 // Source: http://yael.gforge.inria.fr/tutorial/tuto_kmeans.html
-void clusterVPVisualFeatures(int clusters, char* savePath){
+void clusterVPAbstractVisualFeatures(int clusters, char* savePath){
     int k = clusters;                           /* number of cluster to create */
     int d = vpFeatSize;                           /* dimensionality of the vectors */
     int n = noTrainVP;                         /* number of vectors */

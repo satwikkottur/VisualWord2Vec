@@ -1,8 +1,6 @@
 // This is the wrapper around the liblinear library
 # include "liblinearWrapper.h"
 
-// Define the problem
-
 // Define the training and test points
 struct feature_node** testNodes; // storing test instances for liblinear
 int* gtTest; // Ground truth for the test instances
@@ -30,20 +28,29 @@ void performVPTask(){
     // Train the SVM
     struct model* trainedModel = train(curProblem, curParam);
     printf("Trained model\n");
-
+    
     // Find the best parameter C using cross-validation
     double bestAcc, bestC;
-    double startC = 0.0001;
-    double maxC = 1;
+    double startC = 0.001;
+    double maxC = 100;
     int noFolds = 5;
+    
     find_parameter_C(curProblem, curParam, noFolds, startC, maxC, &bestAcc, &bestC);
     printf("Best C: %f\nBest Acc:%f\n", bestC, bestAcc);
 
-    // Test for instances
-    float accuracy = computeAccuracy(trainedModel, curProblem->x, curProblem->y, curProblem->l);
-    //float accuracy = computeAccuracy(trainedModel, testNodes, gtTest, noTestInst);
-    
+    // Cross validation
+    /*double* values = (double*) malloc(sizeof(double) * noTrainVP * noFolds);
+    int i = 0, j;
+    for(j = 0; j < noFolds; j++)
+        for (i = 0; i < noTrainVP; i++){
+            values[noTrainVP * j + i] = -10;
+    }
+    cross_validation(curProblem, curParam, noFolds, values);*/
 
+    // Test for instances
+    // float accuracy = computeAccuracy(trainedModel, curProblem->x, curProblem->y, curProblem->l);
+    // float accuracy = computeAccuracy(trainedModel, testNodes, gtTest, noTestInst);
+    
     // Free the memory
     free_and_destroy_model(&trainedModel);
     free(curParam);
@@ -56,7 +63,7 @@ void createProblem(struct Sentence* trainInsts, long noTrain){
     // Create the struct
     curProblem = (struct problem*) malloc(sizeof(struct problem));
     curProblem->l = (int)noTrain;
-    curProblem->n = vpFeatSize; // Dont include the bias
+    curProblem->n = layer1_size; // Dont include the bias
     curProblem->bias = -1;
     curProblem->y = (double*) malloc(sizeof(double) * noTrain);
     curProblem->x = (struct feature_node**) malloc(sizeof(struct feature_node*) * noTrain);
@@ -65,11 +72,15 @@ void createProblem(struct Sentence* trainInsts, long noTrain){
     long i;
     for (i = 0; i < noTrain; i++){
         // store the feature for each point
-        curProblem->x[i] = createFeatureNodeList(trainInsts[i], vpFeatSize);
+        curProblem->x[i] = createFeatureNodeList(trainInsts[i], layer1_size);
         
         // store the class for each point
-        curProblem->y[i] = (i%2);//(double)(i%2); // Assign random gt
-        //curProblem->y[i] = trainInsts[i].gt;
+        //curProblem->y[i] = ((double)i%2) + 1;//(double)(i%2); // Assign random gt
+        printf("%ld %ld\n", i%2, i);
+        if( i%2 == 0)
+            curProblem->y[i] = 1.0;
+        else
+            curProblem->y[i] = 2.0;
     }
 }
 
@@ -78,7 +89,7 @@ void modifyProblem(struct Sentence* trainInsts, long noTrain){
     // Assume curProblem is not NULL and modify the features
     long i; int d;
     for (i = 0; i < noTrain; i++)
-        for(d = 0; d < vpFeatSize; d++)
+        for(d = 0; d < layer1_size; d++)
             curProblem->x[i][d].value = trainInsts[i].embed[d];
 }
 
@@ -86,11 +97,13 @@ void modifyProblem(struct Sentence* trainInsts, long noTrain){
 void createParameter(){
     // Solver type
     curParam = (struct parameter*) malloc(sizeof(struct parameter));
+
     curParam->solver_type = L2R_L2LOSS_SVC;
     curParam->C = 0.1;
     curParam->eps = 0.01; // default
     curParam->p = 0.1; //default
     curParam->nr_weight = 0;
+    curParam->init_sol = NULL;
 }
 
 // Creating the node list for features
@@ -99,7 +112,7 @@ struct feature_node* createFeatureNodeList(struct Sentence sent, int featSize){
     struct feature_node* featList = (struct feature_node*) 
                                         malloc(sizeof(struct feature_node) * (featSize+1));
     int d;
-    for( d = 0; d < featSize; d++){
+    for(d = 0; d < featSize; d++){
         featList[d].index = d + 1;
         featList[d].value = sent.embed[d];
     }
@@ -130,3 +143,12 @@ float computeAccuracy(struct model* trainedModel, struct feature_node** insts, i
     //return (float)noCorrect/noInsts;
     return 1.0;
 }
+
+    /*int i, j;
+    for (i = 0; i < noTrainVP; i++){
+        for(j = 0; j < layer1_size + 1; j++){
+            printf("(%f %d ; ", curProblem->x[i][j].value, curProblem->x[i][j].index);
+            printf("%f )\n", curProblem->y[i]);
+        }
+    }
+    printf("l:%d n:%d\n", curProblem->l, curProblem->n);*/

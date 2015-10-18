@@ -2,7 +2,7 @@ CC = @gcc
 #Using -Ofast instead of -O3 might result in faster code, but is supported only by newer GCC versions
 #CFLAGS = -lm -pthread -O3 -march=native -Wall -funroll-loops -Wno-unused-result
 # Liblinear path
-LINEARPATH=/home/satwik/VisualWord2Vec/libs/liblinear-1.94/
+LINEARPATH=/home/satwik/VisualWord2Vec/libs/liblinear-2.1/
 LIBLINEAR=$(LINEARPATH)linear.o $(LINEARPATH)tron.o $(LINEARPATH)blas/blas.a
 BLAS=$(LINEARPATH)blas/blas.a
 
@@ -32,7 +32,7 @@ $(BIN)helperFunctions.o : helperFunctions.c
 $(BIN)refineFunctions.o : refineFunctions.c
 	$(CC) -c refineFunctions.c -o $(BIN)refineFunctions.o $(CFLAGS)
 $(BIN)liblinearWrapper.o : liblinearWrapper.c
-	$(CC) -c liblinearWrapper.c -o $(BIN)liblinearWrapper.o $(CFLAGS) $(BLAS)
+	$(CC) -c liblinearWrapper.c -o $(BIN)liblinearWrapper.o $(BLAS) $(CFLAGS)
 
 run:
 	make
