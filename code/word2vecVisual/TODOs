@@ -48,10 +48,8 @@ List of todos:
     - TSNE for (P,R,S) tuple for each cluster (done)
     - TSNE for visual features (done)
 
-CVPR:
-Run Xiaos Visual paraphrasing(and fitb?) task for text baseline
----------------------------------------------------------------
-    - Make the code faster (tough to debug otherwise)
+Train VP for scratch:
+--------------------
     - Use ms_coco + vp training data together to train visual word2vec (done) - doesn't work well
     - Train visual word2vec from scratch (done)
         - Lemmatize MS COCO for refining (done)
@@ -61,11 +59,16 @@ Run Xiaos Visual paraphrasing(and fitb?) task for text baseline
     - Dump all VP sentences : sentences_1, sentences_2 (done)
     - Lemmatize them (done)
     - Compute the word2vec features from C (done)
-    - Read word2vec features in matlab
-    - Confirm the original accuracy with by-pass
-    - Get VP into the loop to stop word2vec refining
-    - Text alignment for paraphrases
+    - Read word2vec features in matlab (done)
+    - Confirm the original accuracy with by-pass (done)
+    - Get VP into the loop to stop word2vec refining (done)
+    - Text alignment for paraphrases 
 - Correct P,R,S training data from inflections using inverse map (done)
+
+CVPR:
+Run Xiaos Visual paraphrasing(and fitb?) task for text baseline
+---------------------------------------------------------------
+    - Make the code faster (tough to debug otherwise)
 - Compute the word overlap statistics for 3-4 separate cases
 - Setup system for refining over sentences for VP task (done)
 

@@ -64,6 +64,8 @@ struct SentencePair{
 
     // Ground truth of the pair
     int gt;
+    // If training/test
+    int isTrain;
 
     // Features (word2vec, coc, tf) in that order
     float* feature;

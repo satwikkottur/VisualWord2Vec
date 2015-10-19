@@ -2,9 +2,9 @@
 % First read the features, decide the number of dimensions, perform
 % PCA and save the pca features back to file in the same format
 
-featurePath = '/home/satwik/VisualWord2Vec/data/float_features.txt';
-savePath = '/home/satwik/VisualWord2Vec/data/pca_features.txt';
-features = dlmread(featurePath);
+featurePath = '/home/satwik/VisualWord2Vec/data/abstract_features_train.txt';
+savePath = '/home/satwik/VisualWord2Vec/data/abstract_features_train_pca.txt';
+features = dlmread(featurePath, ' ', 1, 0);
 
 % Performance pca
 [coeff, score, latent] = pca(features);

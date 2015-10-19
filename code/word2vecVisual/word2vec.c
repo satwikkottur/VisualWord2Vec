@@ -707,11 +707,12 @@ void commonSenseWrapper(){
 // Function for visual paraphrase task
 void visualParaphraseWrapper(){
     // Reading the file for training
-    char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_debug.txt";
-    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_full.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_debug.txt";
+    char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_full.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_sentences_lemma.txt";
-    //char visualPath[] = "/home/satwik/VisualWord2Vec/data/abstract_features_train.txt";
-    char visualPath[] = "/home/satwik/VisualWord2Vec/data/abstract_features_debug.txt";
+    //char visualPath[] = "/home/satwik/VisualWord2Vec/data/abstract_features_train_pca.txt";
+    char visualPath[] = "/home/satwik/VisualWord2Vec/data/abstract_features_train.txt";
+    //char visualPath[] = "/home/satwik/VisualWord2Vec/data/abstract_features_debug.txt";
 
     // Loading word2vec file (from Xiao's baseline)
     //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
@@ -726,7 +727,6 @@ void visualParaphraseWrapper(){
 
     // Compute embeddings
     performVPTask();
-    return;
 
     // Clustering the visual features
     clusterVPAbstractVisualFeatures(clusterArg, NULL);
@@ -736,13 +736,18 @@ void visualParaphraseWrapper(){
     // Initializing the refining network
     initRefining();
 
-    for(noIters = 0; noIters < 0; noIters++){
+    for(noIters = 0; noIters < 200; noIters++){
+        printf("Refining : %d / %d\n", noIters, 200);
+
         // Refining the embeddings
         refineNetworkVP();
+        
+        // Compute embeddings
+        performVPTask();
     }
 
     // Save the refined word2vec features for the VP sentences
-    writeVPSentenceEmbeddings(); 
+    //writeVPSentenceEmbeddings(); 
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -761,9 +766,9 @@ void TrainModel() {
     if (negative > 0) InitUnigramTable();
     start = clock();
     // [S] : Creates the threads for execution
-    //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+    for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
     // [S] : Waits for the completion of execution of the threads
-    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+    for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     
     //***************************************************************************************

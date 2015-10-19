@@ -36,6 +36,7 @@ $(BIN)liblinearWrapper.o : liblinearWrapper.c
 
 run:
 	make
+	#./$(BIN)word2vec -train modelsNdata/vp/vp_train_sentences_lemma.txt -output word2vec_output_makerun.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 	./$(BIN)word2vec -train modelsNdata/vp/coco_lemma_vp_lemma.txt -output word2vec_output_makerun.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 
 vp:
