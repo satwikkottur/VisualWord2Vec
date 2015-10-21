@@ -706,6 +706,9 @@ void commonSenseWrapper(){
 
 // Function for visual paraphrase task
 void visualParaphraseWrapper(){
+    // Read the embeddings from the file
+    //char embedFile[] = "modelsNdata/vp/word2vec_coco_vp_lemma.bin";
+    //loadWord2Vec(embedFile);
     // Reading the file for training
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_debug.txt";
     char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_full.txt";

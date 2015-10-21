@@ -11,6 +11,9 @@ struct Sentence* sentences2; // Set of sentences 2
 struct SentencePair* sentPairs; // Dataset of pairs of sentences
 long noSentPairs; // Number of sentences pairs
 
+// Training the sentences
+int trainSentences = 1; // Train sentences
+
 /***************************************************/
 // Read the sentences
 struct Sentence** readSentences(char* featurePath, long* noSents){
@@ -290,11 +293,11 @@ void writeVPSentenceEmbeddings(){
 void readVPSentences(){
     // First read the sentences
     // Path to the sentences_1
+    //char readSent1[] = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma.txt";
     char readSent1[] = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma.txt";
-    //char readSent1[] = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma_debug.txt";
     // Path to the sentences_2
+    //char readSent2[] = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma.txt";
     char readSent2[] = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma.txt";
-    //char readSent2[] = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma_debug.txt";
     
     // read sentences
     long noSents1, noSents2;
@@ -544,6 +547,7 @@ void refineNetworkVP(){
     long c, i;
     float* y = (float*) malloc(sizeof(float) * noClusters);
     int* wordList = (int*) malloc(MAX_SENTENCE * sizeof(int));
+    int* wordInd = (int*) malloc(sizeof(int));
     int wordCount = 0;
 
     // Checking if training examples are present
@@ -554,7 +558,7 @@ void refineNetworkVP(){
 
     // Read each of the training sentences
     for(i = 0; i < noTrainVP; i++){
-        // printf("Training %ld instance ....\n", i);
+        //printf("Training %ld instance ....\n", i);
         
         // Checking possible fields to avoid segmentation error
         if(trainSents[i].cId < 1 || trainSents[i].cId > noClusters) {
@@ -573,11 +577,26 @@ void refineNetworkVP(){
             // Getting the actual count of words
             wordCount++;
         }
-        // Predict the cluster
-        computeMultinomialPhrase(y, wordList, wordCount);
-        
-        // Propage the error the embeddings
-        updateWeightsPhrase(y, wordList, wordCount, trainSents[i].cId);
+
+        if(!trainSentences){
+            // Training each word
+            for(c = 0; c < wordCount; c++){
+                wordInd[0] = wordList[c];
+                // Predict the cluster
+                computeMultinomialPhrase(y, wordInd, 1);
+                
+                // Propage the error the embeddings
+                updateWeightsPhrase(y, wordInd, 1, trainSents[i].cId);
+            }
+        }
+        else{
+            // Training the sentences
+            // Predict the cluster
+            computeMultinomialPhrase(y, wordList, wordCount);
+            
+            // Propage the error the embeddings
+            updateWeightsPhrase(y, wordList, wordCount, trainSents[i].cId);
+        }
     }
 }
 

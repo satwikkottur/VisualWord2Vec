@@ -68,10 +68,21 @@ Train VP for scratch:
 CVPR:
 Run Xiaos Visual paraphrasing(and fitb?) task for text baseline
 ---------------------------------------------------------------
-    - Make the code faster (tough to debug otherwise)
+- Make the code faster (tough to debug otherwise)
 - Compute the word overlap statistics for 3-4 separate cases
 - Setup system for refining over sentences for VP task (done)
 
 - Reason out why our model works better, intuitively
 - Check for pairs whose distance increase/decreased the most
 - Check for triplets whose relative distance increased/decreased the most
+
+Visual Paraphrasing
+-------------------
+- Adjust the learning rates to get a more stable plots (done)
+- Train with individual words (done)
+- Train on wikipedia and test on VP task (done)
+- Run both Xiao's course and fine grain tasks
+- Play with parameters to get some sense of graphs
+- Hold out a validation set
+- Compute overlap statistics
+- Setup VQA dataset
