@@ -83,6 +83,6 @@ Visual Paraphrasing
 - Train on wikipedia and test on VP task (done)
 - Run both Xiao's course and fine grain tasks
 - Play with parameters to get some sense of graphs
-- Hold out a validation set
+- Hold out a validation set (done)
 - Compute overlap statistics
 - Setup VQA dataset

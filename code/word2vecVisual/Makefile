@@ -42,8 +42,11 @@ run:
 
 vp:
 	make
-	#./$(BIN)word2vec -train modelsNdata/vp/coco_lemma_vp_lemma.txt -output modelsNdata/word2vec_vp_lemma.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 	./$(BIN)word2vec -train modelsNdata/vp/coco_lemma_vp_lemma.txt -output modelsNdata/word2vec_vp_lemma.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
+
+wiki:
+	make
+	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/wiki_vp_train_lemma.txt -output modelsNdata/word2vec_after_refine_lemma.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 
 big:
 	make

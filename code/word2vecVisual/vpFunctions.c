@@ -363,7 +363,8 @@ void readVPSentenceFeatures(){
         // Also read the ground truth file, test/train split, validation set
         gtPath = "/home/satwik/VisualWord2Vec/data/vp_ground_truth.txt";
         splitPath = "/home/satwik/VisualWord2Vec/data/vp_split.txt";
-        validPath = "/home/satwik/VisualWord2Vec/data/vp_val_inds.txt";
+        validPath = "/home/satwik/VisualWord2Vec/data/vp_val_inds_1k.txt";
+        //validPath = "/home/satwik/VisualWord2Vec/data/vp_val_inds.txt";
     }
 
     FILE* gtFile = fopen(gtPath, "rb");
