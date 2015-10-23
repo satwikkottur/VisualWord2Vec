@@ -63,8 +63,8 @@ struct Sentence{
 // Structure for holding the pair of sentences used in VP task
 struct SentencePair{
     // Pair of sentences
-    struct sentence* sent1;
-    struct sentence* sent2;
+    struct Sentence* sent1;
+    struct Sentence* sent2;
 
     // Ground truth of the pair
     int gt;

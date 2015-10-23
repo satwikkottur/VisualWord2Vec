@@ -41,6 +41,7 @@ int trainMulti = 1; // Train single / multiple models for P,R,S
 int clusterArg = 2; // Number of initial clusters to use
 int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
+int debugModeVP = 1; // Debug mode for VP task
 
 /***********************************************************************************/
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
@@ -709,18 +710,24 @@ void visualParaphraseWrapper(){
     // Read the embeddings from the file
     //char embedFile[] = "modelsNdata/vp/word2vec_coco_vp_lemma.bin";
     //loadWord2Vec(embedFile);
+
     // Reading the file for training
-    char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_debug.txt";
-    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_full.txt";
-    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_sentences_lemma.txt";
     char* visualPath = (char*) malloc(sizeof(char) * 100);
+    char* featurePath = (char*) malloc(sizeof(char) * 100);
+
+    if(debugModeVP)
+        featurePath = "/home/satwik/VisualWord2Vec/data/vp_train_debug.txt";
+    else
+        featurePath = "/home/satwik/VisualWord2Vec/data/vp_train_full.txt";
+
     if(usePCA)
         visualPath = "/home/satwik/VisualWord2Vec/data/abstract_features_train_pca.txt";
     else{
-        //visualPath = "/home/satwik/VisualWord2Vec/data/abstract_features_train.txt";
-        visualPath = "/home/satwik/VisualWord2Vec/data/abstract_features_debug.txt";
+        if(debugModeVP)
+            visualPath = "/home/satwik/VisualWord2Vec/data/abstract_features_debug.txt";
+        else
+            visualPath = "/home/satwik/VisualWord2Vec/data/abstract_features_train.txt";
     }
-    //char visualPath[] = "/home/satwik/VisualWord2Vec/data/abstract_features_debug.txt";
 
     // Reading for the word features and visual features
     readVPTrainSentences(featurePath);
@@ -728,20 +735,28 @@ void visualParaphraseWrapper(){
     
     // Tokenizing the training sentences
     tokenizeTrainSentences();
-    return;
+    
     // Compute embeddings
     performVPTask();
 
     // Clustering the visual features
-    clusterVPAbstractVisualFeatures(clusterArg, NULL);
+    if(debugModeVP)
+        clusterVPAbstractVisualFeatures(2, NULL);
+    else
+        clusterVPAbstractVisualFeatures(clusterArg, NULL);
 
     // Begin the refining
-    int noIters;
+    int i, noIters = 200;
+    if(debugModeVP)
+        noIters = 5;
+    else
+        noIters = 200;
+    
     // Initializing the refining network
     initRefining();
 
-    for(noIters = 0; noIters < 200; noIters++){
-        printf("Refining : %d / %d\n", noIters, 200);
+    for(i = 0; i < noIters; i++){
+        printf("Refining : %d / %d\n", i, noIters);
 
         // Refining the embeddings
         refineNetworkVP();

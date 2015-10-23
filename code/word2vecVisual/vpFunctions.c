@@ -12,8 +12,8 @@ struct SentencePair* sentPairs; // Dataset of pairs of sentences
 long noSentPairs; // Number of sentences pairs
 
 // Training the sentences
-int trainSentences = 0; // Train sentences
-int debugMode = 0; // Debug mode, read less data for faster execution
+// Could be one of DESCRIPTIONS, SENTENCES, WORDS, WINDOWS;
+enum TrainModeVP mode = SENTENCES;
 
 /***************************************************/
 // Read the sentences
@@ -112,24 +112,22 @@ void tokenizeSentences(struct Sentence* collection, long noSents){
 
         // Now store the word components, looping over them
         if(sentCount == 0) sentCount = 1; // Punctuations not present, treat as one sentence
-        collection[i].index = (long*) malloc(count * sizeof(long));
-        collection[i].endIndex = (long*) malloc(sentCount * sizeof(long));
+
+        collection[i].index = (int*) malloc(count * sizeof(int));
+        collection[i].endIndex = (int*) malloc(sentCount * sizeof(int));
 
         line = strtok(temp, delim);
         count = 0, sentCount = 0;
         int lineEnd;
-        long wordIndex;
+        int wordIndex;
         while(line != NULL){
             // Convert the token into lower case
             for(n = 0; line[n]; n++){
                 line[n] = tolower(line[n]);
 
-                // Check if it has a trailing full stop, if yes, terminate and report
+                // Check if it has a trailing full stop, if yes, removeit and report
                 if (line[n] == '.'){
                     lineEnd = 1;
-                    //printf("Sent: %s\n", collection[i].sent);
-                    //printf("End of sentence : %d %d %s\n", collection[i].endIndex[sentCount], sentCount, line);
-                    sentCount++;
                     line[n] = '\0';
                 }
             }
@@ -145,6 +143,7 @@ void tokenizeSentences(struct Sentence* collection, long noSents){
             // Adjust end of line count
             if(lineEnd){
                 collection[i].endIndex[sentCount] = count;
+                sentCount++;
                 lineEnd = 0;
             }
             
@@ -338,7 +337,7 @@ void readVPSentences(){
     char* readSent2 = (char*) malloc(100 * sizeof(char));
 
     // Path to the sentences_1
-    if(debugMode){
+    if(debugModeVP){
         readSent1 = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma_debug.txt";
         readSent2 = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma_debug.txt";
     }
@@ -378,7 +377,7 @@ void readVPSentenceFeatures(){
     char* splitPath = (char*) malloc(sizeof(char) * 100);
     char* validPath = (char*) malloc(sizeof(char) * 100);
 
-    if(debugMode){
+    if(debugModeVP){
         // Files for co-occurance features
         cocFeat1 = "/home/satwik/VisualWord2Vec/data/vp_features_coc_1_debug.txt";
         cocFeat2 = "/home/satwik/VisualWord2Vec/data/vp_features_coc_2_debug.txt";
@@ -482,8 +481,8 @@ void readVPSentenceFeatures(){
         sentPairs[i].feature = (float*) malloc(sizeof(float) * totalFeatSize * 2);
         
         // Setting the sentence pairs
-        sentPairs[i].sent1 = &sentences1[i];
-        sentPairs[i].sent2 = &sentences2[i];
+        sentPairs[i].sent1 = sentences1 + i;
+        sentPairs[i].sent2 = sentences2 + i;
 
         // Haar like maps for the features
         for(d = 0; d < otherFeatSize; d++){
@@ -634,9 +633,9 @@ void refineNetworkVP(){
     printf("Refining using VP training sentences\n");
     long c, i, s;
     float* y = (float*) malloc(sizeof(float) * noClusters);
-    int* wordList = (int*) malloc(MAX_SENTENCE * sizeof(int));
-    int* wordInd = (int*) malloc(sizeof(int));
     int wordCount = 0;
+    // The starting and ending index for the current sentence in a description
+    int startInd, endInd; 
 
     // Checking if training examples are present
     if(noTrainVP == 0){
@@ -657,75 +656,46 @@ void refineNetworkVP(){
         // Now collecting words for training
         wordCount = 0;
         
-        // Training each word separately
-        if(!trainSentences){
-            for(c = 0; c < trainSents[i].count; c++){
-                // Train if exists
-                if(trainSents[i].index[c] != -1){
+        switch(mode){
+            // Training each word separately
+            case WORDS:
+                for(c = 0; c < trainSents[i].count; c++){
                     // Predict the cluster
                     computeMultinomialPhrase(y, trainSents[i].index + c, 1);
                     // Propage the error the embeddings
-                    updateWeightsPhrase(y, trainSents[i].index, 1, trainSents[i].cId);
+                    updateWeightsPhrase(y, trainSents[i].index + c, 1, trainSents[i].cId);
                 }
-            }
-        }
-        else{
-            // Training sentences
-            // Handle first sentence
-            // Predict the cluster
-            computeMultinomialPhrase(y, trainSents[i].index + c, 1);
-            // Propage the error the embeddings
-            updateWeightsPhrase(y, trainSents[i].index, 1, trainSents[i].cId);
+                break;
 
-            for(s = 0; s < trainSents[i].sentCount; s++){
-                //wordCount = ;
-            
-            }
-        
-        
-        }
+            // Train each sentence separately
+            case SENTENCES:
+                for(s = 0; s < trainSents[i].sentCount; s++){
+                    if(s == 0) startInd = 0;
+                    else startInd = trainSents[i].endIndex[s-1] + 1;
+                    endInd = trainSents[i].endIndex[s]; 
+               
+                    //printf("Start, end, number: %d %d %d\n", startInd, endInd, endInd - startInd + 1);
+                    // Predict the cluster
+                    computeMultinomialPhrase(y, trainSents[i].index + startInd, endInd - startInd + 1);
+                    // Propage the error the embeddings
+                    updateWeightsPhrase(y, trainSents[i].index + startInd, endInd - startInd + 1, trainSents[i].cId);
+                }
+                break;
 
-        /*for(c = 0; c < trainSents[i].count; c++){
-            // If not in vocab, continue
-            if(trainSents[i].index[c] == -1) continue;
+            case WINDOWS:
+                break;
 
-            wordList[wordCount] = trainSents[i].index[c];
-            // Getting the actual count of words
-            wordCount++;
-        }
-
-        if(!trainSentences){
-            // Training each word
-            for(c = 0; c < wordCount; c++){
-                wordInd[0] = wordList[c];
+            case DESCRIPTIONS:
                 // Predict the cluster
-                computeMultinomialPhrase(y, wordInd, 1);
-                
+                computeMultinomialPhrase(y, trainSents[i].index, trainSents[i].count);
                 // Propage the error the embeddings
-                updateWeightsPhrase(y, wordInd, 1, trainSents[i].cId);
-            }
+                updateWeightsPhrase(y, trainSents[i].index, trainSents[i].count, trainSents[i].cId);
+                break;
+
+            default:
+                printf("Error in train mode!\n");
+                exit(1);
         }
-        else{
-            // Training the sentences
-            // Predict the cluster
-            computeMultinomialPhrase(y, wordList, trainSents[i].endIndex[0]);
-            
-            // Propage the error the embeddings
-            updateWeightsPhrase(y, wordList, wordCount, trainSents[i].cId);
-            
-
-            // Training each sentence from start to end
-            for(c = 1; c < sentCount; c++){
-            
-            
-            }
-
-            // Predict the cluster
-            computeMultinomialPhrase(y, wordList, wordCount);
-            
-            // Propage the error the embeddings
-            updateWeightsPhrase(y, wordList, wordCount, trainSents[i].cId);
-        }*/
     }
 }
 

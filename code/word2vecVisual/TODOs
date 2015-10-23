@@ -87,4 +87,5 @@ Visual Paraphrasing
 - Compute overlap statistics
 - Setup VQA dataset
 - Use windowed training
-- Separate the sentences of description while training
+- Separate the sentences of description while training (done)
+- Setup the text retrieval task
