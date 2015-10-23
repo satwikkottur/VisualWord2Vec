@@ -37,19 +37,18 @@ $(BIN)liblinearWrapper.o : liblinearWrapper.c
 run:
 	make
 	#./$(BIN)word2vec -train modelsNdata/vp/vp_train_sentences_lemma.txt -output word2vec_output_makerun.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
-	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/wiki_vp_train_lemma.txt -output word2vec_output_makerun.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
+	#./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/wiki_vp_train_lemma.txt -output word2vec_output_makerun.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 	#./$(BIN)word2vec -train modelsNdata/vp/coco_lemma_vp_lemma.txt -output modelsNdata/vp/word2vec_coco_vp_lemma.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 
 vp:
 	make
+	#./$(BIN)word2vec -train modelsNdata/vp/coco_lemma_vp_lemma.txt -output modelsNdata/word2vec_vp_lemma.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 	./$(BIN)word2vec -train modelsNdata/vp/coco_lemma_vp_lemma.txt -output modelsNdata/word2vec_vp_lemma.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
-	@/bin/echo -n
 
 big:
 	make
-	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test_lemma.txt -output modelsNdata/word2vec_after_refine_lemma.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
-	echo '\n'
-	#./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/enwik9 -output modelsNdata/word2vec_after_refine_bestmodel_wiki.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 4 -binary 0 -min-count 0
+	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/wiki_vp_train_lemma.txt -output modelsNdata/word2vec_after_refine_lemma.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
+	#./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/enwik9 -output modelsNdata/word2vec_after_refine_bestmodel_wiki.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 24 -binary 0 -min-count 0
 	#./$(BIN)word2vec -train modelsNdata/coco_train_minus_cs_test.txt -output modelsNdata/word2vec_output_bestmodel_single.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -read-vocab modelsNdata/large-vocab.txt
 	# Getting the visualword2vec for VP training + MS COCO
 	#./$(BIN)word2vec -train modelsNdata/coco_vp_train.txt -output modelsNdata/word2vec_vp_train.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0

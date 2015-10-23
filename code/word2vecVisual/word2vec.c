@@ -580,16 +580,16 @@ void commonSenseWrapper(){
     // Common sense task
     // Reading the file for relation word
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
-    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_lemma.txt";
+    char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_lemma.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_18.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_R_120.txt";
 
-    char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_sentences_lemma.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_sentences_lemma.txt";
 
     //char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
-    sprintf(postPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_post_%d_%d_%d_%d.txt", 
+    sprintf(postPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_wiki_post_%d_%d_%d_%d.txt", 
                                         trainPhrases, usePCA, trainMulti, clusterArg);
-    sprintf(prePath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_pre_%d_%d_%d_%d.txt", 
+    sprintf(prePath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_wiki_pre_%d_%d_%d_%d.txt", 
                                         trainPhrases, usePCA, trainMulti, clusterArg);
     sprintf(vocabPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_vocab_%d_%d_%d_%d.txt",
                                         trainPhrases, usePCA, trainMulti, clusterArg);
@@ -603,12 +603,13 @@ void commonSenseWrapper(){
         visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
         //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_R_120.txt";
     }
+    
 
     // Writing word2vec from file
     //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_save.txt";
     //saveWord2Vec(wordPath);
-    char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
-    loadWord2Vec(wordPath);
+    //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
+    //loadWord2Vec(wordPath);
 
     // Initializing the hash
     initFeatureHash();
@@ -653,10 +654,10 @@ void commonSenseWrapper(){
 
     
     // Saving the embeddings, before refining
-    /*if(trainMulti)
+    if(trainMulti)
         saveMultiEmbeddings(prePath);
     else
-        saveEmbeddings(prePath);*/
+        saveEmbeddings(prePath);
 
     // Reset valAccuracy as the first run doesnt count
     prevValAcc = 0; 
@@ -694,13 +695,13 @@ void commonSenseWrapper(){
     return;
 
     // Saving the embeddings, after refining
-    /*if(trainMulti)
+    if(trainMulti)
         saveMultiEmbeddings(postPath);
     else
-        saveEmbeddings(postPath);*/
+        saveEmbeddings(postPath);
 
     // Find test tuples with best improvement, for further visualization
-    //findBestTestTuple(baseTestScores, bestTestScores);*/
+    //findBestTestTuple(baseTestScores, bestTestScores);
 
 }
 
@@ -713,8 +714,11 @@ void visualParaphraseWrapper(){
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_debug.txt";
     char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_full.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_sentences_lemma.txt";
-    //char visualPath[] = "/home/satwik/VisualWord2Vec/data/abstract_features_train_pca.txt";
-    char visualPath[] = "/home/satwik/VisualWord2Vec/data/abstract_features_train.txt";
+    char* visualPath = (char*) malloc(sizeof(char) * 100);
+    if(usePCA)
+        visualPath = "/home/satwik/VisualWord2Vec/data/abstract_features_train_pca.txt";
+    else
+        visualPath = "/home/satwik/VisualWord2Vec/data/abstract_features_train.txt";
     //char visualPath[] = "/home/satwik/VisualWord2Vec/data/abstract_features_debug.txt";
 
     // Loading word2vec file (from Xiao's baseline)
@@ -769,11 +773,15 @@ void TrainModel() {
     if (negative > 0) InitUnigramTable();
     start = clock();
     // [S] : Creates the threads for execution
-    for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+    //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
     // [S] : Waits for the completion of execution of the threads
-    for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
-    
+    // Save the embeddings before refining 
+    char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/wiki_embeddings_dims.bin";
+    //char beforeEmbedPath[] = "modelsNdata/word2vec_vp_lemma.bin";
+    loadWord2Vec(beforeEmbedPath);
+    //saveWord2Vec(beforeEmbedPath);
     //***************************************************************************************
     // Common sense task
     //commonSenseWrapper();
@@ -975,4 +983,3 @@ int main(int argc, char **argv) {
   TrainModel();
   return 0;
 }
-

@@ -4,6 +4,9 @@
 void saveWord2Vec(char* fileName){
     FILE* filePt = fopen(fileName, "wb");
 
+    // Write the vocab size and embedding dimension on the first line
+    fprintf(filePt, "%lld %lld\n", vocab_size, layer1_size);
+
     long i, j, offset;
     for (i = 0; i < vocab_size; i++){
         offset = i * layer1_size;

@@ -12,7 +12,8 @@ struct SentencePair* sentPairs; // Dataset of pairs of sentences
 long noSentPairs; // Number of sentences pairs
 
 // Training the sentences
-int trainSentences = 1; // Train sentences
+int trainSentences = 0; // Train sentences
+int debugMode = 0; // Debug mode, read less data for faster execution
 
 /***************************************************/
 // Read the sentences
@@ -292,12 +293,19 @@ void writeVPSentenceEmbeddings(){
 // Read all sentences along with features
 void readVPSentences(){
     // First read the sentences
+    char* readSent1 = (char*) malloc(100 * sizeof(char));
+    char* readSent2 = (char*) malloc(100 * sizeof(char));
+
     // Path to the sentences_1
-    //char readSent1[] = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma.txt";
-    char readSent1[] = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma.txt";
+    if(debugMode){
+        readSent1 = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma_debug.txt";
+        readSent2 = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma_debug.txt";
+    }
     // Path to the sentences_2
-    //char readSent2[] = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma.txt";
-    char readSent2[] = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma.txt";
+    else{
+        readSent1 = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma.txt";
+        readSent2 = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma.txt";
+    }
     
     // read sentences
     long noSents1, noSents2;
@@ -321,19 +329,46 @@ void readVPSentences(){
 // Reading the features
 void readVPSentenceFeatures(){
     printf("\nReading other features for the sentences!\n");
-    // Files for co-occurance features
-    char cocFeat1[] = "/home/satwik/VisualWord2Vec/data/vp_features_coc_1.txt";
-    char cocFeat2[] = "/home/satwik/VisualWord2Vec/data/vp_features_coc_2.txt";
+    char* cocFeat1 = (char*) malloc(sizeof(char) * 100);
+    char* cocFeat2 = (char*) malloc(sizeof(char) * 100);
+    char* tfFeat1 = (char*) malloc(sizeof(char) * 100);
+    char* tfFeat2 = (char*) malloc(sizeof(char) * 100);
+    char* gtPath = (char*) malloc(sizeof(char) * 100);
+    char* splitPath = (char*) malloc(sizeof(char) * 100);
+    char* validPath = (char*) malloc(sizeof(char) * 100);
 
-    // Files for total frequency features
-    char tfFeat1[] = "/home/satwik/VisualWord2Vec/data/vp_features_tf_1.txt";
-    char tfFeat2[] = "/home/satwik/VisualWord2Vec/data/vp_features_tf_2.txt";
+    if(debugMode){
+        // Files for co-occurance features
+        cocFeat1 = "/home/satwik/VisualWord2Vec/data/vp_features_coc_1_debug.txt";
+        cocFeat2 = "/home/satwik/VisualWord2Vec/data/vp_features_coc_2_debug.txt";
 
-    // Also read the ground truth file, test/train split
-    char gtPath[] = "/home/satwik/VisualWord2Vec/data/vp_ground_truth.txt";
-    char splitPath[] = "/home/satwik/VisualWord2Vec/data/vp_split.txt";
+        // Files for total frequency features
+        tfFeat1 = "/home/satwik/VisualWord2Vec/data/vp_features_tf_1_debug.txt";
+        tfFeat2 = "/home/satwik/VisualWord2Vec/data/vp_features_tf_2_debug.txt";
+
+        // Also read the ground truth file, test/train split, validation set
+        gtPath = "/home/satwik/VisualWord2Vec/data/vp_ground_truth_debug.txt";
+        splitPath = "/home/satwik/VisualWord2Vec/data/vp_split_debug.txt";
+        validPath = "/home/satwik/VisualWord2Vec/data/vp_val_inds_debug.txt";
+    }
+    else{
+        // Files for co-occurance features
+        cocFeat1 = "/home/satwik/VisualWord2Vec/data/vp_features_coc_1.txt";
+        cocFeat2 = "/home/satwik/VisualWord2Vec/data/vp_features_coc_2.txt";
+
+        // Files for total frequency features
+        tfFeat1 = "/home/satwik/VisualWord2Vec/data/vp_features_tf_1.txt";
+        tfFeat2 = "/home/satwik/VisualWord2Vec/data/vp_features_tf_2.txt";
+
+        // Also read the ground truth file, test/train split, validation set
+        gtPath = "/home/satwik/VisualWord2Vec/data/vp_ground_truth.txt";
+        splitPath = "/home/satwik/VisualWord2Vec/data/vp_split.txt";
+        validPath = "/home/satwik/VisualWord2Vec/data/vp_val_inds.txt";
+    }
+
     FILE* gtFile = fopen(gtPath, "rb");
     FILE* splitFile = fopen(splitPath, "rb");
+    FILE* valFile = fopen(validPath, "rb");
 
     // Read the dimensions and check for match in both the cases
     FILE* cocFile1 = fopen(cocFeat1, "rb");
@@ -343,7 +378,8 @@ void readVPSentenceFeatures(){
 
     // Checking for sanity
     if(cocFile1 == NULL || cocFile2 == NULL || 
-        tfFile1 == NULL || tfFile2 == NULL || gtFile == NULL){
+        tfFile1 == NULL || tfFile2 == NULL || 
+        gtFile == NULL || valFile == NULL){
         printf("\nFiles dont exist to read the features!\n");
         exit(1);
     }
@@ -398,7 +434,7 @@ void readVPSentenceFeatures(){
     // Compute the features for the sentence pairs
     sentPairs = (struct SentencePair*) malloc(sizeof(struct SentencePair) * noSentPairs);
     long index = 0; 
-    int gtruth, isTrain;
+    int gtruth, isTrain, isVal;
     for(i = 0; i < noSentPairs; i++){
         // Allocating memory for the features
         sentPairs[i].feature = (float*) malloc(sizeof(float) * totalFeatSize * 2);
@@ -439,6 +475,15 @@ void readVPSentenceFeatures(){
             exit(1);
         }
         sentPairs[i].isTrain = isTrain;
+        
+        // Reading if it is validation set or not
+        fscanf(valFile, "%d\n", &isVal);
+        // Check for consistency
+        if(!(isVal == 1 || isVal == 0)){
+            printf("Val set unexpected!\n");
+            exit(1);
+        }
+        sentPairs[i].isVal = isVal;
     }
 
     // close the file
@@ -448,6 +493,7 @@ void readVPSentenceFeatures(){
     fclose(tfFile2);
     fclose(gtFile);
     fclose(splitFile);
+    fclose(valFile);
 }
 
 // Computing the feaures for the sentences, assume the current embeddings to be updated

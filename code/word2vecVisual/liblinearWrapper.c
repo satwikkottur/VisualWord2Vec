@@ -3,14 +3,19 @@
 
 // Define the training and test points
 struct feature_node** testNodes; // storing test instances for liblinear
+struct feature_node** valNodes; // storing val instances for liblinear
 int* testGtruth;
+int* valGtruth;
 
 long* trainInds; // Indices of the training instances 
 long* testInds; // Indices of the testing instances 
+long* valInds; // Indices of the validation instances
 long noTrainSVM = 0; // Number of training instances for svm
-long noTestSVM; // Number of test instances for svm
+long noTestSVM = 0; // Number of test instances for svm
+long noValSVM = 0; // Number of val instances for svm
 long featSizeSVM;
 float* testScores = NULL;
+float* valScores = NULL;
 
 struct problem* curProblem = NULL; // Current probem to solve using svm
 struct parameter* curParam = NULL; // Current parameters for traing svm
@@ -23,7 +28,7 @@ void learnClassificationModel(struct SentencePair* sentPairs, long noPairs, int 
     if(noTrainSVM == 0){
         // Classifier and other datastructures uninitialized
         // Populate test and train indices
-        populateTestTrainIndices(sentPairs, noPairs);
+        populateTestTrainValIndices(sentPairs, noPairs);
 
         // Create the problem from the data
         createProblemPair(sentPairs);
@@ -39,6 +44,9 @@ void learnClassificationModel(struct SentencePair* sentPairs, long noPairs, int 
 
         // Create test nodes
         createTestNodesPair(sentPairs);
+
+        // Create val nodes
+        createValNodesPair(sentPairs);
     }
     else{
         // Modify the problem structure after getting the new embeddings
@@ -46,6 +54,9 @@ void learnClassificationModel(struct SentencePair* sentPairs, long noPairs, int 
 
         // Modify the test nodes
         modifyTestNodesPair(sentPairs);
+        
+        // Modify the val nodes
+        modifyValNodesPair(sentPairs);
     }
     
     // Find the best parameter C using cross-validation
@@ -63,11 +74,12 @@ void learnClassificationModel(struct SentencePair* sentPairs, long noPairs, int 
     trainedModel = train(curProblem, curParam);
     printf("\nTrained best model!\n");
 
-    // Compute the test accuracy, using scores from test instances
-    float mAP = computeAccuracy(trainedModel, sentPairs);
-    printf("\n****************************\n");
-    printf("Test accuracy (mAP) : %f\n", mAP);
-    printf("****************************\n");
+    // Compute the test/val accuracy, using scores from test/val instances
+    float mAPTest = computeTestAccuracy(trainedModel, sentPairs);
+    float mAPVal = computeValAccuracy(trainedModel, sentPairs);
+    printf("\n**************************************\n");
+    printf("mAP: Test (%f) Val(%f)\n", mAPTest, mAPVal);
+    printf("***************************************\n");
     
     // Free the memory
     //free_and_destroy_model(&trainedModel);
@@ -159,6 +171,43 @@ void createTestNodesPair(struct SentencePair* sentPairs){
     }
 }
 
+// Creating the val nodes using sentence pairs
+void createValNodesPair(struct SentencePair* sentPairs){
+    // Initialize the pointers
+    valNodes = (struct feature_node**) malloc(sizeof(struct feature_node*) * noValSVM);
+    valGtruth = (int*) malloc(sizeof(int) * noValSVM);
+    
+    // Always ignore bias
+    long i;
+    for (i = 0; i < noValSVM; i++){
+        // store the feature for each point
+        valNodes[i] = createNodeListFeature(sentPairs[valInds[i]].feature);
+        
+        // store the class for each point
+        valGtruth[i] = sentPairs[valInds[i]].gt;
+    }
+}
+
+// Creating generic feature nodes (doesn't work)
+void createFeatureNodesPair(struct SentencePair* sentPairs, 
+                            struct feature_node** nodes,
+                            int* gTruth,
+                            long* inds, long count){
+    // initialize the pointers
+    nodes = (struct feature_node**) malloc(sizeof(struct feature_node*) * count);
+    gTruth = (int*) malloc(sizeof(int) * count);
+
+    // Always ignore bias
+    long i;
+    for (i = 0; i < count; i++){
+        // store the feature for each point
+        nodes[i] = createNodeListFeature(sentPairs[inds[i]].feature);
+        
+        // store the class for each point
+        gTruth[i] = sentPairs[inds[i]].gt;
+    }
+}
+
 // Modifying the test nodes using sentence pairs
 void modifyTestNodesPair(struct SentencePair* sentPairs){
     if(testNodes == NULL){
@@ -172,6 +221,30 @@ void modifyTestNodesPair(struct SentencePair* sentPairs){
     for (i = 0; i < noTestSVM; i++)
         for(d = 0; d < 2*layer1_size; d++)
             testNodes[i][d].value = sentPairs[testInds[i]].feature[d];
+}
+
+// Modifying the val nodes using sentence pairs
+void modifyValNodesPair(struct SentencePair* sentPairs){
+    if(valNodes == NULL){
+        printf("\nVal nodes empty! Cannot modify!\n");
+        exit(1);
+    }
+
+    // Assume valNodes is not NULL and modify the features
+    // Modify only the first 2*layer1_size
+    long i; int d;
+    for (i = 0; i < noValSVM; i++)
+        for(d = 0; d < 2*layer1_size; d++)
+            valNodes[i][d].value = sentPairs[valInds[i]].feature[d];
+}
+
+// Modifying generic feature nodes - test / val
+void modifyFeatureNodesPair(struct SentencePair* sentPairs,
+                            struct feature_node** nodes,
+                            int* gTruth,
+                            long* inds, long count){
+                            
+                            
 }
 
 // Creating the problem parameters
@@ -233,28 +306,38 @@ struct feature_node* createNodeListFeature(float* feature){
 }
 
 // Populate the test and train indices from the sentence pairs
-void populateTestTrainIndices(struct SentencePair* sentPairs, long noPairs){
+void populateTestTrainValIndices(struct SentencePair* sentPairs, long noPairs){
     // First go through the pairs and determine the count of test/train
     long i;
     // Re-set number of train and test
     noTrainSVM = 0;
     noTestSVM = 0;
+    noValSVM = 0;
 
-    for(i = 0; i < noPairs; i++){
-        if(sentPairs[i].isTrain)
-            // Train
-            noTrainSVM++;
-        else
-            // Test
-            noTestSVM++;
-    }
+    for(i = 0; i < noPairs; i++)
+        if(sentPairs[i].isVal)
+            // Val set
+            noValSVM++;
+        else if(sentPairs[i].isTrain)
+                // Train
+                noTrainSVM++;
+            else
+                // Test
+                noTestSVM++;
 
     // Now populate the train and test indices
     trainInds = (long*) malloc(sizeof(long) * noTrainSVM);
     testInds = (long*) malloc(sizeof(long) * noTestSVM);
-    long trainCount = 0, testCount = 0;
+    valInds = (long*) malloc(sizeof(long) * noValSVM);
+    long trainCount = 0, testCount = 0, valCount = 0;
     for(i = 0; i < noPairs; i++){
-        if(sentPairs[i].isTrain){
+        // First check if its val set
+        if(sentPairs[i].isVal){
+            // Val
+            valInds[valCount] = i;
+            valCount ++;
+        }
+        else if(sentPairs[i].isTrain){
             // Train
             trainInds[trainCount] = i;
             trainCount++;
@@ -265,10 +348,12 @@ void populateTestTrainIndices(struct SentencePair* sentPairs, long noPairs){
             testCount++;
         }
     }
+
+    printf("Total : Train (%ld) Test (%ld) Val (%ld)\n", noTrainSVM, noTestSVM, noValSVM);
 }
 
 // Computing the accuracy for the test set, given the model
-float computeAccuracy(struct model* trainedModel, struct SentencePair* sentPairs){
+float computeTestAccuracy(struct model* trainedModel, struct SentencePair* sentPairs){
     // Initialize score array, if NULL
     if(testScores == NULL) testScores = (float*) malloc(sizeof(float) * noTestSVM);
 
@@ -311,6 +396,66 @@ float computeAccuracy(struct model* trainedModel, struct SentencePair* sentPairs
     long noPositives = 0;
     // Compute the similarity wrt ideal ordering 1,2,3.....
     for(a = 0; a < noTestSVM; a++)
+        if(rankedLabels[a] == 1){
+            // Increasing the positives
+            noPositives++;
+            mAP += noPositives / (float) (a + 1);
+            //printf("%ld %ld %f\n", noPositives, a + 1, noPositives/(float) (a + 1));
+        }
+   
+    // Compute mAP
+    mAP = mAP / noPositives;
+
+    // Free memory
+    free(rankedScores);
+    free(rankedLabels);
+    return mAP;
+}
+
+// Computing the accuracy for the val set, given the model
+float computeValAccuracy(struct model* trainedModel, struct SentencePair* sentPairs){
+    // Initialize score array, if NULL
+    if(valScores == NULL) valScores = (float*) malloc(sizeof(float) * noValSVM);
+
+    double score;
+    // Loop through all the instances and predict
+    long i;
+    for(i = 0; i < noValSVM; i++){
+        // Compute the score and store
+        predict_values(trainedModel, valNodes[i], &score);
+        valScores[i] = score;
+    }
+
+    // Now pedict the mAP, using ranks
+    printf("Computing MAP...\n\n");
+    // Crude implementation
+    long a, b;
+    int* rankedLabels = (int*) malloc(sizeof(int) * noValSVM);
+    float* rankedScores = (float*) malloc(sizeof(float) * noValSVM);
+
+    // Make a copy of scores
+    for(a = 0; a < noValSVM; a++) rankedScores[a] = valScores[a];
+
+    long maxInd;
+    // Get the rank of positive instances wrt to the scores
+    for(a = 0; a < noValSVM; a++){
+        maxInd = 0;
+        for(b = 0; b < noValSVM; b++)
+            // Check if max is also current max (flag out using -5)
+            if(rankedScores[b] != 1e-10 && 
+                        rankedScores[maxInd] < rankedScores[b]) 
+                maxInd = b;
+
+        // Swap the max and element at that instance
+        rankedLabels[a] = valGtruth[maxInd];
+        // NULLing the max ind 
+        rankedScores[maxInd] = -5;
+    }
+
+    float mAP = 0;
+    long noPositives = 0;
+    // Compute the similarity wrt ideal ordering 1,2,3.....
+    for(a = 0; a < noValSVM; a++)
         if(rankedLabels[a] == 1){
             // Increasing the positives
             noPositives++;

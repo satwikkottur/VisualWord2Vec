@@ -25,7 +25,7 @@ extern long long layer1_size;
 // in its format
 void learnClassificationModel(struct SentencePair*, long, int);
 // Populate the test and train indices
-void populateTestTrainIndices(struct SentencePair*, long);
+void populateTestTrainValIndices(struct SentencePair*, long);
 // Create the problem for the training data
 void createProblem(struct Sentence*, long);
 void createProblemPair(struct SentencePair*); // Given sentence pairs
@@ -39,14 +39,23 @@ void createParameter();
 
 // Creating the testing nodes
 void createTestNodesPair(struct SentencePair*);
+// Creating the val nodes
+void createValNodesPair(struct SentencePair*);
+// Creating generic nodes - test / val
+void createFeatureNodesPair(struct SentencePair*, struct feature_node**, int*, long*, long);
 
 // Modifying the testing nodes
 void modifyTestNodesPair(struct SentencePair*);
+// Modifying the val nodes
+void modifyValNodesPair(struct SentencePair*);
+// Modifying generic nodes - test / val
+void modifyFeatureNodesPair(struct SentencePair*, struct feature_node**, int*, long*, long);
 
 // Create each training instance
 struct feature_node* createNodeListSentence(struct Sentence, int);
 struct feature_node* createNodeListFeature(float* feature);
 
 // Computing the accuracy for a given bunch of features
-float computeAccuracy(struct model*, struct SentencePair*);
+float computeTestAccuracy(struct model*, struct SentencePair*);
+float computeValAccuracy(struct model*, struct SentencePair*);
 # endif
