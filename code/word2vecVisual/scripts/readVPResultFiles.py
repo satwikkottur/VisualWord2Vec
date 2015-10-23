@@ -30,5 +30,9 @@ dumpPaths = ['../out_val1k_sents', \
             '../out_val1k_words_wiki', \
             '../out_val1k_sents_wiki'];
 
+dumpPaths.append(['../out_enum_test_sents', \
+            '../out_enum_test_desc', \
+            '../out_enum_test_words']);
+
 for i in dumpPaths:
     printResults(i);

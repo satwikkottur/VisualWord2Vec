@@ -13,7 +13,7 @@ long noSentPairs; // Number of sentences pairs
 
 // Training the sentences
 // Could be one of DESCRIPTIONS, SENTENCES, WORDS, WINDOWS;
-enum TrainModeVP mode = SENTENCES;
+enum TrainModeVP mode = WINDOWS;
 
 /***************************************************/
 // Read the sentences
@@ -631,7 +631,7 @@ void clusterVPAbstractVisualFeatures(int clusters, char* savePath){
 // Refine the network based on the cluster id
 void refineNetworkVP(){
     printf("Refining using VP training sentences\n");
-    long c, i, s;
+    long c, i, s, w;
     float* y = (float*) malloc(sizeof(float) * noClusters);
     int wordCount = 0;
     // The starting and ending index for the current sentence in a description
@@ -682,7 +682,24 @@ void refineNetworkVP(){
                 }
                 break;
 
+            // Train for each window per sentence (pre-defined window size)
             case WINDOWS:
+                for(s = 0; s < trainSents[i].sentCount; s++){
+                    if(s == 0) startInd = 0;
+                    else startInd = trainSents[i].endIndex[s-1] + 1;
+                    endInd = trainSents[i].endIndex[s]; 
+               
+                    printf("Start, end, number: %d %d %d\n", startInd, endInd, endInd - startInd + 1);
+                    for (w = startInd + windowVP - 1; w <= endInd; w++){
+                        //printf("Window: (start, end) : (%d, %d) (%d, %d)\n", w - windowVP + 1, w, startInd, endInd);
+                        // Predict the cluster
+                        computeMultinomialPhrase(y, 
+                                    trainSents[i].index + (w-windowVP+1), windowVP);
+                        // Propage the error the embeddings
+                        updateWeightsPhrase(y, 
+                                trainSents[i].index + (w-windowVP+1), windowVP, trainSents[i].cId);
+                    }
+                }
                 break;
 
             case DESCRIPTIONS:

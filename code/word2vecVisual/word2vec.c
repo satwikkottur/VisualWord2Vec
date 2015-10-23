@@ -38,10 +38,11 @@ extern float *syn0P, *syn0S, *syn0R;
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
 int trainMulti = 1; // Train single / multiple models for P,R,S
-int clusterArg = 2; // Number of initial clusters to use
+int clusterArg = 100; // Number of initial clusters to use
 int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
-int debugModeVP = 1; // Debug mode for VP task
+int debugModeVP = 0; // Debug mode for VP task
+int windowVP = 5; // window size for the VP task
 
 /***********************************************************************************/
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
@@ -748,7 +749,7 @@ void visualParaphraseWrapper(){
     // Begin the refining
     int i, noIters = 200;
     if(debugModeVP)
-        noIters = 5;
+        noIters = 1;
     else
         noIters = 200;
     

@@ -23,6 +23,7 @@ extern int noClusters;
 extern long long layer1_size;
 extern float* syn0;
 extern int debugModeVP;
+extern int windowVP;
 
 //*********************************************//
 // Enumerations
