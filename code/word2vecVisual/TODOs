@@ -86,3 +86,5 @@ Visual Paraphrasing
 - Hold out a validation set (done)
 - Compute overlap statistics
 - Setup VQA dataset
+- Use windowed training
+- Separate the sentences of description while training

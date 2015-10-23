@@ -41,7 +41,11 @@ struct Sentence{
     // no of words recognized in the current vocab
     int actCount;
     // indices of the words recognized in the curent vocab
-    long* index;
+    int* index;
+    // Indices of the words at the end of each sentence
+    int* endIndex;
+    // Number of sentences
+    int sentCount;
     // Training visual feature used for clustering
     float* vFeat;
     // Cluster Id for the feature

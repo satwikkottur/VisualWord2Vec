@@ -77,11 +77,12 @@ struct Sentence** readSentences(char* featurePath, long* noSents){
 void tokenizeSentences(struct Sentence* collection, long noSents){
     long i;
     for (i = 0; i < noSents; i++){
+        //printf("**************************\n");
         // Copy the word into a local variable line
         char* line = (char*) malloc(MAX_SENTENCE);
         strcpy(line, collection[i].sent);
 
-        int count = 0, n, actCount = 0;
+        int count = 0, n, actCount = 0, sentCount = 0;
 
         // Split based on 's
         char* first = multi_tok(line, "'s");
@@ -95,34 +96,74 @@ void tokenizeSentences(struct Sentence* collection, long noSents){
         strcpy(temp, line);
         
         // Remove ' ', ',', '.', '?', '!', '\', '/'
-        char* delim = " .,/!?\\";
+        char* delim = " ,/!?\\"; // Ignore the full stop, used to demarcate end of sentence
         line = strtok(line, delim);
         // Going over the line to determine the number of parts
         while(line != NULL){
             count++;
+
+            // Check if an ending word
+            if(line[strlen(line)-1] == '.')
+                sentCount++;
+            
+            // Get the next word
             line = strtok(NULL, delim);
         }
 
         // Now store the word components, looping over them
+        if(sentCount == 0) sentCount = 1; // Punctuations not present, treat as one sentence
         collection[i].index = (long*) malloc(count * sizeof(long));
+        collection[i].endIndex = (long*) malloc(sentCount * sizeof(long));
 
         line = strtok(temp, delim);
-        count = 0;
+        count = 0, sentCount = 0;
+        int lineEnd;
+        long wordIndex;
         while(line != NULL){
             // Convert the token into lower case
-            for(n = 0; line[n]; n++) line[n] = tolower(line[n]);
-           
-            // Save the index
-            collection[i].index[count] = SearchVocab(line);
-            if(collection[i].index[count] != -1) actCount++;
-            //if(collection[i].index[count] == -1)
-            //    printf("%s\n", line);
+            for(n = 0; line[n]; n++){
+                line[n] = tolower(line[n]);
+
+                // Check if it has a trailing full stop, if yes, terminate and report
+                if (line[n] == '.'){
+                    lineEnd = 1;
+                    //printf("Sent: %s\n", collection[i].sent);
+                    //printf("End of sentence : %d %d %s\n", collection[i].endIndex[sentCount], sentCount, line);
+                    sentCount++;
+                    line[n] = '\0';
+                }
+            }
+            wordIndex = SearchVocab(line);
+            // Exists in vocab, save
+            if (wordIndex != -1){
+                collection[i].index[count] = wordIndex;
+            
+                actCount++;
+                count++;
+            }
+            
+            // Adjust end of line count
+            if(lineEnd){
+                collection[i].endIndex[sentCount] = count;
+                lineEnd = 0;
+            }
+            
+            // Next word
             line = strtok(NULL, delim);
-            count++;
         }
+
+        // Punctuations absent, treat everything as one setnence
+        if(sentCount == 0){
+            sentCount = 1;
+            collection[i].endIndex[0] = count;
+        }
+
         // Now store the word components, looping over them
         collection[i].count = count;
         collection[i].actCount = actCount;
+        collection[i].sentCount = sentCount;
+
+        //printf("Sent count: %s\n%d\n", collection[i].sent, collection[i].sentCount);
     }
 }
 
@@ -591,7 +632,7 @@ void clusterVPAbstractVisualFeatures(int clusters, char* savePath){
 // Refine the network based on the cluster id
 void refineNetworkVP(){
     printf("Refining using VP training sentences\n");
-    long c, i;
+    long c, i, s;
     float* y = (float*) malloc(sizeof(float) * noClusters);
     int* wordList = (int*) malloc(MAX_SENTENCE * sizeof(int));
     int* wordInd = (int*) malloc(sizeof(int));
@@ -616,7 +657,35 @@ void refineNetworkVP(){
         // Now collecting words for training
         wordCount = 0;
         
-        for(c = 0; c < trainSents[i].count; c++){
+        // Training each word separately
+        if(!trainSentences){
+            for(c = 0; c < trainSents[i].count; c++){
+                // Train if exists
+                if(trainSents[i].index[c] != -1){
+                    // Predict the cluster
+                    computeMultinomialPhrase(y, trainSents[i].index + c, 1);
+                    // Propage the error the embeddings
+                    updateWeightsPhrase(y, trainSents[i].index, 1, trainSents[i].cId);
+                }
+            }
+        }
+        else{
+            // Training sentences
+            // Handle first sentence
+            // Predict the cluster
+            computeMultinomialPhrase(y, trainSents[i].index + c, 1);
+            // Propage the error the embeddings
+            updateWeightsPhrase(y, trainSents[i].index, 1, trainSents[i].cId);
+
+            for(s = 0; s < trainSents[i].sentCount; s++){
+                //wordCount = ;
+            
+            }
+        
+        
+        }
+
+        /*for(c = 0; c < trainSents[i].count; c++){
             // If not in vocab, continue
             if(trainSents[i].index[c] == -1) continue;
 
@@ -639,11 +708,24 @@ void refineNetworkVP(){
         else{
             // Training the sentences
             // Predict the cluster
+            computeMultinomialPhrase(y, wordList, trainSents[i].endIndex[0]);
+            
+            // Propage the error the embeddings
+            updateWeightsPhrase(y, wordList, wordCount, trainSents[i].cId);
+            
+
+            // Training each sentence from start to end
+            for(c = 1; c < sentCount; c++){
+            
+            
+            }
+
+            // Predict the cluster
             computeMultinomialPhrase(y, wordList, wordCount);
             
             // Propage the error the embeddings
             updateWeightsPhrase(y, wordList, wordCount, trainSents[i].cId);
-        }
+        }*/
     }
 }
 
