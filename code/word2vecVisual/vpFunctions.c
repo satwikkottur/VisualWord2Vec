@@ -689,7 +689,7 @@ void refineNetworkVP(){
                     else startInd = trainSents[i].endIndex[s-1] + 1;
                     endInd = trainSents[i].endIndex[s]; 
                
-                    printf("Start, end, number: %d %d %d\n", startInd, endInd, endInd - startInd + 1);
+                    //printf("Start, end, number: %d %d %d\n", startInd, endInd, endInd - startInd + 1);
                     for (w = startInd + windowVP - 1; w <= endInd; w++){
                         //printf("Window: (start, end) : (%d, %d) (%d, %d)\n", w - windowVP + 1, w, startInd, endInd);
                         // Predict the cluster

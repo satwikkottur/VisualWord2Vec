@@ -86,6 +86,8 @@ Visual Paraphrasing
 - Hold out a validation set (done)
 - Compute overlap statistics
 - Setup VQA dataset
-- Use windowed training
+- Refine using VQA dataset
+- Send VQA dataset training captions to Rama
+- Use windowed training (done)
 - Separate the sentences of description while training (done)
 - Setup the text retrieval task

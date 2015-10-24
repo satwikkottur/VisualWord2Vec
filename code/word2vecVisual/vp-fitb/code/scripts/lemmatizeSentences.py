@@ -31,9 +31,20 @@ def main(readPath, savePath, tokenPath):
     readFile.close();
 
     # First tag the sentences, get wordnet tags and then lemmatize
-    posLines = [pos_tag(i) for i in tokenLines];
+    print('Beginning to tag...')
+
+    # Check for unicode and ignore in case of errors
+    #posLines = [];
+    #for i in xrange(0, len(tokenLines)):
+        #print (i, len(tokenLines))
+        #posLines.append(pos_tag([unicode(j, errors = 'ignore') for j in tokenLines[i]]));
+    posLines = [pos_tag([unicode(j, errors = 'ignore') for j in i])\
+                                for i in tokenLines];
+
+    #posLines = [pos_tag(i) for i in tokenLines];
     newTags = [[(i[0], get_wordnet_pos(i[1])) for i in j] \
                                                 for j in posLines];
+    print('Done tagging...')
 
     # Store all the tokens after lemmatizing
     tokenSet = [];
@@ -80,7 +91,7 @@ tokenPath = '/home/satwik/VisualWord2Vec/data/coco_train_minus_cs_test_lemma_tok
 main(readPath, savePath, tokenPath);'''
 
 # VP all sentences
-readPath = '../dumps/vp_sentences_1.txt';
+'''readPath = '../dumps/vp_sentences_1.txt';
 savePath = '../dumps/vp_sentences1_lemma.txt';
 tokenPath = '../dumps/vp_sentence1_tokens_lemma.txt';
 main(readPath, savePath, tokenPath);
@@ -88,7 +99,14 @@ main(readPath, savePath, tokenPath);
 readPath = '../dumps/vp_sentences_2.txt';
 savePath = '../dumps/vp_sentences2_lemma.txt';
 tokenPath = '../dumps/vp_sentence2_tokens_lemma.txt';
+main(readPath, savePath, tokenPath);'''
+
+# VQA sentences
+readPath = '/home/satwik/VisualWord2Vec/data/vqa_train_captions_raw.txt';
+savePath = '/home/satwik/VisualWord2Vec/data/vqa_train_captions_lemma.txt';
+tokenPath = '/home/satwik/VisualWord2Vec/data/vqa_train_captions_tokens.txt';
 main(readPath, savePath, tokenPath);
+
 ###############################################################################
 '''
 # Read the tokens, lemmatize
@@ -108,3 +126,8 @@ for i in tokens:
 
 readFile.close();
 saveFile.close();'''
+'''posLines = [];
+for i in tokenLines:
+print i
+unicodeLine = [unicode(j, errors = 'ignore') for j in i];
+posLines.append(pos_tag(unicodeLine));'''
