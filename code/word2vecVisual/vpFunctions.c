@@ -13,7 +13,7 @@ long noSentPairs; // Number of sentences pairs
 
 // Training the sentences
 // Could be one of DESCRIPTIONS, SENTENCES, WORDS, WINDOWS;
-enum TrainModeVP mode = WINDOWS;
+enum TrainModeVP mode = WORDS;
 
 /***************************************************/
 // Read the sentences

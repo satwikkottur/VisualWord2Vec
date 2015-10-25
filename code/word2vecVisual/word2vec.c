@@ -38,8 +38,8 @@ extern float *syn0P, *syn0S, *syn0R;
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
 int trainMulti = 1; // Train single / multiple models for P,R,S
-int clusterArg = 25; // Number of initial clusters to use
-int usePCA = 0;  // Reduce the dimensions through PCA
+int clusterArg = 100; // Number of initial clusters to use
+int usePCA = 1;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
 int windowVP = 5; // window size for the VP task
@@ -790,16 +790,18 @@ void TrainModel() {
     //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     // Save the embeddings before refining 
-    char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings_pre_refine.bin";
+    char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
+    //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings_pre_refine.bin";
     //char beforeEmbedPath[] = "modelsNdata/word2vec_vp_lemma.bin";
     loadWord2Vec(beforeEmbedPath);
     //saveWord2Vec(beforeEmbedPath);
     //***************************************************************************************
     // Common sense task
-    commonSenseWrapper();
+    //commonSenseWrapper();
     
     // Visual paraphrase task
-    //visualParaphraseWrapper();
+    visualParaphraseWrapper();
+    return;
 
     //***************************************************************************************
     /***************************************************************************************/

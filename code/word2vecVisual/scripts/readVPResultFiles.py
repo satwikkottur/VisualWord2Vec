@@ -23,17 +23,27 @@ def printResults(dumpPath):
 
 ###########################################################################
 #dumpPath = '../modelsNdata/backup/out_val_sents';
-dumpPaths = ['../out_val1k_sents', \
+'''dumpPaths = ['../out_vaIl1k_sents', \
             '../out_val1k_sents_pca', \
             '../out_val1k_words', \
             '../out_val1k_words_pca', \
             '../out_val1k_words_wiki', \
             '../out_val1k_sents_wiki'];
 
-dumpPaths.extend(['../out_enum_test_sents', \
+#dumpPaths.extend(['../out_enum_test_sents', \
             '../out_enum_test_desc', \
             '../out_enum_test_words', \
-            '../out_enum_test_winds_back']);
+            '../out_enum_test_winds']);'''
+
+dumpPaths = [];
+dumpPaths.extend(['../out_enum_wiki_desc', \
+                    '../out_enum_wiki_desc_pca', \
+                    '../out_enum_wiki_sents', \
+                    '../out_enum_wiki_sents_pca', \
+                    '../out_enum_wiki_words', \
+                    '../out_enum_wiki_words_pca', \
+                    '../out_enum_wiki_winds', \
+                    '../out_enum_wiki_winds_pca']);
 
 for i in dumpPaths:
     printResults(i);
