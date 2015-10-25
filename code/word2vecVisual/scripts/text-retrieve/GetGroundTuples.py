@@ -6,8 +6,6 @@ import os
 picklePath = '/home/satwik/VisualWord2Vec/data/text_retrieval_pilot_lemma.p';
 tuplesData = pickle.load(open(picklePath, 'rb'));
 
-rootPath = '';
-
 # Order : Relation, Primary, Secondary
 tuples = tuplesData['data'];
 
