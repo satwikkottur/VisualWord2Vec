@@ -2,6 +2,7 @@
 import os
 import numpy as np
 import re
+import nltk
 from nltk.stem import WordNetLemmatizer
 from copy import deepcopy
 

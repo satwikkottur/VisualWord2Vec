@@ -102,11 +102,16 @@ tokenPath = '../dumps/vp_sentence2_tokens_lemma.txt';
 main(readPath, savePath, tokenPath);'''
 
 # VQA sentences
-readPath = '/home/satwik/VisualWord2Vec/data/vqa_train_captions_raw.txt';
+'''readPath = '/home/satwik/VisualWord2Vec/data/vqa_train_captions_raw.txt';
 savePath = '/home/satwik/VisualWord2Vec/data/vqa_train_captions_lemma.txt';
 tokenPath = '/home/satwik/VisualWord2Vec/data/vqa_train_captions_tokens.txt';
-main(readPath, savePath, tokenPath);
+main(readPath, savePath, tokenPath);'''
 
+# MS COCO captions
+readPath = '/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco.txt';
+savePath = '/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma.txt';
+tokenPath = '/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma_tokens.txt';
+main(readPath, savePath, tokenPath);
 ###############################################################################
 '''
 # Read the tokens, lemmatize

@@ -3,7 +3,9 @@ import re
     
 def printResults(dumpPath):
     #dumpPath = '../modelsNdata/backup/out_val_sents';
-    fileId = open(dumpPath, 'rb');
+    rootPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/';
+    #rootPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/backup/';
+    fileId = open(rootPath + dumpPath, 'rb');
     if(fileId == None):
         print 'File not found!'
         return
@@ -18,32 +20,49 @@ def printResults(dumpPath):
 
     print dumpPath
     print 'Baseline: %s\nBest VP: %s\n' % \
-                (testScores[0], testScores[valScores.index(max(valScores))])
+                (testScores[0], testScores[valScores.index(max(valScores[0:100]))])
     fileId.close();
 
 ###########################################################################
 #dumpPath = '../modelsNdata/backup/out_val_sents';
-'''dumpPaths = ['../out_vaIl1k_sents', \
-            '../out_val1k_sents_pca', \
-            '../out_val1k_words', \
-            '../out_val1k_words_pca', \
-            '../out_val1k_words_wiki', \
-            '../out_val1k_sents_wiki'];
+'''dumpPaths = ['out_val1k_sents', \
+            'out_val1k_sents_pca', \
+            'out_val1k_words', \
+            'out_val1k_words_pca', \
+            'out_val1k_words_wiki', \
+            'out_val1k_sents_wiki'];
 
-#dumpPaths.extend(['../out_enum_test_sents', \
-            '../out_enum_test_desc', \
-            '../out_enum_test_words', \
-            '../out_enum_test_winds']);'''
+dumpPaths.extend(['out_enum_test_sents', \
+            'out_enum_test_desc', \
+            'out_enum_test_words', \
+            'out_enum_test_winds']);'''
+
+'''dumpPaths.extend(['out_enum_wiki_desc', \
+                    'out_enum_wiki_desc_pca', \
+                    'out_enum_wiki_sents', \
+                    'out_enum_wiki_sents_pca', \
+                    'out_enum_wiki_words', \
+                    'out_enum_wiki_words_pca', \
+                    'out_enum_wiki_winds', \
+                    'out_enum_wiki_winds_pca']);'''
 
 dumpPaths = [];
-dumpPaths.extend(['../out_enum_wiki_desc', \
-                    '../out_enum_wiki_desc_pca', \
-                    '../out_enum_wiki_sents', \
-                    '../out_enum_wiki_sents_pca', \
-                    '../out_enum_wiki_words', \
-                    '../out_enum_wiki_words_pca', \
-                    '../out_enum_wiki_winds', \
-                    '../out_enum_wiki_winds_pca']);
+dumpPaths.extend(['out_vp_coco_descs', \
+                    'out_vp_coco_descs_pca', \
+                    'out_vp_coco_sents', \
+                    'out_vp_coco_sents_pca', \
+                    'out_vp_coco_words', \
+                    'out_vp_coco_words_pca', \
+                    'out_vp_coco_winds', \
+                    'out_vp_coco_winds_pca']);
 
+'''dumpPaths.extend(['out_wiki_desc', \
+                    'out_wiki_descs_pca', \
+                    'out_wiki_sents', \
+                    'out_wiki_sents_pca', \
+                    'out_wiki_words', \
+                    'out_wiki_words_pca', \
+                    'out_wiki_winds', \
+                    'out_wiki_winds_pca']);'''
 for i in dumpPaths:
     printResults(i);

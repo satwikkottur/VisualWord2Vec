@@ -37,9 +37,9 @@ extern float *syn0P, *syn0S, *syn0R;
 
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
-int trainMulti = 1; // Train single / multiple models for P,R,S
-int clusterArg = 100; // Number of initial clusters to use
-int usePCA = 1;  // Reduce the dimensions through PCA
+int trainMulti = 0; // Train single / multiple models for P,R,S
+int clusterArg = 25; // Number of initial clusters to use
+int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
 int windowVP = 5; // window size for the VP task
@@ -578,6 +578,7 @@ void commonSenseWrapper(){
     char* postPath = (char*) malloc(sizeof(char) * 100);
     char* prePath = (char*) malloc(sizeof(char) * 100);
     char* vocabPath = (char*) malloc(sizeof(char) * 100);
+    char* embedDumpPath = (char*) malloc(sizeof(char) * 100);
 
     // Common sense task
     // Reading the file for relation word
@@ -669,6 +670,7 @@ void commonSenseWrapper(){
                                         usePCA, trainPhrases, trainMulti, clusterArg);
     
     int noOverfit = 1;
+    int iter = 0;
     while(noOverfit){
         // Refine the network for multi model
         if(trainMulti){
@@ -684,6 +686,12 @@ void commonSenseWrapper(){
             else
                 refineNetwork();
         }
+
+        // Saving the embeddings
+        sprintf(embedDumpPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_wiki_iter_%d.bin",
+                                            iter);
+        saveWord2Vec(embedDumpPath);
+        iter++;
         
         if(trainMulti)
             // Performing the multi model common sense task
@@ -702,15 +710,14 @@ void commonSenseWrapper(){
         saveEmbeddings(postPath);
 
     // Find test tuples with best improvement, for further visualization
-    //findBestTestTuple(baseTestScores, bestTestScores);
-
+    findBestTestTuple(baseTestScores, bestTestScores);
 }
 
 // Function for visual paraphrase task
 void visualParaphraseWrapper(){
     // Read the embeddings from the file
-    //char embedFile[] = "modelsNdata/vp/word2vec_coco_vp_lemma.bin";
-    //loadWord2Vec(embedFile);
+    char embedFile[] = "modelsNdata/vp/word2vec_coco_vp_lemma.bin";
+    loadWord2Vec(embedFile);
 
     // Reading the file for training
     char* visualPath = (char*) malloc(sizeof(char) * 100);
@@ -793,14 +800,15 @@ void TrainModel() {
     char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings_pre_refine.bin";
     //char beforeEmbedPath[] = "modelsNdata/word2vec_vp_lemma.bin";
-    loadWord2Vec(beforeEmbedPath);
+    //char beforeEmbedPath[] = "modelsNdata/mscoco_before.bin";
+    //loadWord2Vec(beforeEmbedPath);
     //saveWord2Vec(beforeEmbedPath);
     //***************************************************************************************
     // Common sense task
-    //commonSenseWrapper();
+    commonSenseWrapper();
     
     // Visual paraphrase task
-    visualParaphraseWrapper();
+    //visualParaphraseWrapper();
     return;
 
     //***************************************************************************************
