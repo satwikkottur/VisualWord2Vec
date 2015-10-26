@@ -4,15 +4,15 @@
 % showPRStog = sow the tsne of P,R,S together
 
 % Read the file
-clustIdPath = '../../modelsNdata/cluster_id_save_10.txt';
+clustIdPath = '../../modelsNdata/cluster_id_save_25.txt';
 cIds = dlmread(clustIdPath);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Show the TSNE for P,R,S
 % Read the tuples and feature files
 % Setting up paths
-%rootPath = '/home/satwik/VisualWord2Vec/';
-rootPath = '/Users/skottur/CMU/Personal/VisualWord2Vec/';
+rootPath = '/home/satwik/VisualWord2Vec/';
+%rootPath = '/Users/skottur/CMU/Personal/VisualWord2Vec/';
 
 addpath(fullfile(rootPath, 'code/io/'));
 addpath(genpath(fullfile(rootPath, 'libs')));
@@ -23,9 +23,9 @@ featPath = fullfile(rootPath, 'data/float_features_withoutheader.txt');
 rootPath = fullfile(rootPath, '/code/word2vecVisual');
 modelPath = fullfile(rootPath, 'modelsNdata');
 
-preFile = fullfile(modelPath, 'backup', 'word2vec_pre_0_0_1_25.txt');
-postFile = fullfile(modelPath, 'backup', 'word2vec_post_0_0_1_25.txt');
-vocabFile = fullfile(modelPath, 'word2vec_vocab_0_0_1_25.txt');
+preFile = fullfile(modelPath, 'word2vec_wiki_pre_0_0_1_25.txt');
+postFile = fullfile(modelPath, 'word2vec_wiki_post_0_0_1_25.txt');
+vocabFile = fullfile(modelPath, 'word2vec_vocab_0_0_0_25.txt');
 
 % Dont read if already exists in workspace
 if(~exist('Rfeats', 'var'))

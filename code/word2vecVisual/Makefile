@@ -46,8 +46,8 @@ vp:
 
 wiki:
 	make
-	#./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/enwik9 -output /home/satwik/VisualWord2Vec/models/wiki_just_embeddings.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 36 -binary 0 -min-count 0
-	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/wiki_vp_train_lemma.txt -output modelsNdata/word2vec_after_refine_lemma.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
+	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/enwik9 -output /home/satwik/VisualWord2Vec/models/wiki_just_embeddings.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 36 -binary 0 -min-count 0
+	#./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/wiki_vp_train_lemma.txt -output modelsNdata/word2vec_after_refine_lemma.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 
 big:
 	make

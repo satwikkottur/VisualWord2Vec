@@ -637,6 +637,9 @@ void commonSenseWrapper(){
     //saveFeatureWordVocab(vocabPath);
     //char splitPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/split_vocab.txt";  
     //saveFeatureWordVocabSplit(splitPath);
+    // Saving the feature vocabulary
+    saveFeatureWordVocab(vocabPath);
+    return;
     
     // Store the basemodel test tuple scores and best model test tuple scores
     float* baseTestScores = (float*) malloc(sizeof(float) * noTest);
@@ -797,10 +800,10 @@ void TrainModel() {
     //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     // Save the embeddings before refining 
-    char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
+    //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings_pre_refine.bin";
     //char beforeEmbedPath[] = "modelsNdata/word2vec_vp_lemma.bin";
-    //char beforeEmbedPath[] = "modelsNdata/mscoco_before.bin";
+    char beforeEmbedPath[] = "modelsNdata/mscoco_before.bin";
     //loadWord2Vec(beforeEmbedPath);
     //saveWord2Vec(beforeEmbedPath);
     //***************************************************************************************
