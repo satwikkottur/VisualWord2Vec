@@ -15,11 +15,10 @@
 
 extern struct featureWord* featHashWords;
 extern struct prsTuple* trainTuples;
-extern long noTrain;
 extern int noCluster;
 extern int visualFeatSize;
 
-void debugVisualFeatureRead(char*);
-void debugPRSFeatureRead(char*);
+void debugVisualFeatureRead(char*, long);
+void debugPRSFeatureRead(char*, long);
 
 #endif

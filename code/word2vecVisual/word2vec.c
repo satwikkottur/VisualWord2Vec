@@ -28,6 +28,7 @@
 # include "debugFunctions.h"
 # include "vpFunctions.h"
 # include "helperFunctions.h"
+# include "cocoFunctions.h"
 /***********************************************************************************/
 // Extern variables
 extern float prevTestAcc, prevValAcc;
@@ -43,6 +44,9 @@ int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
 int windowVP = 5; // window size for the VP task
+// Training the sentences in one of the modes
+// Could be one of DESCRIPTIONS, SENTENCES, WORDS, WINDOWS;
+enum TrainMode trainMode = DESCRIPTIONS;
 
 /***********************************************************************************/
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
@@ -786,9 +790,12 @@ void visualParaphraseWrapper(){
 // Function for training from ms coco dataset
 void mscocoWrapper(){
     // Load the embeddings (pre-trained) to save time
-    char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
+    //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
+    // Load the word2vec embeddings from Xiao's
+    char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
     loadWord2Vec(beforeEmbedPath);
 
+    ////////// Dirty work of setting up paths//////////////////////////////////////////////////////////
     // [S] added
     char* visualPath = (char*) malloc(sizeof(char) * 100);
     char* postPath = (char*) malloc(sizeof(char) * 100);
@@ -821,21 +828,23 @@ void mscocoWrapper(){
         visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
         //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_R_120.txt";
     }
+
+    // Paths for train sentences and their cluster ids for COCO captions
+    char clusterPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/cluster_100_coco_train.txt";
+    char trainPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma.txt";
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
     
-
-    // Writing word2vec from file
-    //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_save.txt";
-    //saveWord2Vec(wordPath);
-
     // Initializing the hash
     initFeatureHash();
     // Reading for the word features, cluster ids and visual features
-    // ClusterId reading will be avoided when clustering is ported to C
     readFeatureFile(featurePath);
     
     // Reading cluster file for ms coco
-    char clusterPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/cluster_100_coco_train.txt";
-    readClusterIdFile(clusterPath);
+    readTrainSentencesCOCO(trainPath);
+    // Reading the cluster ids
+    readClusterIdCOCO(clusterPath);
+    // Tokenizing the files
+    tokenizeTrainSentencesCOCO();
 
     // Read the validation and test sets    
     if(noTest == 0)
@@ -846,27 +855,11 @@ void mscocoWrapper(){
     float* baseTestScores = (float*) malloc(sizeof(float) * noTest);
     float* bestTestScores = (float*) malloc(sizeof(float) * noTest);
 
-    return;
-
-    if(trainMulti){
-        // Initializing the refining network
-        initMultiRefining();
-        // Performing the multi model common sense task
-        performMultiCommonSenseTask(baseTestScores);
-    }
-    else{
-        // Initializing the refining network
-        initRefining();
-        // Perform common sense task
-        performCommonSenseTask(baseTestScores);
-    }
-
-    
-    // Saving the embeddings, before refining
-    /*if(trainMulti)
-        saveMultiEmbeddings(prePath);
-    else
-        saveEmbeddings(prePath);*/
+    // Refine the embeddings (single only)
+    // Initializing the refining network
+    initRefining();
+    // Perform common sense task
+    performCommonSenseTask(baseTestScores);
 
     // Reset valAccuracy as the first run doesnt count
     prevValAcc = 0; 
@@ -878,45 +871,12 @@ void mscocoWrapper(){
     int noOverfit = 1;
     int iter = 0;
     while(noOverfit){
-        // Refine the network for multi model
-        if(trainMulti){
-            if(trainPhrases)
-                refineMultiNetworkPhrase();
-            else
-                refineMultiNetwork();
-        }
         // Refine the network
-        else{
-            if(trainPhrases)
-                refineNetworkPhrase();
-            else
-                refineNetwork();
-        }
-
-        // Saving the embeddings snapshots
-        /*sprintf(embedDumpPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_wiki_iter_%d.bin",
-                                            iter);
-        saveWord2Vec(embedDumpPath);
-        iter++;*/
+        refineNetworkCOCO();
         
-        if(trainMulti)
-            // Performing the multi model common sense task
-            //noOverfit = performMultiCommonSenseTask(NULL);
-            noOverfit = performMultiCommonSenseTask(bestTestScores);
-        else
-            // Perform common sense task
-            //noOverfit = performCommonSenseTask(NULL);
-            noOverfit = performCommonSenseTask(bestTestScores);
+        // Perform common sense task
+        noOverfit = performCommonSenseTask(bestTestScores);
     }
-
-    // Saving the embeddings, after refining
-    /*if(trainMulti)
-        saveMultiEmbeddings(postPath);
-    else
-        saveEmbeddings(postPath);*/
-
-    // Find test tuples with best improvement, for further visualization
-    //findBestTestTuple(baseTestScores, bestTestScores);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////

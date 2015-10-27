@@ -76,4 +76,9 @@ struct SentencePair{
     // Features (word2vec, coc, tf) in that order
     float* feature;
 };
+
+// Enumerations
+// Training mode for vp task
+// Refining using either entire descriptions/sentences/words
+enum TrainMode {DESCRIPTIONS, SENTENCES, WINDOWS, WORDS};
 #endif

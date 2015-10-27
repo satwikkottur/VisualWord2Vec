@@ -6,6 +6,12 @@ void initRefining(){
     long long a, b;
     unsigned long long next_random = 1;
 
+    // Check if noClusters and layer1_size is not 0
+    if(layer1_size == 0 || noClusters == 0){
+        printf("\nNumber of cluster (%d) | layer1_size (%d) is zero!\n", noClusters, layer1_size);
+        exit(1);
+    }
+
     // Setup the network 
     a = posix_memalign((void **)&syn1, 128, (long long)noClusters * layer1_size * sizeof(float));
     if (syn1 == NULL) {
@@ -206,4 +212,91 @@ void computeSentenceEmbeddings(struct Sentence* collection, long noSents){
     }
 
     free(mean);
+}
+
+// Refine the network based on the cluster id, given sentences
+void refineNetworkSentences(struct Sentence* trainSents, long noTrain, enum TrainMode mode){
+    long c, i, s, w;
+    float* y = (float*) malloc(sizeof(float) * noClusters);
+    int wordCount = 0;
+    // The starting and ending index for the current sentence in a description
+    int startInd, endInd; 
+
+    // Checking if training examples are present
+    if(noTrain == 0){
+        printf("Training examples not loaded!\n");   
+        exit(1);
+    }
+
+    // Read each of the training sentences
+    for(i = 0; i < noTrain; i++){
+        //printf("Training %ld instance ....\n", i);
+        
+        // Checking possible fields to avoid segmentation error
+        if(trainSents[i].cId < 1 || trainSents[i].cId > noClusters) {
+            printf("\nCluster id (%d) for %ld instance invalid!\n", trainSents[i].cId, i);
+            exit(1);
+        }
+
+        // Now collecting words for training
+        wordCount = 0;
+        
+        switch(mode){
+            // Training each word separately
+            case WORDS:
+                for(c = 0; c < trainSents[i].count; c++){
+                    // Predict the cluster
+                    computeMultinomialPhrase(y, trainSents[i].index + c, 1);
+                    // Propage the error the embeddings
+                    updateWeightsPhrase(y, trainSents[i].index + c, 1, trainSents[i].cId);
+                }
+                break;
+
+            // Train each sentence separately
+            case SENTENCES:
+                for(s = 0; s < trainSents[i].sentCount; s++){
+                    if(s == 0) startInd = 0;
+                    else startInd = trainSents[i].endIndex[s-1] + 1;
+                    endInd = trainSents[i].endIndex[s]; 
+               
+                    //printf("Start, end, number: %d %d %d\n", startInd, endInd, endInd - startInd + 1);
+                    // Predict the cluster
+                    computeMultinomialPhrase(y, trainSents[i].index + startInd, endInd - startInd + 1);
+                    // Propage the error the embeddings
+                    updateWeightsPhrase(y, trainSents[i].index + startInd, endInd - startInd + 1, trainSents[i].cId);
+                }
+                break;
+
+            // Train for each window per sentence (pre-defined window size)
+            case WINDOWS:
+                for(s = 0; s < trainSents[i].sentCount; s++){
+                    if(s == 0) startInd = 0;
+                    else startInd = trainSents[i].endIndex[s-1] + 1;
+                    endInd = trainSents[i].endIndex[s]; 
+               
+                    //printf("Start, end, number: %d %d %d\n", startInd, endInd, endInd - startInd + 1);
+                    for (w = startInd + windowVP - 1; w <= endInd; w++){
+                        //printf("Window: (start, end) : (%d, %d) (%d, %d)\n", w - windowVP + 1, w, startInd, endInd);
+                        // Predict the cluster
+                        computeMultinomialPhrase(y, 
+                                    trainSents[i].index + (w-windowVP+1), windowVP);
+                        // Propage the error the embeddings
+                        updateWeightsPhrase(y, 
+                                trainSents[i].index + (w-windowVP+1), windowVP, trainSents[i].cId);
+                    }
+                }
+                break;
+
+            case DESCRIPTIONS:
+                // Predict the cluster
+                computeMultinomialPhrase(y, trainSents[i].index, trainSents[i].count);
+                // Propage the error the embeddings
+                updateWeightsPhrase(y, trainSents[i].index, trainSents[i].count, trainSents[i].cId);
+                break;
+
+            default:
+                printf("Error in train mode!\n");
+                exit(1);
+        }
+    }
 }

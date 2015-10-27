@@ -1,6 +1,6 @@
 # include "debugFunctions.h"
 
-void debugVisualFeatureRead(char* fileName){
+void debugVisualFeatureRead(char* fileName, long noTrain){
     FILE* filePt = fopen(fileName, "wb");
 
     // Iterators
@@ -15,7 +15,7 @@ void debugVisualFeatureRead(char* fileName){
     fclose(filePt);
 }
 
-void debugPRSFeatureRead(char* fileName){
+void debugPRSFeatureRead(char* fileName, long noTrain){
     FILE* filePt = fopen(fileName, "wb");
 
     // Debugging by saving the PRS back into file and manually checking

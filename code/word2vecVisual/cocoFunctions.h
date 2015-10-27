@@ -18,5 +18,17 @@
 # include "helperFunctions.h"
 # include "refineFunctions.h"
 
+// External variables
+extern enum TrainMode trainMode;
+extern int noClusters;
+
+// Reading the  training sentences
+void readTrainSentencesCOCO(char*);
+// Reading the cluster ids
+void readClusterIdCOCO(char*);
+// Tokenize the sentences for training
+void tokenizeTrainSentencesCOCO();
+// Perform refining with MS COCO
+void refineNetworkCOCO();
 
 #endif

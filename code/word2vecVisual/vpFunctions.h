@@ -24,12 +24,9 @@ extern long long layer1_size;
 extern float* syn0;
 extern int debugModeVP;
 extern int windowVP;
+extern enum TrainMode trainMode;
 
 //*********************************************//
-// Enumerations
-// Training mode for vp task
-// Refining using either entire descriptions/sentences/words
-enum TrainModeVP {DESCRIPTIONS, SENTENCES, WINDOWS, WORDS};
 //*********************************************//
 //*********************************************//
 // Get the features for all the sentences

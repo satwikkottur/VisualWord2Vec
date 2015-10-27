@@ -20,6 +20,7 @@
 extern long long vocab_size, layer1_size;
 extern float *syn0, *syn1, *expTable;
 extern long long vocab_size, layer1_size;
+extern int windowVP;
 
 /*******************************************/
 // Initializing the refining
@@ -41,4 +42,6 @@ void updateWeightsPhrase(float*, int*, int, int);
 // Mean of the embeddings of all the words that are present in the vocab
 void computeSentenceEmbeddings(struct Sentence*, long);
 
+// Refine the network based on the cluster id, given sentences
+void refineNetworkSentences(struct Sentence*, long, enum TrainMode);
 # endif

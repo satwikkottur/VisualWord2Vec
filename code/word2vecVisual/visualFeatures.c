@@ -8,7 +8,8 @@ int* featHashInd; // Storing the hash indices that reference to vocab
 const int featHashSize = 200000; // Size of the hash for feature words
 int featVocabSize = 0; // Actual vocab size for feature word 
 int featVocabMaxSize = 5000; // Maximum number of feature vocab
-long noTrain = 0, noTest = 0, noVal = 0; // Number of test and validation variables
+static long noTrain = 0, noVal = 0; // Number of test and validation variables
+long noTest = 0;
 float* cosDist; // Storing the cosine distances between all the feature vocabulary
 float* valScore, *testScore; // Storing the scores for test and val
 // Storing the cosine distances between all the feature vocabulary (multimodel)
@@ -1262,7 +1263,7 @@ void readTestValFiles(char* valName, char* testName){
     }
 
     noVal = noTuples;
-    printf("Found %ld tuples in %s...\n\n", noTuples, valName);
+    printf("\nFound %ld tuples in %s...\n", noTuples, valName);
     // Close the file
     fclose(filePt);
     /*******************************************************************************/
@@ -1290,7 +1291,7 @@ void readTestValFiles(char* valName, char* testName){
     }
 
     noTest = noTuples;
-    printf("Found %ld tuples in %s...\n\n", noTuples, testName);
+    printf("Found %ld tuples in %s...\n", noTuples, testName);
     // Close the file
     fclose(filePt);
 }

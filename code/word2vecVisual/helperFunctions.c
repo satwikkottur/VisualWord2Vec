@@ -100,8 +100,11 @@ struct Sentence** readSentences(char* featurePath, long* noSents){
     rewind(filePtr);
     
     // Allocate the collection
-    struct Sentence* collection = 
-                (struct Sentence*) malloc(sizeof(struct Sentence) * sentCount);
+    // Have another layer to avoid local variable
+    struct Sentence** collection = (struct Sentence**)
+                                    malloc(sizeof(struct Sentence*));
+    collection[0] = (struct Sentence*) 
+                            malloc(sizeof(struct Sentence) * sentCount);
     // Read and store contents
     for( i = 0; i < sentCount; i++){
         if(fgets(currentSent, MAX_SENTENCE, filePtr) != NULL){
@@ -109,15 +112,15 @@ struct Sentence** readSentences(char* featurePath, long* noSents){
             currentSent[strlen(currentSent) - 1] = '\0';
             
             // Allocate memory and copy sentence
-            collection[i].sent = (char*) malloc(sizeof(char) * MAX_SENTENCE);
-            strcpy(collection[i].sent, currentSent);
+            collection[0][i].sent = (char*) malloc(sizeof(char) * MAX_SENTENCE);
+            strcpy(collection[0][i].sent, currentSent);
         }
 
         // Assign other members as needed
-        collection[i].embed = NULL;
+        collection[0][i].embed = NULL;
 
         // Assign some gt
-        collection[i].gt = -1;
+        collection[0][i].gt = -1;
     }
     // Store the number of sentences
     *noSents = sentCount;
@@ -132,7 +135,7 @@ struct Sentence** readSentences(char* featurePath, long* noSents){
         fprintf(savePtr, "%s\n", collection[i].sent);
     fclose(savePtr);*/
 
-    return &collection;
+    return collection;
 }
 
 // Tokenize sentences
@@ -226,6 +229,8 @@ void tokenizeSentences(struct Sentence* collection, long noSents){
 
         //printf("Sent count: %s\n%d\n", collection[i].sent, collection[i].sentCount);
     }
+
+    printf("\nTokenized %ld sentences!\n", noSents);
 }
 
 // Save the sentence embeddings
