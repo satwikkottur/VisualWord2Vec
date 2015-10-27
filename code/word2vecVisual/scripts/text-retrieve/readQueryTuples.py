@@ -18,14 +18,16 @@ task = ImageRetriever();
 gtPath = dataPath + 'pilot_gt.txt';
 task.readGroundTuples(gtPath);
 
-#embedPath = '/home/satwik/VisualWord2Vec/models/vp_coco_embeddings.bin';
+'''#embedPath = '/home/satwik/VisualWord2Vec/models/vp_coco_embeddings.bin';
 # word2vec path 0.156923076923 0.391538461538 0.510769230769
-'''embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_before_refine.bin';
+# Only 3: 0.173076923077 0.390384615385 0.509615384615
+embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_before_refine.bin';
 task.readWord2Vec(embedPath);
 # Perform the task
 task.performTask(tuples);
 
 # Read after refining and perform task again 0.166923 0.3853846 0.5330769 
+# Only 3:0.180769230769 0.388461538462 0.540384615385
 embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_after_refine.bin';
 task.readWord2Vec(embedPath);
 # Perform the task
@@ -35,17 +37,36 @@ task.performTask(tuples);
 embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt';
 task.readWord2Vec(embedPath);
 # Perform the task
-task.performTask(tuples);'''
+task.performTask(tuples);
 
 #embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_output_bestmodel_single.bin';
 embedPath = '/home/satwik/VisualWord2Vec/models/wiki_embeddings_pre_refine.bin';
 #0.133076923077 0.324615384615 0.422307692308
+# Only top 3 : 0.159615384615 0.369230769231 0.490384615385
 task.readWord2Vec(embedPath);
 # Perform the task
 task.performTask(tuples);
 
 #0.124615384615 0.290769230769 0.383076923077
+# Only top 3 :  
 embedPath = '/home/satwik/VisualWord2Vec/models/wiki_embeddings_post_refine.bin';
 task.readWord2Vec(embedPath);
 # Perform the task
+task.performTask(tuples);'''
+
+# Read the embeddings dumped during each iteration of refining and re-do text 
+# retrieval
+dumpPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_wiki_iter_0.bin";
+task.readWord2Vec(dumpPath);
 task.performTask(tuples);
+dumpPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_wiki_iter_24.bin";
+task.readWord2Vec(dumpPath);
+task.performTask(tuples);
+
+'''for i in xrange(0, 25):
+    print 'Current iteration : %d / %d' % (i, 25)
+
+    # Read embeddings and perform task
+    task.readWord2Vec(dumpPath % i);
+    task.performTask(tuples);'''
+

@@ -32,5 +32,17 @@ void loadWord2Vec(char*);
 // Source: http://stackoverflow.com/questions/29788983/split-char-string-with-multi-character-delimiter-in-c
 char *multi_tok(char *, char *);
 
+/***************************************************/
+// Read the sentences
+struct Sentence** readSentences(char*, long*);
+
+// Tokenize sentences
+void tokenizeSentences(struct Sentence*, long);
+
+// Save the sentence embeddings
+void writeSentenceEmbeddings(char*, struct Sentence*, long);
+
+
+/***************************************************/
 
 # endif

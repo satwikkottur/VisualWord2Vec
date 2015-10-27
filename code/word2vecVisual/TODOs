@@ -91,4 +91,4 @@ Visual Paraphrasing
 - Use windowed training (done)
 - Separate the sentences of description while training (done)
 - Setup the text retrieval task (done)
-- Capture embeddings at different stages of refining and see text-retrieval task
+- Capture embeddings at different stages of refining and see text-retrieval task (done)

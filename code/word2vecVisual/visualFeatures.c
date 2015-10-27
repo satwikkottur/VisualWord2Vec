@@ -512,7 +512,7 @@ void refineMultiNetworkPhrase(){
         // Now collecting words for training
         //*****************************************
         // Updating the weights for P
-        /*p = featHashWords[train[i].p];
+        p = featHashWords[trainTuples[i].p];
         wordCount = 0;
         
         for(c = 0; c < p.count; c++){
@@ -530,7 +530,7 @@ void refineMultiNetworkPhrase(){
         // Predict the cluster
         computeMultinomialPhrase(y, wordList, wordCount);
         // Propage the error the embeddings
-        updateWeightsPhrase(y, wordList, wordCount, train[i].cId);
+        updateWeightsPhrase(y, wordList, wordCount, trainTuples[i].cId);
         //==========================================================
         // Updating the weights for S
         s = featHashWords[trainTuples[i].s];
@@ -551,7 +551,7 @@ void refineMultiNetworkPhrase(){
         computeMultinomialPhrase(y, wordList, wordCount);
         // Propage the error the embeddings
         updateWeightsPhrase(y, wordList, wordCount, trainTuples[i].cId);
-        //==========================================================*/
+        //==========================================================
         // Updating the weights for R
         r = featHashWords[trainTuples[i].r];
         wordCount = 0;
@@ -1594,29 +1594,29 @@ void findBestTestTuple(float* baseScore, float* bestScore){
 
     // Check if the tuple if positive and there is an increase
     long i;
-    /*for(i = 0; i < noTest; i++){
+    for(i = 0; i < noTest; i++){
         if(test[i].cId && (bestScore[i] > baseScore[i])){
             // Store the index and increase the count
             improvedInd[count] = i;
             count++;
         }
-    }*/
+    }
 
     // Print all the test tuples along with ground truth
-    for (i = 0; i < noTest; i++){
+    /*for (i = 0; i < noTest; i++){
         improvedInd[i] = i;
-    }
+    }*/
     printf("%d tuples improved! \n", count);
 
     // Do something here
     // Dump the tuples and embeddings along with base and best score
-    char tupleFile[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/all_test_tuples.txt";
-    char embedFile[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/all_test_embed.txt";
+    //char tupleFile[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/all_test_tuples.txt";
+    //char embedFile[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/all_test_embed.txt";
 
     // Saving only improved tuples
     //saveMultiTupleEmbeddings(tupleFile, embedFile, test, baseScore, bestScore, improvedInd, count);
     // Saving all the test tuples
-    saveMultiTupleEmbeddings(tupleFile, embedFile, test, baseScore, bestScore, improvedInd, noTest);
+    //saveMultiTupleEmbeddings(tupleFile, embedFile, test, baseScore, bestScore, improvedInd, noTest);
 
     free(improvedInd);
 }

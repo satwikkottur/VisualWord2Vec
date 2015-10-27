@@ -171,3 +171,39 @@ void updateWeightsPhrase(float* y, int* wordId, int noWords, int trueId){
     free(e);
 }
 
+// Compute the sentence embeddings
+// Mean of the embeddings of all the words that are present in the vocab
+void computeSentenceEmbeddings(struct Sentence* collection, long noSents){
+    printf("\nComputing the sentence embeddings!\n");
+    float* mean = (float*) calloc(layer1_size, sizeof(float));
+    long i, w, d, offset;
+
+    for( i = 0; i < noSents; i++){
+        // reset the mean to zero
+        memset(mean, 0, layer1_size);
+
+        // For each sentence, loop over word        
+        for( w = 0; w < collection[i].count; w++){
+            if(collection[i].index[w] == -1) continue;
+
+            offset = layer1_size * collection[i].index[w];
+            // Compute the mean for each dimension
+            for (d = 0; d < layer1_size; d++)
+                mean[d] += syn0[offset + d];
+        }
+
+        // Normalize the mean, if count > 0
+        if(collection[i].actCount > 0)
+            for (d = 0; d < layer1_size; d++)
+                mean[d] /= sqrt(collection[i].actCount);
+        
+        // If not allocated, allocate memory to embed
+        if(collection[i].embed == NULL)
+            collection[i].embed = (float*) malloc(sizeof(float) * layer1_size);
+        
+        // Store the mean 
+        memcpy(collection[i].embed, mean, layer1_size * sizeof(float));
+    }
+
+    free(mean);
+}

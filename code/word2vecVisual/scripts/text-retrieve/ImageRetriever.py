@@ -171,7 +171,8 @@ class ImageRetriever:
             print 'Tuples : %d / %d' % (iterCount, noTuples)
             iterCount += 1;
 
-            for j in dataTuples[i]:
+            # Consider only top three
+            for j in dataTuples[i][0:2]:
                 gtRank = self.scoreQueryTuple(j, i[0]);
                 count += 1;
                 if gtRank == 0:

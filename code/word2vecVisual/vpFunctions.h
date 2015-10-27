@@ -31,19 +31,6 @@ extern int windowVP;
 // Refining using either entire descriptions/sentences/words
 enum TrainModeVP {DESCRIPTIONS, SENTENCES, WINDOWS, WORDS};
 //*********************************************//
-// Genetic sentence related functions
-// Reading sentences
-struct Sentence** readSentence(char*, long*);
-
-// Writing sentence embeddings
-void writeSentenceEmbeddings(char*, struct Sentence*, long);
-
-// Computing the sentence embeddings
-void computeSentenceEmbeddings(struct Sentence*, long);
-
-// Tokenizing sentences
-void tokenizeSentences(struct Sentence*, long);
-
 //*********************************************//
 // Get the features for all the sentences
 //*********************************************//

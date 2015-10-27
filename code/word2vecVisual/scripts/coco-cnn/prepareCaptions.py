@@ -54,7 +54,7 @@ capId.close();'''
 
 # Write the clusterIds to a file
 # We take the captionFeatMap to get correct id
-clusterPath = dataPath + 'cluster_100_coco_train.txt';
+clusterPath = dataPath + 'cluster_100_coco_train_nohup.txt';
 cId = open(clusterPath, 'wb');
 
 for i in xrange(0, len(data['annotations'])):

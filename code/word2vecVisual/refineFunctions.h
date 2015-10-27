@@ -37,4 +37,8 @@ void computeMultinomialPhrase(float*, int*, int);
 // Updates the weights for a phrase
 void updateWeightsPhrase(float*, int*, int, int);
 
+// Compute the sentence embeddings
+// Mean of the embeddings of all the words that are present in the vocab
+void computeSentenceEmbeddings(struct Sentence*, long);
+
 # endif
