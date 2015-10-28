@@ -578,9 +578,9 @@ void *TrainModelThread(void *id) {
 // Function for common sense task
 void commonSenseWrapper(){
     // Load the word2vec embeddings from Xiao's
-    //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
+    char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
-    //loadWord2Vec(wordPath);
+    loadWord2Vec(wordPath);
 
     // [S] added
     char* visualPath = (char*) malloc(sizeof(char) * 100);
@@ -634,7 +634,7 @@ void commonSenseWrapper(){
     readVisualFeatureFile(visualPath);
     char clusterSavePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/cluster_id_save.txt";
     // To save clusterId / distance, provide save path; else NULL
-    clusterVisualFeatures(clusterArg, NULL);
+    //clusterVisualFeatures(clusterArg, NULL);
 
     // Read the validation and test sets    
     if(noTest == 0)
@@ -660,9 +660,10 @@ void commonSenseWrapper(){
     }
     else{
         // Initializing the refining network
-        initRefining();
+        initRefiningRegress();
+        //initRefining();
         // Perform common sense task
-        performCommonSenseTask(baseTestScores);
+        //performCommonSenseTask(baseTestScores);
     }
 
     
@@ -681,6 +682,17 @@ void commonSenseWrapper(){
     
     int noOverfit = 1;
     int iter = 0;
+
+    // Debugging for regressing visual features
+    while(noOverfit){
+        // Refine the network
+        refineNetworkRegress();
+    
+        // Perform the common sense task 
+        noOverfit = performCommonSenseTask(bestTestScores);
+    }
+
+    return;
     while(noOverfit){
         // Refine the network for multi model
         if(trainMulti){
@@ -908,14 +920,15 @@ void TrainModel() {
     //loadWord2Vec(beforeEmbedPath);
     //saveWord2Vec(beforeEmbedPath);
     //***************************************************************************************
-    // Common sense task
-    //commonSenseWrapper();
     
     // Visual paraphrase task
     //visualParaphraseWrapper();
 
     // Training from MS COCO
-    mscocoWrapper();
+    //mscocoWrapper();
+    
+    // Common sense task
+    commonSenseWrapper();
     return;
 
     //***************************************************************************************

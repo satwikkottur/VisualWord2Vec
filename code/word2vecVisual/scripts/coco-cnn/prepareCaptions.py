@@ -5,6 +5,8 @@ import numpy as np
 from sklearn.cluster import KMeans
 import re
 
+K = 10000;
+
 dataPath = '/home/satwik/VisualWord2Vec/data/coco-cnn/'
 captionPath = dataPath + 'captions_train2014.json';
 
@@ -16,7 +18,7 @@ featTagPath = dataPath + 'img_name_train.npy';
 
 # Read the features and cluster them through k-means
 features = np.load(open(featPath, 'rb'));
-kmeans = KMeans(n_clusters = 200);
+kmeans = KMeans(n_clusters = K);
 kmeans.fit(features);
 clusterId = kmeans.labels_;
 print 'Done clustering!'
@@ -54,7 +56,7 @@ capId.close();'''
 
 # Write the clusterIds to a file
 # We take the captionFeatMap to get correct id
-clusterPath = dataPath + 'cluster_200_coco_train.txt';
+clusterPath = dataPath + ('cluster_%d_coco_train.txt' % K);
 cId = open(clusterPath, 'wb');
 
 for i in xrange(0, len(data['annotations'])):

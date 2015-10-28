@@ -25,6 +25,7 @@ extern struct vocab_word* vocab;
 extern int permuteMAP;
 // From refineFunctions.h
 extern int noClusters;
+extern int visualFeatSize;
 /************************************************************************/
 // Signatures of original functions
 /************************************************************************/
@@ -56,6 +57,8 @@ void refineMultiNetwork();
 // Function to refine the network for multi models using phrases
 void refineMultiNetworkPhrase();
 
+// Function refine the network for regression the visual features
+void refineNetworkRegress();
 //------------------------------------------------------------
 // Compute the embeddings for all the words
 void computeEmbeddings();

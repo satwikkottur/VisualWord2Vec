@@ -16,7 +16,7 @@ float* valScore, *testScore; // Storing the scores for test and val
 float *cosDistP, *cosDistR, *cosDistS; 
 int verbose = 0; // Printing which function is being executed
 //int noClusters = 0; // Number of clusters to be used // Make this extern: refineFunctions.h
-int visualFeatSize = 0; // Size of the visual features used
+//int visualFeatSize = 0; // Size of the visual features used // Make this extern : refineFunctions.h
 float prevValAcc = 0, prevTestAcc = 0;
 
 struct prsTuple *trainTuples, *test, *val;
@@ -323,6 +323,63 @@ void refineNetwork(){
             computeMultinomial(y, r.index[c]);
             // Propage the error to the PRS features
             updateWeights(y, r.index[c], trainTuples[i].cId);
+        }
+    }
+}
+
+// Refine the network through clusters
+void refineNetworkRegress(){
+    long long c, i;
+    float* y = (float*) malloc(sizeof(float) * visualFeatSize);
+    struct featureWord p, s, r;
+
+    // Checking if training examples are present
+    if(noTrain == 0){
+        printf("Training examples not loaded!\n");   
+        exit(1);
+    }
+
+    // Read each of the training instance
+    for(i = 0; i < noTrain; i++){
+        printf("Training %lld instance ....\n", i);
+        
+        // Updating the weights for P
+        p = featHashWords[trainTuples[i].p];
+        for(c = 0; c < p.count; c++){
+            // If not in vocab, continue
+            if(p.index[c] == -1) continue;
+            //printf("p: %d %d\n", p.index[c], p.count);
+
+            // Regress the features
+            computeOutputRegress(y, p.index[c]);
+            // Propage the error to the PRS features
+            updateWeightsRegress(y, p.index[c], trainTuples[i].feat);
+        }
+        
+        // Updating the weights for S
+        s = featHashWords[trainTuples[i].s];
+        for(c = 0; c < s.count; c++){
+            // If not in vocab, continue
+            if(s.index[c] == -1) continue;
+            //printf("s: %d %d\n", s.index[c], s.count);
+
+            // Regress the features
+            computeOutputRegress(y, s.index[c]);
+            // Propage the error to the PRS features
+            updateWeightsRegress(y, s.index[c], trainTuples[i].feat);
+        }
+
+        // Updating the weights for R
+        r = featHashWords[trainTuples[i].r];
+        for(c = 0; c < r.count; c++){
+            // If not in vocab, continue
+            if(r.index[c] == -1) continue;
+            //printf("r: %d %d\n", r.index[c], r.count);
+
+            // Regress the features
+            computeOutputRegress(y, r.index[c]);
+            // Propage the error to the PRS features
+            updateWeightsRegress(y, r.index[c], trainTuples[i].feat);
         }
     }
 }

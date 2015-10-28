@@ -1,5 +1,6 @@
 # include "refineFunctions.h"
 int noClusters = 0;
+int visualFeatSize = 0;
 
 // Initializing the refining
 void initRefining(){
@@ -8,7 +9,7 @@ void initRefining(){
 
     // Check if noClusters and layer1_size is not 0
     if(layer1_size == 0 || noClusters == 0){
-        printf("\nNumber of cluster (%d) | layer1_size (%d) is zero!\n", noClusters, layer1_size);
+        printf("\nNumber of cluster (%d) | layer1_size (%lld) is zero!\n", noClusters, layer1_size);
         exit(1);
     }
 
@@ -21,6 +22,31 @@ void initRefining(){
 
     // Initialize the last layer of weights
     for (a = 0; a < noClusters; a++) for (b = 0; b < layer1_size; b++){
+        next_random = next_random * (unsigned long long)25214903917 + 11;
+        syn1[a * layer1_size + b] = (((next_random & 0xFFFF) / (float)65536) - 0.5) / layer1_size;
+    }
+}
+
+// Initializing the refining for the regression setup
+void initRefiningRegress(){
+    long long a, b;
+    unsigned long long next_random = 1;
+
+    // Check if noClusters and layer1_size is not 0
+    if(layer1_size == 0 || visualFeatSize == 0){
+        printf("\nVisualFeatSize (%d) | layer1_size (%lld) is zero!\n", visualFeatSize, layer1_size);
+        exit(1);
+    }
+
+    // Setup the network 
+    a = posix_memalign((void **)&syn1, 128, (long long)visualFeatSize * layer1_size * sizeof(float));
+    if (syn1 == NULL) {
+        printf("Memory allocation failed\n"); 
+        exit(1);
+    }
+
+    // Initialize the last layer of weights
+    for (a = 0; a < visualFeatSize; a++) for (b = 0; b < layer1_size; b++){
         next_random = next_random * (unsigned long long)25214903917 + 11;
         syn1[a * layer1_size + b] = (((next_random & 0xFFFF) / (float)65536) - 0.5) / layer1_size;
     }
@@ -177,6 +203,68 @@ void updateWeightsPhrase(float* y, int* wordId, int noWords, int trueId){
     free(e);
 }
 
+// Computing the output for regression
+void computeOutputRegress(float* y, int wordId){
+    //printf("\nEntered the output function\n");
+    // y stores the multinomial distribution
+    float dotProduct = 0, sum = 0;
+    long long a, b, offset1, offset2;
+
+    // Offset to access the outer layer weights
+    offset1 = wordId * layer1_size;
+    for (b = 0; b < noClusters; b++){
+        dotProduct = 0;
+        // Offset to access the values of hidden layer weights
+        offset2 = b * layer1_size;
+
+        for (a = 0; a < layer1_size; a++){
+            dotProduct += syn0[offset1 + a] * syn1[offset2 + a];
+        }
+
+        y[b] = dotProduct;
+    }
+}
+
+// Update the weights for regression
+void updateWeightsRegress(float* y, int wordId, float* trueFeat){
+    //printf("\nEntered the update function\n");
+    // compute gradient for outer layer weights, gradient g
+    float* e = (float*) malloc(visualFeatSize * sizeof(float));
+    long long a, b, c, offset1, offset2;
+    float learningRateInner = 0.01, learningRateOuter = 0.01;
+
+    // Computing error
+    for(b = 0; b < visualFeatSize; b++) e[b] = y[b] - trueFeat[b];
+    // Save inner layer weights for correct updates
+    float* syn0copy = (float*) malloc(sizeof(float) * layer1_size);
+
+    offset1 = layer1_size * wordId;
+    for (c = 0; c < layer1_size; c++) syn0copy[c] = syn0[offset1 + c];
+    // compute gradient for inner layer weights
+    // update inner layer weights
+    // Offset for accessing inner weights
+    for(b = 0; b < visualFeatSize; b++){
+        // Offset for accesing outer weights
+        offset2 = layer1_size * b;
+        
+        for(c = 0; c < layer1_size; c++)
+            syn0[offset1 + c] -= learningRateInner * e[b] * syn1[offset2 + c];
+    }
+
+    // compute gradient for outer layer weights
+    // update outer layer weights
+    for(a = 0; a < visualFeatSize; a++){
+        offset2 = layer1_size * a;
+        for(b = 0; b < layer1_size; b++){
+            syn1[offset2 + b] -= learningRateOuter * e[a] * syn0copy[b];
+        }
+    }
+
+    // Cleaning the copy
+    free(e);
+    free(syn0copy);
+}
+
 // Compute the sentence embeddings
 // Mean of the embeddings of all the words that are present in the vocab
 void computeSentenceEmbeddings(struct Sentence* collection, long noSents){
@@ -230,7 +318,9 @@ void refineNetworkSentences(struct Sentence* trainSents, long noTrain, enum Trai
 
     // Read each of the training sentences
     for(i = 0; i < noTrain; i++){
-        //printf("Training %ld instance ....\n", i);
+        // Print after every thousand sentences
+        if(i%1000 == 0)
+            printf("Training %ld / %ld instance ....\n", i, noTrain);
         
         // Checking possible fields to avoid segmentation error
         if(trainSents[i].cId < 1 || trainSents[i].cId > noClusters) {

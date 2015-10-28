@@ -25,6 +25,8 @@ extern int windowVP;
 /*******************************************/
 // Initializing the refining
 void initRefining();
+// Initializing the refining, while regression
+void initRefiningRegress();
 
 // Evaluate y_i for each output cluster
 void computeMultinomial(float*, int);
@@ -37,6 +39,12 @@ void computeMultinomialPhrase(float*, int*, int);
 
 // Updates the weights for a phrase
 void updateWeightsPhrase(float*, int*, int, int);
+
+// Compute the output for regression
+void computeOutputRegress(float* y, int);
+
+// Update the weights for regression
+void updateWeightsRegress(float*, int, float*);
 
 // Compute the sentence embeddings
 // Mean of the embeddings of all the words that are present in the vocab
