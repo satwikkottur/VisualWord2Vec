@@ -840,14 +840,14 @@ void mscocoWrapper(){
         visualPath = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
     else{
         //visualPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/fc7_features_debug.txt";
-        visualPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/fc7_features.txt";
+        visualPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/fc7_features_train.txt";
         mapPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_train_map.txt";
     }
 
     // Paths for train sentences and their cluster ids for COCO captions
     char clusterPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/cluster_100_coco_train.txt";
     //char trainPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma_debug.txt";
-    char trainPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma.txt";
+    char trainPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_train_lemma_nomaps.txt";
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     
     // Initializing the hash

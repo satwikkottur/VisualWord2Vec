@@ -44,22 +44,26 @@ mapId = open(mapDumpPath, 'wb');
 # Get the corresponding feature for each caption
 # Also save the map
 trainFeats = [];
+count = 0;
 for i in capData:
+    if( count % 1000 == 0):
+        print '%d / %d' % (count, len(capData))
+    count += 1;
+
     # Get feat index
     featId = featTags.index(i);
-
-    mapId.write('%d\n' % featId);
     
     # Cross check
     if featTags[featId] != i:
         sys.exit(1);
 
-    # For each caption, note feat id
+    # For each caption, note feat id and write the map
     #[capId.write( '%d: %s' % (len(trainFeats), j.replace('\n', '')) + '\n' )\
     #                                for j in capData[i]];
+    [mapId.write('%d\n' % len(trainFeats)) for j in capData[i]];
 
     # Collect feature
-    #trainFeats.append(features[featId]);
+    trainFeats.append(features[featId]);
 
 #capId.close();
 mapId.close();
