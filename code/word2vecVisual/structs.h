@@ -52,6 +52,8 @@ struct Sentence{
     int cId;
     // Ground truth whether the sentence/corresponding is truth or not
     int gt;
+    // Feature index in case of many-to-one (MS COCO)
+    int featInd;
 
     // Embeddings for the sentence
     float* embed;

@@ -35,9 +35,11 @@ featTags = [str(int(re.match(prefix, i).group(1))) for i in featImgNames];
 # Collect the relevant features and captions
 featDumpPath = dataPath + 'fc7_features_train.txt';
 capDumpPath = dataPath + 'captions_coco_train.txt';
+mapDumpPath = dataPath + 'captions_coco_train_map.txt';
 
 # Open the files
-capId = open(capDumpPath, 'wb');
+#capId = open(capDumpPath, 'wb');
+mapId = open(mapDumpPath, 'wb');
 
 # Get the corresponding feature for each caption
 # Also save the map
@@ -45,18 +47,25 @@ trainFeats = [];
 for i in capData:
     # Get feat index
     featId = featTags.index(i);
+
+    mapId.write('%d\n' % featId);
     
     # Cross check
     if featTags[featId] != i:
         sys.exit(1);
 
     # For each caption, note feat id
-    [capId.write( '%d: %s' % (len(trainFeats), j) + '\n' ) for j in capData[i]];
+    #[capId.write( '%d: %s' % (len(trainFeats), j.replace('\n', '')) + '\n' )\
+    #                                for j in capData[i]];
 
     # Collect feature
-    trainFeats.append(features[featId]);
+    #trainFeats.append(features[featId]);
 
-capId.close();
+#capId.close();
+mapId.close();
+
+print 'Preparing to dump feature file'
 # Dump all the features
-np.savetxt(featDumpPath, np.array(trainFeats), delimiter = ' ', \
-                                         fmt = '%.6f', header = str(trainFeats[0].shape[0]));
+#np.savetxt(featDumpPath, np.array(trainFeats), delimiter = ' ', \
+#                                         fmt = '%.6f', header = '%d %d' % (len(trainFeats), trainFeats[0].shape[0]));
+print 'Finished dumping feature file'

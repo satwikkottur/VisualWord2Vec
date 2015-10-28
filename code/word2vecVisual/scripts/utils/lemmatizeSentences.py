@@ -108,31 +108,8 @@ tokenPath = '/home/satwik/VisualWord2Vec/data/vqa_train_captions_tokens.txt';
 main(readPath, savePath, tokenPath);'''
 
 # MS COCO captions
-readPath = '/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco.txt';
-savePath = '/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma.txt';
-tokenPath = '/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma_tokens.txt';
+readPath = '/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_train.txt';
+savePath = '/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_train_lemma.txt';
+tokenPath = '/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_train_lemma_tokens.txt';
 main(readPath, savePath, tokenPath);
 ###############################################################################
-'''
-# Read the tokens, lemmatize
-lmt = WordNetLemmatizer();
-rawTokens = [i.strip('\n') for i in readFile.readlines()];
-tokens = [lmt.lemmatize(i) for i in rawTokens];
-
-#for i in xrange(0, len(tokens)):
-#    print (rawTokens[i], tokens[i]);
-
-# Writing back the lemmatized tokens
-savePath = '../dumps/lemmatized_token_dumps.txt';
-saveFile = open(savePath, 'wb');
-
-for i in tokens:
-    saveFile.write(i + '\n')
-
-readFile.close();
-saveFile.close();'''
-'''posLines = [];
-for i in tokenLines:
-print i
-unicodeLine = [unicode(j, errors = 'ignore') for j in i];
-posLines.append(pos_tag(unicodeLine));'''

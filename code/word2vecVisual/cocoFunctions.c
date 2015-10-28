@@ -2,11 +2,13 @@
 
 // Variables for the current task
 static struct Sentence* trainSents;
+static float** features;
+static int* featClusterId;
 static long noTrain = 0;
-static int featSize = 0;
+static long noFeats = 0;
 
 // Reading the  training sentences
-void readTrainSentencesCOCO(char* trainPath){
+void readTrainSentencesCOCO(char* trainPath, char* mapPath){
     long noSents = 0;
     // Use readSentences
     trainSents = *readSentences(trainPath, &noSents);
@@ -18,6 +20,16 @@ void readTrainSentencesCOCO(char* trainPath){
         }
     }
     else noTrain = noSents;
+
+    // Now reading the maps
+    FILE* mapPtr = fopen(mapPath, "rb");
+
+    int i, mapId;
+    for(i = 0; i < noTrain; i++)
+        if(!fscanf(mapPtr, "%d\n", &mapId))
+            trainSents[i].featInd = mapId;
+
+    fclose(mapPtr);
     printf("\nRead %ld sentences for training!\n", noTrain);
 }
 
@@ -76,29 +88,38 @@ void readVisualFeatureFileCOCO(char* featPath){
     int i, noLines = 0;
 
     // Read the first line and get the feature size
-    fscanf(filePt, "# %d", &visualFeatSize);
-    printf("Visual features are of size : %d...\n", visualFeatSize);
+    fscanf(filePt, "# %ld %d", &noFeats, &visualFeatSize);
+    printf("\nVisual features are of size: %d...\nNumber of features: %ld ...\n", 
+                                visualFeatSize, noFeats);
+
+    // Setting up the memory
+    features = (float**) malloc(sizeof(float*) * noFeats);
+    for (i = 0; i < noFeats; i++)
+        features[i] = (float*) malloc(sizeof(float) * visualFeatSize);
 
     // Reading till EOF
     while(fscanf(filePt, "%f", &feature) != EOF){
-        trainSents[noLines].vFeat = (float*) malloc(sizeof(float) * visualFeatSize);
         // Save the already read feature
-        trainSents[noLines].vFeat[0] = feature;
+        features[noLines][0] = feature;
 
         for(i = 1; i < visualFeatSize; i++){
-            //printf("%f ", feature);
             fscanf(filePt, "%f", &feature);
-            trainSents[noLines].vFeat[i] = feature;
+            features[noLines][i] = feature;
         }
-        //printf("%f\n", feature);
 
+        // Debugging printing
         if(noLines % 5000 == 0)
             printf("Line : %d\n", noLines);
+
         noLines++;
     }
 
+    if(noLines != noFeats){
+        printf("Number of features incorrectly read!\n");
+        exit(1);
+    }
+
     printf("\nRead visual features for %d sentences...\n", noLines);
-    featSize = noLines;
 
     // Closing the file
     fclose(filePt);
@@ -109,7 +130,7 @@ void readVisualFeatureFileCOCO(char* featPath){
 void clusterVisualFeaturesCOCO(int clusters, char* savePath){
     int k = clusters;                           /* number of cluster to create */
     int d = visualFeatSize;                           /* dimensionality of the vectors */
-    int n = featSize;                         /* number of vectors */
+    int n = noFeats;                         /* number of vectors */
     int nt = 12;                           /* number of threads to use */
     int niter = 0;                        /* number of iterations (0 for convergence)*/
     int redo = 1;                         /* number of redo */
@@ -120,7 +141,7 @@ void clusterVisualFeaturesCOCO(int clusters, char* savePath){
     for (i = 0; i < n; i++){
         offset = i * d;
         for(j = 0; j < d; j++)
-            v[offset + j] = (float) trainSents[i].vFeat[j];
+            v[offset + j] = (float) features[i][j];
     }
     
     /* variables are allocated externaly */
@@ -137,14 +158,19 @@ void clusterVisualFeaturesCOCO(int clusters, char* savePath){
     printf ("kmeans performed in %.3fs\n\n", (t2 - t1)  / 1000);
     //ivec_print (nassign, k);
     
-    // Write the cluster ids to the Sentences
+    // Write the cluster ids to the Sentences, considering their featId
+    featClusterId = (int*) malloc(sizeof(int) * noFeats);
     for (i = 0; i < n; i++)
-        trainSents[i].cId = assign[i] + 1;
-    
+        featClusterId[i] = assign[i] + 1;
+
+    for (i = 0; i < noTrain; i++)
+        trainSents[i].cId = assign[trainSents[i].featInd] + 1;
+
     // Debugging the cId for the train tuples
     /*for (i = 0; i < n; i++)
      printf("%i\n", train[i].cId);*/
 
+     //==================================================================
      // Write the clusters to a file, if non-empty
     if(savePath != NULL){
         // Open the file
@@ -156,18 +182,16 @@ void clusterVisualFeaturesCOCO(int clusters, char* savePath){
         }
 
         // Save the cluster ids
-        int i;
         for (i = 0; i < n; i++)
-            fprintf(filePtr, "%d %f\n", trainSents[i].cId, dis[i]);
+            fprintf(filePtr, "%d\n", assign[i]);
+            //fprintf(filePtr, "%d %f\n", assign[i], dis[i]);
 
         // Close the file
         fclose(filePtr); 
     }
     
     // Assigning the number of clusters
-    if(noClusters == 0){
-        noClusters = clusters;
-    }
+    if(noClusters == 0) noClusters = clusters;
     
     // Free memory
     free(v); free(centroids); free(dis); free(assign); free(nassign);

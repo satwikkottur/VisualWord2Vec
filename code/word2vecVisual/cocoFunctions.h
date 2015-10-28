@@ -24,7 +24,7 @@ extern int noClusters;
 extern int visualFeatSize;
 
 // Reading the  training sentences
-void readTrainSentencesCOCO(char*);
+void readTrainSentencesCOCO(char*, char*);
 // Reading the cluster ids
 void readClusterIdCOCO(char*);
 // Tokenize the sentences for training

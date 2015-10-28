@@ -816,6 +816,7 @@ void mscocoWrapper(){
     char* prePath = (char*) malloc(sizeof(char) * 100);
     char* vocabPath = (char*) malloc(sizeof(char) * 100);
     char* embedDumpPath = (char*) malloc(sizeof(char) * 100);
+    char* mapPath = (char*) malloc(sizeof(char) * 100);
 
     // Common sense task
     // Reading the file for relation word
@@ -840,6 +841,7 @@ void mscocoWrapper(){
     else{
         //visualPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/fc7_features_debug.txt";
         visualPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/fc7_features.txt";
+        mapPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_train_map.txt";
     }
 
     // Paths for train sentences and their cluster ids for COCO captions
@@ -854,7 +856,7 @@ void mscocoWrapper(){
     readFeatureFile(featurePath);
     
     // Reading cluster file for ms coco
-    readTrainSentencesCOCO(trainPath);
+    readTrainSentencesCOCO(trainPath, mapPath);
 
     // reading cluster files from matlab
     //char clusterpath[] = "/home/satwik/visualword2vec/data/coco-cnn/cluster_100_coco_train.txt";
