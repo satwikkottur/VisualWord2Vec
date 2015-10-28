@@ -11,6 +11,9 @@ err*
 models/*
 code/word2vecVisual/modelsNdata/*
 
+# Ignore the vp-fitb code
+code/word2vecVisual/vp-fitb/
+
 # Ignoring files from python
 *.py[cod]
 # Ignoring the swig folder
