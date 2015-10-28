@@ -580,7 +580,7 @@ void commonSenseWrapper(){
     // Load the word2vec embeddings from Xiao's
     char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
-    loadWord2Vec(wordPath);
+    //loadWord2Vec(wordPath);
 
     // [S] added
     char* visualPath = (char*) malloc(sizeof(char) * 100);
@@ -622,19 +622,20 @@ void commonSenseWrapper(){
     //saveWord2Vec(wordPath);
 
     // Initializing the hash
-    initFeatureHash();
+    //initFeatureHash();
     // Reading for the word features, cluster ids and visual features
-    // ClusterId reading will be avoided when clustering is ported to C
-    readFeatureFile(featurePath);
+    // clusterid reading will be avoided when clustering is ported to c
+    //readfeaturefile(featurepath);
     
-    // Reading cluster files from MATLAB
-    //char clusterPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/cluster_100_coco_train.txt";
-    //readClusterIdFile(clusterPath);
+    // reading cluster files from matlab
+    //char clusterpath[] = "/home/satwik/visualword2vec/data/coco-cnn/cluster_100_coco_train.txt";
+    //readclusteridfile(clusterpath);
     // Clustering in C
+    noClusters = 0;
     readVisualFeatureFile(visualPath);
     char clusterSavePath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/cluster_id_save.txt";
     // To save clusterId / distance, provide save path; else NULL
-    //clusterVisualFeatures(clusterArg, NULL);
+    clusterVisualFeatures(clusterArg, NULL);
 
     // Read the validation and test sets    
     if(noTest == 0)
@@ -660,10 +661,10 @@ void commonSenseWrapper(){
     }
     else{
         // Initializing the refining network
-        initRefiningRegress();
-        //initRefining();
+        //initRefiningRegress();
+        initRefining();
         // Perform common sense task
-        //performCommonSenseTask(baseTestScores);
+        performCommonSenseTask(baseTestScores);
     }
 
     
@@ -686,7 +687,8 @@ void commonSenseWrapper(){
     // Debugging for regressing visual features
     while(noOverfit){
         // Refine the network
-        refineNetworkRegress();
+        refineNetwork();
+        //refineNetworkRegress();
     
         // Perform the common sense task 
         noOverfit = performCommonSenseTask(bestTestScores);
@@ -836,13 +838,13 @@ void mscocoWrapper(){
     if(usePCA)
         visualPath = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
     else{
-        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_18.txt";
-        visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
-        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_R_120.txt";
+        //visualPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/fc7_features_debug.txt";
+        visualPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/fc7_features.txt";
     }
 
     // Paths for train sentences and their cluster ids for COCO captions
     char clusterPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/cluster_100_coco_train.txt";
+    //char trainPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma_debug.txt";
     char trainPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma.txt";
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     
@@ -853,8 +855,20 @@ void mscocoWrapper(){
     
     // Reading cluster file for ms coco
     readTrainSentencesCOCO(trainPath);
+
+    // reading cluster files from matlab
+    //char clusterpath[] = "/home/satwik/visualword2vec/data/coco-cnn/cluster_100_coco_train.txt";
+    //readclusteridfile(clusterpath);
+
+    noClusters = 0;
+    readVisualFeatureFileCOCO(visualPath);
+    char clusterSavePath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/C_cluster_100.txt";
+    // To save clusterId / distance, provide save path; else NULL
+    clusterVisualFeaturesCOCO(clusterArg, clusterSavePath);
+    return;
     // Reading the cluster ids
-    readClusterIdCOCO(clusterPath);
+    //readClusterIdCOCO(clusterPath);
+
     // Tokenizing the files
     tokenizeTrainSentencesCOCO();
 
@@ -885,7 +899,6 @@ void mscocoWrapper(){
     while(noOverfit){
         // Refine the network
         refineNetworkCOCO();
-        
         // Perform common sense task
         noOverfit = performCommonSenseTask(bestTestScores);
     }
@@ -925,10 +938,13 @@ void TrainModel() {
     //visualParaphraseWrapper();
 
     // Training from MS COCO
-    //mscocoWrapper();
+    mscocoWrapper();
+
+    // Marking the change
+    //printf("\nChange over!\n");
     
     // Common sense task
-    commonSenseWrapper();
+    //commonSenseWrapper();
     return;
 
     //***************************************************************************************

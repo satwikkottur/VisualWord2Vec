@@ -21,6 +21,7 @@
 // External variables
 extern enum TrainMode trainMode;
 extern int noClusters;
+extern int visualFeatSize;
 
 // Reading the  training sentences
 void readTrainSentencesCOCO(char*);
@@ -30,5 +31,12 @@ void readClusterIdCOCO(char*);
 void tokenizeTrainSentencesCOCO();
 // Perform refining with MS COCO
 void refineNetworkCOCO();
+
+// Reading the visual feature file for COCO
+void readVisualFeatureFileCOCO(char*);
+
+// Clustering kmeans wrapper
+// Source: http://yael.gforge.inria.fr/tutorial/tuto_kmeans.html
+void clusterVisualFeaturesCOCO(int, char*);
 
 #endif

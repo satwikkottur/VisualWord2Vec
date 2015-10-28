@@ -212,7 +212,7 @@ void computeOutputRegress(float* y, int wordId){
 
     // Offset to access the outer layer weights
     offset1 = wordId * layer1_size;
-    for (b = 0; b < noClusters; b++){
+    for (b = 0; b < visualFeatSize; b++){
         dotProduct = 0;
         // Offset to access the values of hidden layer weights
         offset2 = b * layer1_size;

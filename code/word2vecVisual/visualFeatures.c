@@ -341,7 +341,7 @@ void refineNetworkRegress(){
 
     // Read each of the training instance
     for(i = 0; i < noTrain; i++){
-        printf("Training %lld instance ....\n", i);
+        //printf("Training %lld instance ....\n", i);
         
         // Updating the weights for P
         p = featHashWords[trainTuples[i].p];
@@ -849,8 +849,9 @@ void computeFeatureEmbedding(struct featureWord* feature){
 
         // Write the vector
         offset = feature->index[c] * layer1_size;
-        for (i = 0; i < layer1_size; i++) 
+        for (i = 0; i < layer1_size; i++){
             mean[i] += syn0[offset + i];
+        }
 
         // Increase the count
         actualCount++;
@@ -1111,7 +1112,6 @@ int performCommonSenseTask(float* testTupleScores){
     float* iterPrecTest = (float*) malloc(sizeof(float) * 2);
     float* iterPrecVal = (float*) malloc(sizeof(float) * 2);
     for(threshold = 1.0; threshold < 2.0; threshold += 0.1){
-        
         computeTestValScores(val, noVal, threshold, valScore);
         computeTestValScores(test, noTest, threshold, testScore);
 
