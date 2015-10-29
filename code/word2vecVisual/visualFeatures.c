@@ -252,12 +252,15 @@ void initMultiRefining(){
     // Initialize the last layer of weights
     for (a = 0; a < noClusters; a++) for (b = 0; b < layer1_size; b++){
         next_random = next_random * (unsigned long long)25214903917 + 11;
+        //syn1R[a * layer1_size + b] = 0;
         syn1R[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
 
         next_random = next_random * (unsigned long long)25214903917 + 11;
+        //syn1S[a * layer1_size + b] = 0;
         syn1S[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
 
         next_random = next_random * (unsigned long long)25214903917 + 11;
+        //syn1P[a * layer1_size + b] = 0;
         syn1P[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
     }
 }

@@ -93,8 +93,8 @@ Visual Paraphrasing
 - Setup the text retrieval task (done)
 - Capture embeddings at different stages of refining and see text-retrieval task (done)
 
-- Finish text retrieval task for single, multi for MS COCO and wikipedia
-- Check MS COCO (whole minus test) for single and double refining
+- Finish text retrieval task for single, multi for MS COCO and wikipedia (done)
+- Check MS COCO (whole minus test) for single and double refining (done)
 - Prepare dataset from MS COCO similar to ICCV-
 - Check performance on the ICCV like dataset from real images
 - Setup regression task on abstract scenes

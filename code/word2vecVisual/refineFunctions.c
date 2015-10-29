@@ -23,6 +23,7 @@ void initRefining(){
     // Initialize the last layer of weights
     for (a = 0; a < noClusters; a++) for (b = 0; b < layer1_size; b++){
         next_random = next_random * (unsigned long long)25214903917 + 11;
+        //syn1[a * layer1_size + b] = 0.0;
         syn1[a * layer1_size + b] = (((next_random & 0xFFFF) / (float)65536) - 0.5) / layer1_size;
     }
 }

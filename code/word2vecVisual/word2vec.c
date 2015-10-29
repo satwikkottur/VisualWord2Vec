@@ -627,10 +627,10 @@ void commonSenseWrapper(){
     //saveWord2Vec(wordPath);
 
     // Initializing the hash
-    //initFeatureHash();
+    initFeatureHash();
     // Reading for the word features, cluster ids and visual features
     // clusterid reading will be avoided when clustering is ported to c
-    //readfeaturefile(featurepath);
+    readFeatureFile(featurePath);
     
     // reading cluster files from matlab
     //char clusterpath[] = "/home/satwik/visualword2vec/data/coco-cnn/cluster_100_coco_train.txt";
@@ -690,16 +690,15 @@ void commonSenseWrapper(){
     int iter = 0;
 
     // Debugging for regressing visual features
-    while(noOverfit){
+    /*while(noOverfit){
         // Refine the network
         refineNetwork();
         //refineNetworkRegress();
     
         // Perform the common sense task 
         noOverfit = performCommonSenseTask(bestTestScores);
-    }
+    }*/
 
-    return;
     while(noOverfit){
         // Refine the network for multi model
         if(trainMulti){
@@ -951,10 +950,10 @@ void TrainModel() {
     //visualParaphraseWrapper();
 
     // Training from MS COCO
-    mscocoWrapper();
+    //mscocoWrapper();
 
     // Marking the change
-    printf("\nChange over!\n");
+    //printf("\nChange over!\n");
     
     // Common sense task
     commonSenseWrapper();
@@ -966,7 +965,7 @@ void TrainModel() {
     /***************************************************************************************/
     // Write the three models separately (P,R,S)
     // P 
-    /*char outputP[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/p_model.txt";
+    char outputP[] = "/home/satwik/VisualWord2Vec/models/p_wiki_model.txt";
     fo = fopen(outputP, "wb");
     syn0 = syn0P;
     // Save the word vectors
@@ -980,7 +979,7 @@ void TrainModel() {
     fclose(fo);
     
     // R
-    char outputR[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/r_model.txt";
+    char outputR[] = "/home/satwik/VisualWord2Vec/models/r_wiki_model.txt";
     fo = fopen(outputR, "wb");
     syn0 = syn0R;
     // Save the word vectors
@@ -994,7 +993,7 @@ void TrainModel() {
     fclose(fo);
 
     // S
-    char outputS[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/s_model.txt";
+    char outputS[] = "/home/satwik/VisualWord2Vec/models/s_wiki_model.txt";
     fo = fopen(outputS, "wb");
     syn0 = syn0S;
     // Save the word vectors
@@ -1005,7 +1004,8 @@ void TrainModel() {
       else for (b = 0; b < layer1_size; b++) fprintf(fo, "%lf ", syn0[a * layer1_size + b]);
       fprintf(fo, "\n");
     }
-    fclose(fo);*/
+    fclose(fo);
+    return;
     /***************************************************************************************/
     
     fo = fopen(output_file, "wb");

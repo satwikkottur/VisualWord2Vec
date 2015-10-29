@@ -13,37 +13,27 @@ tuplesData = pickle.load(open(picklePath, 'rb'));
 tuples = tuplesData['data'];
 
 # Create instance of the task (with multiple / single embeddings)
+#task = ImageRetriever('SINGLE');
 task = ImageRetriever('MULTI');
-
 # Read the ground truth
 gtPath = dataPath + 'pilot_gt.txt';
 task.readGroundTuples(gtPath);
-
 # Reading embeddings for multiple models
-modelPath = '/home/satwik/VisualWord2Vec/data/%s_model.bin';
+modelPath = '/home/satwik/VisualWord2Vec/models/%s_wiki_model.txt';
+#modelPath = '/home/satwik/VisualWord2Vec/data/%s_model.bin';
 embedPaths = {};
-for i in ['r', 's', 'p']:
+for i in ['r', 'p', 's']:
     embedPaths[i] = modelPath % i;
-embedPath = '/home/satwik/VisualWord2Vec/models/vp_coco_embeddings.bin';
 task.loadWord2Vec(embedPaths)
-#subset = {tuples.keys()[i]: tuples[tuples.keys()[i]] for i in xrange(0, 2)}
 task.performTask(tuples)
 
+'''embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt';
+task.loadWord2Vec(embedPath)
+task.performTask(tuples)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+embedPath = '/home/satwik/VisualWord2Vec/data/word2vec_output_bestmodel_single.bin';
+task.loadWord2Vec(embedPath)
+task.performTask(tuples)'''
 
 
 ####################### Examples ##########################
