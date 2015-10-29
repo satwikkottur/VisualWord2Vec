@@ -18,7 +18,7 @@
 #include <math.h>
 #include <pthread.h>
 #include <ctype.h>
-
+#include <unistd.h>
 
 /**********************************************************************************/
 // [S] added
@@ -39,7 +39,9 @@ extern float *syn0P, *syn0S, *syn0R;
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
 int trainMulti = 0; // Train single / multiple models for P,R,S
-int clusterArg = 25; // Number of initial clusters to use
+int clusterCommonSense = 25; // Number of initial clusters to use
+int clusterCOCO = 10000; // Number of initial clusters to use
+int clusterVP = 100; // Number of initial clusters to use
 int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
@@ -577,6 +579,9 @@ void *TrainModelThread(void *id) {
 
 // Function for common sense task
 void commonSenseWrapper(){
+    // Rename clusterArg in current function
+    int clusterArg = clusterCommonSense;
+
     // Load the word2vec embeddings from Xiao's
     char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
@@ -739,6 +744,7 @@ void commonSenseWrapper(){
 
 // Function for visual paraphrase task
 void visualParaphraseWrapper(){
+    int clusterArg = clusterVP;
     // Read the embeddings from the file
     char embedFile[] = "modelsNdata/vp/word2vec_coco_vp_lemma.bin";
     loadWord2Vec(embedFile);
@@ -803,6 +809,8 @@ void visualParaphraseWrapper(){
 
 // Function for training from ms coco dataset
 void mscocoWrapper(){
+    // Cluster argument assignment
+    int clusterArg = clusterCOCO;
     // Load the embeddings (pre-trained) to save time
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
     // Load the word2vec embeddings from Xiao's
@@ -845,7 +853,7 @@ void mscocoWrapper(){
     }
 
     // Paths for train sentences and their cluster ids for COCO captions
-    char clusterPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/cluster_100_coco_train.txt";
+    //char clusterPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/cluster_100_coco_train.txt";
     //char trainPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma_debug.txt";
     char trainPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_train_lemma_nomaps.txt";
     ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -858,19 +866,22 @@ void mscocoWrapper(){
     // Reading cluster file for ms coco
     readTrainSentencesCOCO(trainPath, mapPath);
 
-    // reading cluster files from matlab
-    //char clusterpath[] = "/home/satwik/visualword2vec/data/coco-cnn/cluster_100_coco_train.txt";
-    //readclusteridfile(clusterpath);
-
-    noClusters = 0;
+    // Read the features and cluster to get the ids
     readVisualFeatureFileCOCO(visualPath);
-    char clusterSavePath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/C_cluster_100.txt";
-    // To save clusterId / distance, provide save path; else NULL
-    clusterVisualFeaturesCOCO(clusterArg, clusterSavePath);
-    return;
-    // Reading the cluster ids
-    //readClusterIdCOCO(clusterPath);
-
+    
+    char* clusterPath = (char*) malloc(sizeof(char) * 100);
+    sprintf(clusterPath, "/home/satwik/VisualWord2Vec/data/coco-cnn/C_cluster_%d.txt",
+                            clusterArg);
+    // Check if cluster file exists, else cluster
+    if( access(clusterPath, F_OK) != -1){
+        // Reading the cluster ids
+        readClusterIdCOCO(clusterPath);
+    }
+    else{
+        // To save clusterId / distance, provide save path; else NULL
+        clusterVisualFeaturesCOCO(clusterArg, clusterPath);
+    }
+                        
     // Tokenizing the files
     tokenizeTrainSentencesCOCO();
 
@@ -943,10 +954,10 @@ void TrainModel() {
     mscocoWrapper();
 
     // Marking the change
-    //printf("\nChange over!\n");
+    printf("\nChange over!\n");
     
     // Common sense task
-    //commonSenseWrapper();
+    commonSenseWrapper();
     return;
 
     //***************************************************************************************

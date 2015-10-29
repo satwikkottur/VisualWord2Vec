@@ -5,7 +5,8 @@ import os
 from nltk.stem import WordNetLemmatizer
 
 # Setting up paths
-picklePath = '/home/satwik/VisualWord2Vec/data/text_retrieval_pilot.p';
+dataPath = '/home/satwik/VisualWord2Vec/data/text-ret/';
+picklePath = dataPath + 'text_ret_final.p';
 tuplesData = pickle.load(open(picklePath, 'rb'));
 
 # Order : Relation, Primary, Secondary
@@ -28,5 +29,5 @@ for i in tuples.keys():
     tuplesData['data'][i] = lemmaTuple;
 
 # Save the pickle file
-dumpPath = '/home/satwik/VisualWord2Vec/data/text_retrieval_pilot_lemma.p';
+dumpPath = dataPath + 'text_ret_final_lemma.p';
 pickle.dump(tuplesData, open(dumpPath, 'wb'));

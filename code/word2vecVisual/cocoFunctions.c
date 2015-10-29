@@ -3,7 +3,7 @@
 // Variables for the current task
 static struct Sentence* trainSents;
 static float** features;
-static int* featClusterId;
+static int* featClusterId = NULL;
 static long noTrain = 0;
 static long noFeats = 0;
 
@@ -24,13 +24,24 @@ void readTrainSentencesCOCO(char* trainPath, char* mapPath){
     // Now reading the maps
     FILE* mapPtr = fopen(mapPath, "rb");
 
+    if(mapPtr == NULL){
+        printf("File doesnt exist at %s!\n", mapPath);
+        exit(1);
+    }
+
     int i, mapId;
     for(i = 0; i < noTrain; i++)
-        if(!fscanf(mapPtr, "%d\n", &mapId))
+        if(fscanf(mapPtr, "%d\n", &mapId) != EOF)
             trainSents[i].featInd = mapId;
 
     fclose(mapPtr);
     printf("\nRead %ld sentences for training!\n", noTrain);
+
+    // Debug, checking the feature indices
+    /*for(i = 0; i < noTrain; i++){
+        printf("Train map index: %d => %d\n", i, trainSents[i].featInd);
+    }
+    exit(1);*/
 }
 
 // Reading the cluster ids
@@ -42,22 +53,35 @@ void readClusterIdCOCO(char* clusterPath){
         exit(1);
     }
 
+    // Check if the feature cluster ids are initialized
+    if(noFeats == 0){
+        printf("Features not read!\n");
+        exit(1);
+    }
+    else if (featClusterId == NULL)
+        featClusterId = (int*) malloc(sizeof(int) * noFeats);
+
     // Keep track of max clsuter id
     int i = 0, clusterId, maxClusterId = 0;
     while(fscanf(filePt, "%d\n", &clusterId) != EOF){
-        trainSents[i].cId = clusterId + 1;
+        featClusterId[i] = clusterId + 1;
         i++;
         if(maxClusterId < clusterId) maxClusterId = clusterId;
     }
 
     // Sanity check
-    if(i != noTrain){
-        printf("\nNumber of training instances dont match in cluster file!\n");
+    if(i != noFeats){
+        printf("\nNumber of features dont match in cluster file!\n");
         exit(1);
     }
     else{
         printf("\nRead cluster file with K = %d\n", maxClusterId+1);
         noClusters = maxClusterId + 1;
+    }
+
+    // Assigning the cluster ids to the sentences
+    for(i = 0; i < noTrain; i++){
+        trainSents[i].cId = featClusterId[trainSents[i].featInd];
     }
 
     fclose(filePt);
@@ -109,7 +133,7 @@ void readVisualFeatureFileCOCO(char* featPath){
 
         // Debugging printing
         if(noLines % 5000 == 0)
-            printf("Line : %d\n", noLines);
+            printf("Reading features : %d\n", noLines);
 
         noLines++;
     }
