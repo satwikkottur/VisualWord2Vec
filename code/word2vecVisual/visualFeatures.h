@@ -42,8 +42,10 @@ void initFeatureHash();
 // Initializing the refining of network (multiple)
 void initMultiRefining(); // Training multiple models
 
-// Reading the feature file
-void readFeatureFile(char*);
+// Reading the feature file PRS
+struct prsTuple** readPSRFeatureFile(char*, long*);
+// Reading the refining and training file
+void readRefineTrainFeatureFiles(char*, char*);
 
 // Reading the cluster id file
 void readClusterIdFile(char*);
