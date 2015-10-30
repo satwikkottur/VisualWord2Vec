@@ -1,4 +1,4 @@
-# include "cocoFunctions.h"
+# include "vqaFunctions.h"
 
 // Variables for the current task
 static struct Sentence* trainSents;
@@ -8,7 +8,7 @@ static long noTrain = 0;
 static long noFeats = 0;
 
 // Reading the  training sentences
-void readTrainSentencesCOCO(char* trainPath, char* mapPath){
+void readTrainSentencesVQA(char* trainPath){
     long noSents = 0;
     // Use readSentences
     trainSents = *readSentences(trainPath, &noSents);
@@ -21,21 +21,14 @@ void readTrainSentencesCOCO(char* trainPath, char* mapPath){
     }
     else noTrain = noSents;
 
-    // Now reading the maps
-    FILE* mapPtr = fopen(mapPath, "rb");
-
-    if(mapPtr == NULL){
-        printf("File doesnt exist at %s!\n", mapPath);
-        exit(1);
+    // Now map each sentence to corresponding feature
+    // Five consecutive sentences belong to a feature
+    int featId = -1, i;
+    for(i = 0; i < noTrain; i++){
+        // Increment the feature id
+        if( i % 5 == 0) featId++;
+        trainSents[i].featInd = featId;
     }
-
-    int i, mapId;
-    for(i = 0; i < noTrain; i++)
-        if(fscanf(mapPtr, "%d\n", &mapId) != EOF)
-            trainSents[i].featInd = mapId;
-
-    fclose(mapPtr);
-    printf("\nRead %ld sentences for training!\n", noTrain);
 
     // Debug, checking the feature indices
     /*for(i = 0; i < noTrain; i++){
@@ -45,7 +38,7 @@ void readTrainSentencesCOCO(char* trainPath, char* mapPath){
 }
 
 // Reading the cluster ids
-void readClusterIdCOCO(char* clusterPath){
+void readClusterIdVQA(char* clusterPath){
     FILE* filePt = fopen(clusterPath, "rb");
 
     if(filePt == NULL){
@@ -88,19 +81,19 @@ void readClusterIdCOCO(char* clusterPath){
 }
 
 // Tokenize the sentences for training
-void tokenizeTrainSentencesCOCO(){
+void tokenizeTrainSentencesVQA(){
     // Call the function to tokenize sentences
     tokenizeSentences(trainSents, noTrain);
 }
 
-// Refining the network using COCO
-void refineNetworkCOCO(){
-    printf("\nRefining using MSCOCO training sentences....\n");
+// Refining the network using VQA
+void refineNetworkVQA(){
+    printf("\nRefining using MSVQA training sentences....\n");
     refineNetworkSentences(trainSents, noTrain, trainMode);
 }
 
-// Reading the visual feature file for COCO
-void readVisualFeatureFileCOCO(char* featPath){
+// Reading the visual feature file for VQA
+void readVisualFeatureFileVQA(char* featPath){
     FILE* filePt = fopen(featPath, "rb");
 
     if(filePt == NULL){
@@ -151,7 +144,7 @@ void readVisualFeatureFileCOCO(char* featPath){
 
 // Clustering kmeans wrapper
 // Source: http://yael.gforge.inria.fr/tutorial/tuto_kmeans.html
-void clusterVisualFeaturesCOCO(int clusters, char* savePath){
+void clusterVisualFeaturesVQA(int clusters, char* savePath){
     int k = clusters;                           /* number of cluster to create */
     int d = visualFeatSize;                           /* dimensionality of the vectors */
     int n = noFeats;                         /* number of vectors */

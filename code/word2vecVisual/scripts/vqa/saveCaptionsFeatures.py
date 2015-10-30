@@ -5,8 +5,8 @@ import io
 
 #################################################################################
 # Setting up save paths
-featSavePath = '/home/satwik/VisualWord2Vec/data/vqa_train_features.txt';
-capSavePath = '/home/satwik/VisualWord2Vec/data/vqa_train_captions_raw.txt';
+featSavePath = '/home/satwik/VisualWord2Vec/data/vqa/vqa_train_features.txt';
+capSavePath = '/home/satwik/VisualWord2Vec/data/vqa/vqa_train_captions_raw.txt';
 #################################################################################
 # Read the val data
 #fileName = '/home/satwik/VisualWord2Vec/data/captions_abstract_v002_val2015.json';

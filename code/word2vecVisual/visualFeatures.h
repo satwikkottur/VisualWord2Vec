@@ -12,6 +12,7 @@
 // For clustering
 # include <yael/vector.h>
 # include <yael/kmeans.h>
+# include <yael/gmm.h>
 # include <yael/machinedeps.h>
 # include "structs.h"
 # include "macros.h"
@@ -105,6 +106,8 @@ void readVisualFeatureFile(char*);
 
 // Wrapper for kmeans
 void clusterVisualFeatures(int, char*);
+// Wrapper for gmm
+void gmmVisualFeatures(int, char*);
 /*****************************************/
 // Common sense task
 int performCommonSenseTask(float*);

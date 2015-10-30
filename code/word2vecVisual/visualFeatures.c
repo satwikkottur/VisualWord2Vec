@@ -1083,6 +1083,76 @@ void clusterVisualFeatures(int clusters, char* savePath){
     free(v); free(centroids); free(dis); free(assign); free(nassign);
 }
 
+// Wrapper for GMM
+void gmmVisualFeatures(int clusters, char* savePath){
+    int k = clusters;                           /* number of cluster to create */
+    int d = visualFeatSize;                           /* dimensionality of the vectors */
+    int n = noRefine;                         /* number of vectors */
+    //int nt = 1;                           /* number of threads to use */
+    int niter = 1000;                        /* number of iterations (0 for convergence)*/
+    int redo = 1;                         /* number of redo */
+    
+    // Populate the features
+    float * v = fvec_new (d * n);    /* random set of vectors */
+    long i, j, offset;
+    for (i = 0; i < n; i++){
+        offset = i * d;
+        for(j = 0; j < d; j++)
+            v[offset + j] = (float) refineTuples[i].feat[j];
+    }
+    
+    /* variables are allocated externaly */
+    float * centroids = fvec_new (d * k); /* output: centroids */
+    float * dis = fvec_new (n);           /* point-to-cluster distance */
+    int * assign = ivec_new (n);          /* quantization index of each point */
+    int * nassign = ivec_new (k);         /* output: number of vectors assigned to each centroid */
+    
+    double t1 = getmillisecs();
+    // Cluster the features
+    kmeans (d, n, k, niter, v, 1, 1, redo, centroids, dis, assign, nassign);
+    // Compute GMM model
+    gmm_t* gmm = gmm_learn(d, n, 25, niter, v, 24, 1, redo, 25);
+    double t2 = getmillisecs();
+    
+    printf ("kmeans performed in %.3fs\n\n", (t2 - t1)  / 1000);
+    //ivec_print (nassign, k);
+    
+    // Write the cluster ids to the prsTuple structure
+    for (i = 0; i < n; i++)
+        refineTuples[i].cId = assign[i] + 1;
+    
+    // Debugging the cId for the train tuples
+    /*for (i = 0; i < n; i++)
+     printf("%i\n", train[i].cId);*/
+
+     // Write the clusters to a file, if non-empty
+    if(savePath != NULL){
+        // Open the file
+        FILE* filePtr = fopen(savePath, "wb");
+
+        if(noRefine == 0){
+            printf("ClusterIds not available to save!\n");
+            exit(1);
+        }
+
+        // Save the cluster ids
+        int i;
+        for (i = 0; i < noRefine; i++)
+            fprintf(filePtr, "%d %f\n", refineTuples[i].cId, dis[i]);
+
+        // Close the file
+        fclose(filePtr); 
+    }
+    
+    // Assigning the number of clusters
+    if(noClusters == 0){
+        noClusters = clusters;
+    }
+    
+    // Free memory
+    free(v); free(centroids); free(dis); free(assign); free(nassign);
+}
+
 // Common sense evaluation
 int performCommonSenseTask(float* testTupleScores){
     printf("Common sense task\n\n");
