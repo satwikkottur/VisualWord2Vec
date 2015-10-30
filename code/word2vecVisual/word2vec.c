@@ -41,16 +41,16 @@ extern float *syn0P, *syn0S, *syn0R;
 int trainPhrases = 0; // Handle phrases as a unit / separately
 int trainMulti = 0; // Train single / multiple models for P,R,S
 int clusterCommonSense = 25; // Number of initial clusters to use
-int clusterCOCO = 50; // Number of initial clusters to use
+int clusterCOCO = 5000; // Number of initial clusters to use
 int clusterVQA = 1000; // Number of initial clusters to use
 int clusterVP = 100; // Number of initial clusters to use
-int usePCA = 0;  // Reduce the dimensions through PCA
+int usePCA = 1;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
 int windowVP = 5; // window size for the VP task
 // Training the sentences in one of the modes
 // Could be one of DESCRIPTIONS, SENTENCES, WORDS, WINDOWS;
-enum TrainMode trainMode = WORDS;
+enum TrainMode trainMode = DESCRIPTIONS;
 
 /***********************************************************************************/
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
@@ -1077,16 +1077,16 @@ void TrainModel() {
     //visualParaphraseWrapper();
 
     // Training from MS COCO
-    //mscocoWrapper();
+    mscocoWrapper();
 
     // Training from MS COCO
-    vqaWrapper();
+    //vqaWrapper();
 
     // Marking the change
-    //printf("\nChange over!\n");
+    printf("\nChange over!\n");
     
     // Common sense task
-    //commonSenseWrapper();
+    commonSenseWrapper();
     return;
 
     //***************************************************************************************

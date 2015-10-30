@@ -125,9 +125,8 @@ void readVisualFeatureFileVQA(char* featPath){
         }
 
         // Debugging printing
-        if(noLines % 5000 == 0)
+        if(noLines % 1000 == 0)
             printf("Reading features : %d\n", noLines);
-
         noLines++;
     }
 
