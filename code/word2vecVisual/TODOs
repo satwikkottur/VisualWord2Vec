@@ -64,10 +64,26 @@ Train VP for scratch:
     - Get VP into the loop to stop word2vec refining (done)
     - Text alignment for paraphrases 
 - Correct P,R,S training data from inflections using inverse map (done)
+- Adjust the learning rates to get a more stable plots (done)
+- Train with individual words (done)
+- Train on wikipedia and test on VP task (done)
+- Run both Xiao's course and fine grain tasks
+- Play with parameters to get some sense of graphs
+- Hold out a validation set (done)
+- Compute overlap statistics
+- Setup VQA dataset (done)
+- Refine using VQA dataset (done)
+- Send VQA dataset training captions to Rama (done)
+- Use windowed training (done)
+- Separate the sentences of description while training (done)
+- Setup the text retrieval task (done)
+- Capture embeddings at different stages of refining and see text-retrieval task (done)
+- Finish text retrieval task for single, multi for MS COCO and wikipedia (done)
+- Check MS COCO (whole minus test) for single and double refining (done)
+- Prepare dataset from MS COCO similar to ICCV (done)
+- Check performance on the ICCV like dataset from real images (done)
 
 CVPR:
-Run Xiaos Visual paraphrasing(and fitb?) task for text baseline
----------------------------------------------------------------
 - Make the code faster (tough to debug otherwise)
 - Compute the word overlap statistics for 3-4 separate cases
 - Setup system for refining over sentences for VP task (done)
@@ -76,25 +92,8 @@ Run Xiaos Visual paraphrasing(and fitb?) task for text baseline
 - Check for pairs whose distance increase/decreased the most
 - Check for triplets whose relative distance increased/decreased the most
 
-Visual Paraphrasing
--------------------
-- Adjust the learning rates to get a more stable plots (done)
-- Train with individual words (done)
-- Train on wikipedia and test on VP task (done)
-- Run both Xiao's course and fine grain tasks
-- Play with parameters to get some sense of graphs
-- Hold out a validation set (done)
-- Compute overlap statistics
-- Setup VQA dataset
-- Refine using VQA dataset
-- Send VQA dataset training captions to Rama (done)
-- Use windowed training (done)
-- Separate the sentences of description while training (done)
-- Setup the text retrieval task (done)
-- Capture embeddings at different stages of refining and see text-retrieval task (done)
-
-- Finish text retrieval task for single, multi for MS COCO and wikipedia (done)
-- Check MS COCO (whole minus test) for single and double refining (done)
-- Prepare dataset from MS COCO similar to ICCV-
-- Check performance on the ICCV like dataset from real images
 - Setup regression task on abstract scenes
+- Switch off each of the features for ICCV and check performance
+- GMMs
+- Train text-based image retrieval for MS COCO
+- Compute median R metric

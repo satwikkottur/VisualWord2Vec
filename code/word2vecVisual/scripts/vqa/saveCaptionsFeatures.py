@@ -18,7 +18,7 @@ fileName = '/home/satwik/VisualWord2Vec/data/captions_abstract_v002_train2015.js
 with open(fileName) as data_file:
     trainData = json.load(data_file);
 
-# Read the features
+'''# Read the features
 featName = '/srv/share/vqa/release_data/abstract_v002/scene_json/features/abstract_v002_%s2015_features.npy';
 trainFeat = numpy.load(featName % 'train');
 #valFeat = numpy.load(featName % 'val');
@@ -38,4 +38,4 @@ captionId.close();
 #featureId.write(num2str(featDim) + '\n');
 #for i in 
 
-#featureId.close()
+#featureId.close()'''

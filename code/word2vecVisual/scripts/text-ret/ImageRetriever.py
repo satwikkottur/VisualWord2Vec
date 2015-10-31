@@ -224,6 +224,7 @@ class ImageRetriever:
         # Required Top@ recalls
         recInds = [1, 5, 10, 50, 100];
         recalls = dict.fromkeys(recInds, 0);
+        ranks = []; # Get all the ranks to compute the median
 
         noTuples = len(dataTuples);
         # For each tuple, we have a corresponding gt
@@ -236,6 +237,7 @@ class ImageRetriever:
             # Consider only top three
             for j in dataTuples[i][0:2]:
                 gtRank = self.__scoreQueryTuple(j, i[0]);
+                ranks.append(gtRank);
                 count += 1;
                 
                 # Iteratively count towards recall
@@ -247,4 +249,137 @@ class ImageRetriever:
         print '*********************'
         for i in recInds:
             print 'Recall (%d) : %f)' % (i, recalls[i]/float(count))
+        print 'Med r: %d' % np.median(np.array(ranks))
         print '*********************'
+
+    # Compute the gtRank for a test caption 
+    def __scoreQueryCaption(self, qCap, qImgId):
+        score = [];
+        for i in self.capList:
+            score.append(self.__computeEmbedding(qCap, self.embeds).dot(\
+                                            self.groundEmbeds[i].transpose()));
+
+        gtScore = score[self.capList.index(qImgId)];
+
+        # Sort and find out the rank of gtScore
+        score.sort(reverse=True);
+        gtRank = score.index(gtScore);
+
+        return gtRank;
+
+    # Separate the train and test sets for easier evaluation
+    def setupTrainTestCOCO(self, captions):
+        # Pull out the first caption to serve as the ground truth
+        self.groundCaps = {};
+        self.groundEmbeds = {};
+        self.capList = [];
+        self.testCaps = {};
+
+        for i in captions['annotations']:
+            imgId = i['image_id'];
+            # Capture the ground truth
+            if(imgId not in self.groundCaps):
+                self.capList.append(imgId);
+                self.groundCaps[imgId] = i['caption'];
+                self.testCaps[imgId] = [];
+
+            # Capture the test tuples
+            else:
+                self.testCaps[imgId].append(i['caption']);
+
+        '''print len(captions['annotations'])
+        print len(set([i['image_id'] for i in captions['annotations']]))
+        print len(self.groundCaps)
+        print len(self.testCaps)
+        print len(self.capList)'''
+
+        # Compute the embeddings for the ground tuples
+        self.groundEmbeds = {i: self.__computeEmbedding(self.groundCaps[i], self.embeds)\
+                                for i in self.groundCaps};
+
+    # Setup the system for multiprocessing
+    def setupMultiProcessing(self, noThreads):
+        self.recalls = [{} for i in xrange(0, noThreads)];
+        self.ranks = [[] for i in xrange(0, noThreads)];
+
+    # Perform the task in multiprocesesing way
+    def performTaskMultiCOCO(self, threadId, noThreads):
+        # Required Top@ recalls
+        recInds = [1, 5, 10, 50, 100];
+        recalls = dict.fromkeys(recInds, 0);
+        ranks = []; # Get all the ranks to compute the median
+        count = 0;
+        iterCount = 0;
+
+        testList = self.capList[threadId::noThreads];
+        testCaps = {i:self.testCaps[i] for i in testList};
+
+        # Compute similarity for each test case and get the ground truth rank
+        for i in testCaps:
+            # Print progress:
+            print 'Caption (%d) : %d / %d' % (threadId, iterCount, len(testCaps))
+            iterCount += 1;
+                
+            # For each query in the image
+            for j in testCaps[i]:
+                gtRank = self.__scoreQueryCaption(j, i);
+                
+                ranks.append(gtRank);
+                count += 1;
+                
+                # Iteratively count towards recall
+                for recId in recInds:
+                    if gtRank < recId:
+                        recalls[recId] += 1;
+            
+        # Print the results
+        '''.print '*********************'
+        for i in recInds:
+            print 'Recall (%d) : %f)' % (i, recalls[i]/float(count))
+        print 'Med r: %d' % np.median(np.array(ranks))
+        print '*********************'''
+
+        # Store the results
+        self.recalls[threadId] = recalls;
+        self.ranks[threadId] = ranks;
+
+    # Perform the task for COCO
+    def performTaskCOCO(self, captions):
+        self.setupTrainTestCOCO(captions);
+
+        # Required Top@ recalls
+        recInds = [1, 5, 10, 50, 100];
+        recalls = dict.fromkeys(recInds, 0);
+        ranks = []; # Get all the ranks to compute the median
+        count = 0;
+        iterCount = 0;
+
+        # Compute similarity for each test case and get the ground truth rank
+        for i in self.testCaps:
+            # Print progress:
+            print 'Caption: %d / %d' % (iterCount, len(self.testCaps))
+            iterCount += 1;
+                
+            # For each query in the image
+            for j in self.testCaps[i]:
+                gtRank = self.__scoreQueryCaption(j, i);
+                
+                ranks.append(gtRank);
+                count += 1;
+                
+                # Iteratively count towards recall
+                for recId in recInds:
+                    if gtRank < recId:
+                        recalls[recId] += 1;
+            
+        # Print the results
+        print '*********************'
+        for i in recInds:
+            print 'Recall (%d) : %f)' % (i, recalls[i]/float(count))
+        print 'Med r: %d' % np.median(np.array(ranks))
+        print '*********************'
+
+
+
+
+

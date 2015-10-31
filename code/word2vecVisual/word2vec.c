@@ -44,7 +44,7 @@ int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
 int clusterVQA = 1000; // Number of initial clusters to use
 int clusterVP = 100; // Number of initial clusters to use
-int usePCA = 1;  // Reduce the dimensions through PCA
+int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
 int windowVP = 5; // window size for the VP task
@@ -633,10 +633,10 @@ void commonSenseWrapper(){
     //saveWord2Vec(wordPath);
 
     // Initializing the hash
-    //initFeatureHash();
+    initFeatureHash();
     // Reading for the word features, cluster ids and visual features
     // clusterid reading will be avoided when clustering is ported to c
-    //readRefineTrainFeatureFiles(featurePathICCV, NULL);
+    readRefineTrainFeatureFiles(featurePathICCV, NULL);
     
     // reading cluster files from matlab
     //char clusterpath[] = "/home/satwik/visualword2vec/data/coco-cnn/cluster_100_coco_train.txt";
@@ -938,8 +938,8 @@ void vqaWrapper(){
     // Load the embeddings (pre-trained) to save time
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
     // Load the word2vec embeddings from Xiao's
-    //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
-    char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/vqa/word2vec_vqa_before.bin";
+    char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
+    //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/vqa/word2vec_vqa_before.bin";
     loadWord2Vec(beforeEmbedPath);
 
     ////////// Dirty work of setting up paths//////////////////////////////////////////////////////////
@@ -1057,9 +1057,9 @@ void TrainModel() {
     if (negative > 0) InitUnigramTable();
     start = clock();
     // [S] : Creates the threads for execution
-    //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+    for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
     // [S] : Waits for the completion of execution of the threads
-    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+    for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     // Save the embeddings before refining 
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
@@ -1077,17 +1077,16 @@ void TrainModel() {
     //visualParaphraseWrapper();
 
     // Training from MS COCO
-    mscocoWrapper();
+    //mscocoWrapper();
 
     // Training from MS COCO
     //vqaWrapper();
 
     // Marking the change
-    printf("\nChange over!\n");
+    //printf("\nChange over!\n");
     
     // Common sense task
     commonSenseWrapper();
-    return;
 
     //***************************************************************************************
     /***************************************************************************************/
@@ -1095,7 +1094,7 @@ void TrainModel() {
     /***************************************************************************************/
     // Write the three models separately (P,R,S)
     // P 
-    char outputP[] = "/home/satwik/VisualWord2Vec/models/p_wiki_model.txt";
+    /*char outputP[] = "/home/satwik/VisualWord2Vec/models/p_wiki_model.txt";
     fo = fopen(outputP, "wb");
     syn0 = syn0P;
     // Save the word vectors
@@ -1134,8 +1133,7 @@ void TrainModel() {
       else for (b = 0; b < layer1_size; b++) fprintf(fo, "%lf ", syn0[a * layer1_size + b]);
       fprintf(fo, "\n");
     }
-    fclose(fo);
-    return;
+    fclose(fo);*/
     /***************************************************************************************/
     
     fo = fopen(output_file, "wb");

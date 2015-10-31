@@ -10,33 +10,20 @@ capPath = dataPath + 'captions_val2014.json';
 with open(capPath, 'rb') as dataFile:
     captions = json.load(dataFile);
 
+# Create instance of the task
+task = ImageRetriever('SINGLE');
 
-
-
-
-'''# Order : Relation, Primary, Secondary
-tuples = tuplesData['data'];
-
-# Create instance of the task (with multiple / single embeddings)
-#task = ImageRetriever('SINGLE');
-task = ImageRetriever('MULTI');
-# Read the ground truth
-gtPath = dataPath + 'pilot_gt.txt';
-task.readGroundTuples(gtPath);
 # Reading embeddings for multiple models
-modelPath = '/home/satwik/VisualWord2Vec/models/%s_wiki_model.txt';
-#modelPath = '/home/satwik/VisualWord2Vec/data/%s_model.bin';
-embedPaths = {};
-for i in ['r', 'p', 's']:
-    embedPaths[i] = modelPath % i;
-task.loadWord2Vec(embedPaths)
-task.performTask(tuples)'''
+embedPath = '/home/satwik/VisualWord2Vec/data/word2vec_output_bestmodel_single.bin';
+task.loadWord2Vec(embedPath);
+# Perform the task on COCO
+task.performTaskCOCO(captions);
 
 '''embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt';
-task.loadWord2Vec(embedPath)
-task.performTask(tuples)
+task.loadWord2Vec(embedPath);
+task.performTaskCOCO(captions);'''
 
-embedPath = '/home/satwik/VisualWord2Vec/data/word2vec_output_bestmodel_single.bin';
+'''embedPath = '/home/satwik/VisualWord2Vec/data/word2vec_output_bestmodel_single.bin';
 task.loadWord2Vec(embedPath)
 task.performTask(tuples)'''
 
