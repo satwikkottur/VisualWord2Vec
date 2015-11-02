@@ -39,12 +39,12 @@ extern float *syn0P, *syn0S, *syn0R;
 
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
-int trainMulti = 0; // Train single / multiple models for P,R,S
+int trainMulti = 1; // Train single / multiple models for P,R,S
 int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
 int clusterVQA = 1000; // Number of initial clusters to use
 int clusterVP = 100; // Number of initial clusters to use
-int usePCA = 1;  // Reduce the dimensions through PCA
+int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
 int windowVP = 5; // window size for the VP task
@@ -585,7 +585,8 @@ void commonSenseWrapper(){
     int clusterArg = clusterCommonSense;
 
     // Load the word2vec embeddings from Xiao's
-    char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
+    //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
+    char wordPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
     //loadWord2Vec(wordPath);
 
@@ -1061,24 +1062,26 @@ void TrainModel() {
     if (negative > 0) InitUnigramTable();
     start = clock();
     // [S] : Creates the threads for execution
-    //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
+    for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
     // [S] : Waits for the completion of execution of the threads
-    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
+    for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     // Save the embeddings before refining 
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
+    char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings_100.bin";
+    //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings_50.bin";
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings_pre_refine.bin";
     //char beforeEmbedPath[] = "modelsNdata/word2vec_vp_lemma.bin";
     //char beforeEmbedPath[] = "modelsNdata/mscoco_before.bin";
 
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
-    char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/vqa/word2vec_vqa_before.bin";
+    //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/vqa/word2vec_vqa_before.bin";
     //loadWord2Vec(beforeEmbedPath);
-    //saveWord2Vec(beforeEmbedPath);
+    saveWord2Vec(beforeEmbedPath);
     //***************************************************************************************
     
     // Visual paraphrase task
-    visualParaphraseWrapper();
+    //visualParaphraseWrapper();
 
     // Training from MS COCO
     //mscocoWrapper();
@@ -1090,7 +1093,7 @@ void TrainModel() {
     //printf("\nChange over!\n");
     
     // Common sense task
-    //commonSenseWrapper();
+    commonSenseWrapper();
     return;
 
     //***************************************************************************************

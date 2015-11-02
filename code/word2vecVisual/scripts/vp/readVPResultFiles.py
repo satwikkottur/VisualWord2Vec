@@ -3,8 +3,8 @@ import re
     
 def printResults(dumpPath):
     #dumpPath = '../modelsNdata/backup/out_val_sents';
-    rootPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/';
-    #rootPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/backup/';
+    #rootPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/';
+    rootPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/vp/';
     fileId = open(rootPath + dumpPath, 'rb');
     if(fileId == None):
         print 'File not found!'
@@ -47,7 +47,7 @@ dumpPaths.extend(['out_enum_test_sents', \
                     'out_enum_wiki_winds_pca']);'''
 
 dumpPaths = [];
-'''dumpPaths.extend(['out_vp_50_descs_pca', \
+dumpPaths.extend(['out_vp_50_descs_pca', \
                 'out_vp_50_sents', \
                 'out_vp_50_sents_pca', \
                 'out_vp_50_descs', \
@@ -59,13 +59,13 @@ dumpPaths = [];
 dumpPaths.extend(['out_vp_100_descs_pca', \
                 'out_vp_100_sents', \
                 'out_vp_100_sents_pca', \
-                'out_vp_100_descs', \
+                'out_vp_100_desc', \
                 'out_vp_100_winds', \
                 'out_vp_100_winds_pca', \
                 'out_vp_100_words', \
-                'out_vp_100_words_pca']);'''
+                'out_vp_100_words_pca']);
 
-dumpPaths.extend(['out_vp_wiki_50_descs_pca', \
+'''dumpPaths.extend(['out_vp_wiki_50_descs_pca', \
                 'out_vp_wiki_50_sents', \
                 'out_vp_wiki_50_sents_pca', \
                 'out_vp_wiki_50_descs', \
@@ -81,7 +81,7 @@ dumpPaths.extend(['out_vp_wiki_100_descs_pca', \
                 'out_vp_wiki_100_winds', \
                 'out_vp_wiki_100_winds_pca', \
                 'out_vp_wiki_100_words', \
-                'out_vp_wiki_100_words_pca']);
+                'out_vp_wiki_100_words_pca']);'''
 
 '''dumpPaths.extend(['out_vp_coco_descs', \
                     'out_vp_coco_descs_pca', \
