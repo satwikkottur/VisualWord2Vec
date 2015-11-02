@@ -58,4 +58,6 @@ struct feature_node* createNodeListFeature(float* feature);
 // Computing the accuracy for a given bunch of features
 float computeTestAccuracy(struct model*, struct SentencePair*);
 float computeValAccuracy(struct model*, struct SentencePair*);
+// Saving the test scores along with gt
+void saveTestScores(char*, struct SentencePair*);
 # endif

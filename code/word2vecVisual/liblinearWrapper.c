@@ -17,6 +17,10 @@ long featSizeSVM;
 float* testScores = NULL;
 float* valScores = NULL;
 
+// A flag to indicate the first run
+int firstRun = 0;
+int countRun = 0;
+
 struct problem* curProblem = NULL; // Current probem to solve using svm
 struct parameter* curParam = NULL; // Current parameters for traing svm
 struct model* trainedModel; // Model that is trained
@@ -27,6 +31,9 @@ void learnClassificationModel(struct SentencePair* sentPairs, long noPairs, int 
     featSizeSVM = totalFeatSize;
     if(noTrainSVM == 0){
         // Classifier and other datastructures uninitialized
+        // The first run on the task (record base scores)
+        firstRun = 1;
+                
         // Populate test and train indices
         populateTestTrainValIndices(sentPairs, noPairs);
 
@@ -49,6 +56,9 @@ void learnClassificationModel(struct SentencePair* sentPairs, long noPairs, int 
         createValNodesPair(sentPairs);
     }
     else{
+        // Set the flag to zero (not the first run)
+        firstRun = 0;
+
         // Modify the problem structure after getting the new embeddings
         modifyProblemPair(sentPairs);
 
@@ -81,11 +91,19 @@ void learnClassificationModel(struct SentencePair* sentPairs, long noPairs, int 
     printf("mAP: Test (%f) Val(%f)\n", mAPTest, mAPVal);
     printf("***************************************\n");
     
+    // Also save the 10 sentences from each category based on scores
+    char* savePath = (char*) malloc(sizeof(char) * 100);
+    if (countRun > 1){
+        sprintf(savePath, "modelsNdata/vp_test_scores_%d.txt", countRun);
+        saveTestScores(savePath, sentPairs);
+    }
+
     // Free the memory
     //free_and_destroy_model(&trainedModel);
     //free(curParam);
     //free(curProblem);
     //free(testNodes);
+    countRun++;
 }
 
 // Creating the problem structure for liblinear
@@ -364,6 +382,10 @@ float computeTestAccuracy(struct model* trainedModel, struct SentencePair* sentP
         // Compute the score and store
         predict_values(trainedModel, testNodes[i], &score);
         testScores[i] = score;
+        
+        // Now record the test scores in the struct to get the best improved sentences
+        if(firstRun) sentPairs[testInds[i]].baseScore = score;
+        else sentPairs[testInds[i]].newScore = score;
     }
 
     // Now pedict the mAP, using ranks
@@ -470,6 +492,21 @@ float computeValAccuracy(struct model* trainedModel, struct SentencePair* sentPa
     free(rankedScores);
     free(rankedLabels);
     return mAP;
+}
+
+// Save the test scores along with ground truth and id
+void saveTestScores(char* fileName, struct SentencePair* sentPairs){
+    FILE* filePt = fopen(fileName, "wb");
+    
+    int i;
+    for(i = 0; i < noTestSVM; i++){
+        fprintf(filePt, "%d %d %f %f\n", testInds[i], 
+                                    sentPairs[testInds[i]].gt, 
+                                    sentPairs[testInds[i]].baseScore,
+                                    sentPairs[testInds[i]].newScore);
+    }
+
+    fclose(filePt);
 }
 
     /*int i, j;

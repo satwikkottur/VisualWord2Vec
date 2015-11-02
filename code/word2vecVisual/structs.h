@@ -74,6 +74,8 @@ struct SentencePair{
     int isTrain;
     // If in the val set
     int isVal;
+    // Record the base score and improved score
+    float baseScore, newScore;
 
     // Features (word2vec, coc, tf) in that order
     float* feature;

@@ -6,6 +6,7 @@ data/*
 out*
 err*
 *.txt
+*.pickle
 
 # Models folder
 models/*
