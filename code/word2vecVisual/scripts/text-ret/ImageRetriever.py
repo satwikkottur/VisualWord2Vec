@@ -331,12 +331,12 @@ class ImageRetriever:
                 for recId in recInds:
                     if gtRank < recId:
                         recalls[recId] += 1;
-            
+
         # Print the results
-        '''.print '*********************'
+        print '*********************'
         for i in recInds:
-            print 'Recall (%d) : %f)' % (i, recalls[i]/float(count))
-        print 'Med r: %d' % np.median(np.array(ranks))
+            print 'Recall (%d) (%d) : %d / %d' % (threadId, i, recalls[i], count)
+        print 'Med r (%d): %s' % (threadId, str(ranks))
         print '*********************'''
 
         # Store the results

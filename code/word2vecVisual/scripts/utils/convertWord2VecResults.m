@@ -2,7 +2,6 @@
 % Changed to a function
 function convertWord2VecResults(resultPath, savePath)
     % Reading the file
-    resultPath
     d = textread(resultPath, '%s');
 
     % then this should get the words (tokens_word2vec) and a corresponding matrix of vectors (vectors_word2vec)

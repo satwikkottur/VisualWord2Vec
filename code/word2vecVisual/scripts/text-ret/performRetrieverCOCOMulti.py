@@ -15,7 +15,10 @@ with open(capPath, 'rb') as dataFile:
 task = ImageRetriever('SINGLE');
 
 # Reading embeddings for multiple models
-embedPath = '/home/satwik/VisualWord2Vec/data/word2vec_output_bestmodel_single.bin';
+#embedPath = '/home/satwik/VisualWord2Vec/data/word2vec_output_bestmodel_single.bin';
+#embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt';
+embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_wiki_iter_24.bin";
+#embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_before_refine.bin';
 task.loadWord2Vec(embedPath);
 # Setup the mutliprocessing framework
 task.setupTrainTestCOCO(captions);
@@ -32,7 +35,7 @@ for i in xrange(0, noThreads):
 #task.performTaskCOCO(captions);
 
 # Save the pickle file
-pickle.dump(task, open(dataPath + 'retrieved_multi.pickle', 'wb'));
+#pickle.dump(task, open(dataPath + 'retrieved_multi_baseline.pickle', 'wb'));
 
 '''embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt';
 task.loadWord2Vec(embedPath);

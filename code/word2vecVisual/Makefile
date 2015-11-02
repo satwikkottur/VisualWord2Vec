@@ -39,7 +39,7 @@ vqa:
 
 vp:
 	make
-	./$(BIN)word2vec -train modelsNdata/vp/coco_lemma_vp_lemma.txt -output modelsNdata/word2vec_vp_lemma_50hidden.bin -cbow 0 -size 50 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
+	./$(BIN)word2vec -train modelsNdata/vp/coco_lemma_vp_lemma.txt -output modelsNdata/word2vec_vp_lemma_100hidden.bin -cbow 0 -size 100 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 
 coco:
 	make
@@ -51,7 +51,7 @@ wikiplain:
 
 wikivp:
 	make
-	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/wiki_vp_train_lemma.txt -output modelsNdata/word2vec_after_refine_lemma.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
+	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/wiki_vp_train_lemma.txt -output modelsNdata/wiki_vp_before_50.bin -cbow 0 -size 100 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
 
 common:
 	make

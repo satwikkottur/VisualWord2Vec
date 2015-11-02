@@ -47,14 +47,50 @@ dumpPaths.extend(['out_enum_test_sents', \
                     'out_enum_wiki_winds_pca']);'''
 
 dumpPaths = [];
-dumpPaths.extend(['out_vp_coco_descs', \
+'''dumpPaths.extend(['out_vp_50_descs_pca', \
+                'out_vp_50_sents', \
+                'out_vp_50_sents_pca', \
+                'out_vp_50_descs', \
+                'out_vp_50_winds', \
+                'out_vp_50_winds_pca', \
+                'out_vp_50_words', \
+                'out_vp_50_words_pca']);
+
+dumpPaths.extend(['out_vp_100_descs_pca', \
+                'out_vp_100_sents', \
+                'out_vp_100_sents_pca', \
+                'out_vp_100_descs', \
+                'out_vp_100_winds', \
+                'out_vp_100_winds_pca', \
+                'out_vp_100_words', \
+                'out_vp_100_words_pca']);'''
+
+dumpPaths.extend(['out_vp_wiki_50_descs_pca', \
+                'out_vp_wiki_50_sents', \
+                'out_vp_wiki_50_sents_pca', \
+                'out_vp_wiki_50_descs', \
+                'out_vp_wiki_50_winds', \
+                'out_vp_wiki_50_winds_pca', \
+                'out_vp_wiki_50_words', \
+                'out_vp_wiki_50_words_pca']);
+
+dumpPaths.extend(['out_vp_wiki_100_descs_pca', \
+                'out_vp_wiki_100_sents', \
+                'out_vp_wiki_100_sents_pca', \
+                'out_vp_wiki_100_descs', \
+                'out_vp_wiki_100_winds', \
+                'out_vp_wiki_100_winds_pca', \
+                'out_vp_wiki_100_words', \
+                'out_vp_wiki_100_words_pca']);
+
+'''dumpPaths.extend(['out_vp_coco_descs', \
                     'out_vp_coco_descs_pca', \
                     'out_vp_coco_sents', \
                     'out_vp_coco_sents_pca', \
                     'out_vp_coco_words', \
                     'out_vp_coco_words_pca', \
                     'out_vp_coco_winds', \
-                    'out_vp_coco_winds_pca']);
+                    'out_vp_coco_winds_pca']);'''
 
 '''dumpPaths.extend(['out_wiki_desc', \
                     'out_wiki_descs_pca', \
