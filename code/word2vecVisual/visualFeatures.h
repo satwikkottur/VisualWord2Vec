@@ -21,9 +21,11 @@
 
 // Declaring the extern variables allowing separation of code
 extern long long vocab_size, layer1_size;
-extern float *syn0, *syn1, *expTable;
+extern float *syn0, *syn1, *expTable, *syn0raw;
+extern int* refineVocab;
 extern struct vocab_word* vocab;
 extern int permuteMAP;
+extern int useAlternate;
 // From refineFunctions.h
 extern int noClusters;
 extern int visualFeatSize;
@@ -70,6 +72,8 @@ void computeMultiEmbeddings();
 
 // Computing the embedding for the feature word 
 void computeFeatureEmbedding(struct featureWord*);
+// Computing the embedding for the feature word, using raw word2vec
+void computeRawFeatureEmbedding(struct featureWord*);
 // Computing the embedding for feature word in case of multi model
 void computeMultiFeatureEmbedding(struct featureWord*);
 //------------------------------------------------------------
@@ -117,6 +121,8 @@ int performMultiCommonSenseTask(float*);
 void readTestValFiles(char*, char*);
 // Computing the cos distances
 void evaluateCosDistance();
+// Computing the cos distances for raw word2vec embeddings
+void evaluateRawCosDistance();
 // Computing the cos distances for multi-model
 void evaluateMultiCosDistance();
 // Computing the test and val scores
@@ -131,4 +137,11 @@ float* computePermuteMAP(float*, struct prsTuple*, int*, long);
 // Visualization and qualitative analysis
 // Get the best test tuples with maximum improvement
 void findBestTestTuple(float*, float*);
+
+// Record the refining vocab
+void recordRefineVocab();
+// Mark the feature words for raw/refined
+void markFeatureWords();
+// Save the refined vocabulary
+void saveRefineVocab(char*);
 #endif

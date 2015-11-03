@@ -11,10 +11,11 @@ int featVocabMaxSize = 5000; // Maximum number of feature vocab
 static long noRefine = 0; // Number of refining training instances
 static long noTrain = 0, noVal = 0; // Number of test and validation variables
 long noTest = 0;
-float* cosDist; // Storing the cosine distances between all the feature vocabulary
+float* cosDist = NULL; // Storing the cosine distances between all the feature vocabulary
+float* cosDistRaw = NULL; // Storing the cosine distances between all the feature vocabulary (raw)
 float* valScore, *testScore; // Storing the scores for test and val
 // Storing the cosine distances between all the feature vocabulary (multimodel)
-float *cosDistP, *cosDistR, *cosDistS; 
+float *cosDistP = NULL, *cosDistR = NULL, *cosDistS = NULL;
 int verbose = 0; // Printing which function is being executed
 //int noClusters = 0; // Number of clusters to be used // Make this extern: refineFunctions.h
 //int visualFeatSize = 0; // Size of the visual features used // Make this extern : refineFunctions.h
@@ -78,6 +79,9 @@ struct prsTuple** readPSRFeatureFile(char* filePath, long* tupleCount){
 void readRefineTrainFeatureFiles(char* refinePath, char* trainPath){
     // Read the refine tuples first
     refineTuples = *readPSRFeatureFile(refinePath, &noRefine);
+    
+    // Immediately record the refine vocab, if needed
+    if(useAlternate) recordRefineVocab();
     
     if(trainPath == NULL){
         // If the second option is null, we take them to be equal
@@ -175,6 +179,7 @@ struct featureWord constructFeatureWord(char* word){
     feature.embedR = NULL;
     feature.embedS = NULL;
     feature.embedP = NULL;
+    feature.embedRaw = NULL;
     feature.count = 0;
     
     int count = 0, i;
@@ -823,6 +828,21 @@ void computeEmbeddings(){
         // Computing the feature embedding
         computeFeatureEmbedding(&featHashWords[i]);
     }
+
+    // If raw embeddings are also needed, only for the first time
+    if(useAlternate && cosDistRaw == NULL){
+        for(i = 0; i < featVocabSize; i++){
+            if(featHashWords[i].embedRaw == NULL)
+                // Allocate space
+                featHashWords[i].embedRaw = (float*) malloc(layer1_size * sizeof(float));
+        
+            // Computing the feature embedding
+            computeRawFeatureEmbedding(&featHashWords[i]);
+        }
+
+        // Only for the first time (also compute the cosineSimilarity for raw embeddings
+        evaluateRawCosDistance();
+    }
 }
 
 // Compute embeddings for multi models
@@ -884,6 +904,49 @@ void computeFeatureEmbedding(struct featureWord* feature){
         
     //feature->magnitude = (float*) malloc(sizeof(float));
     feature->magnitude = sqrt(magnitude);
+
+    free(mean);
+}
+
+// Compute raw embedding for a feature word if needed
+void computeRawFeatureEmbedding(struct featureWord* feature){
+    // Go through the current feature and get the mean of components
+    int i, c, actualCount = 0;
+    long long offset;
+    float* mean;
+    mean = (float*) calloc(layer1_size, sizeof(float));
+
+    // Get the mean feature for the word
+    for(c = 0; c < feature->count; c++){
+        // If not in vocab, continue
+        if(feature->index[c] == -1) continue;
+
+        // Write the vector
+        offset = feature->index[c] * layer1_size;
+        for (i = 0; i < layer1_size; i++){
+            mean[i] += syn0raw[offset + i];
+        }
+
+        // Increase the count
+        actualCount++;
+    }
+
+    // Normalizing if non-zero count
+    if(actualCount)
+        for (i = 0; i < layer1_size; i++)
+            mean[i] = mean[i]/actualCount;
+
+    // Saving the embedding in the featureWord
+    for(i = 0; i < layer1_size; i++)
+        feature->embedRaw[i] = mean[i];
+
+    // Compute the magnitude of mean
+    float magnitude = 0;
+    for(i = 0; i < layer1_size; i++)
+        magnitude += mean[i] * mean[i];
+        
+    //feature->magnitude = (float*) malloc(sizeof(float));
+    feature->magnitudeRaw = sqrt(magnitude);
 
     free(mean);
 }
@@ -1432,13 +1495,17 @@ void readTestValFiles(char* valName, char* testName){
     printf("Found %ld tuples in %s...\n", noTuples, testName);
     // Close the file
     fclose(filePt);
+
+    // Mark the featureWords is raw word2vec are to be used
+    if(useAlternate) markFeatureWords();
 }
 
 // Cosine distance evaluation
 void evaluateCosDistance(){
     if (verbose) printf("Evaluating pairwise dotproducts..\n\n");
-    // Allocate memory for cosDist variable
-    cosDist = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
+    // Allocate memory for cosDist variable, if not alloted
+    if(cosDist == NULL)
+        cosDist = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
     
     // For each pair, we evaluate the dot product along with normalization
     long a, b, i, offset;
@@ -1469,13 +1536,52 @@ void evaluateCosDistance(){
     }
 }
 
+// Cosine distance evaluation (raw embeddings)
+void evaluateRawCosDistance(){
+    if (verbose) printf("Evaluating pairwise dotproducts..\n\n");
+    // Allocate memory for cosDist variable, if not alloted
+    if(cosDistRaw == NULL)
+        cosDistRaw = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
+    
+    // For each pair, we evaluate the dot product along with normalization
+    long a, b, i, offset;
+    float magProd = 0, dotProduct;
+    for(a = 0; a < featVocabSize; a++){
+        offset = featVocabSize * a;
+        for(b = a; b < featVocabSize; b++){
+            if(featHashWords[a].embedRaw == NULL || featHashWords[b].embedRaw == NULL)
+                printf("NULL pointers : %ld %ld\n", a, b);
+
+            dotProduct = 0;
+            for(i = 0; i < layer1_size; i++){
+                dotProduct += 
+                    featHashWords[a].embedRaw[i] * featHashWords[b].embedRaw[i];
+            }
+            
+            // Save the dotproduct
+            magProd = (featHashWords[a].magnitudeRaw) * (featHashWords[b].magnitudeRaw);
+            if(magProd){
+                cosDistRaw[offset + b] = dotProduct / magProd;
+                cosDistRaw[a + b * featVocabSize] = dotProduct / magProd;
+            }
+             else{
+                cosDistRaw[offset + b] = 0.0;
+                cosDistRaw[a + b * featVocabSize] = 0.0;
+            }
+        }
+    }
+}
+
 // Cosine distance evaluation for multi model
 void evaluateMultiCosDistance(){
     if (verbose) printf("Evaluating pairwise dot products(multi)....\n\n");
     // Allocate memory for cosDist variable
-    cosDistR = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
-    cosDistS = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
-    cosDistP = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
+    if(cosDistR == NULL)
+        cosDistR = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
+    if(cosDistS == NULL)
+        cosDistS = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
+    if(cosDistP == NULL)
+        cosDistP = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
     
     // For each pair, we evaluate the dot product along with normalization
     long a, b, i, offset;
@@ -1558,23 +1664,57 @@ void computeTestValScores(struct prsTuple* holder, long noInst, float threshold,
     float meanScore, pScore, rScore, sScore, curScore; 
     for(a = 0; a < noInst; a++){
         meanScore = 0.0;
-        // For each training instance, find score, ReLU and max
-        for(b = 0; b < noTrain; b++){
-            // Get P score
-            pScore = cosDist[featVocabSize * trainTuples[b].p + holder[a].p];
-            
-            // Get R score
-            rScore = cosDist[featVocabSize * trainTuples[b].r + holder[a].r];
-            
-            // Get S score
-            sScore = cosDist[featVocabSize * trainTuples[b].s + holder[a].s];
-           
-            // ReLU
-            curScore = pScore + rScore + sScore - threshold;
-            if(curScore < 0) curScore = 0;
-            
-            // Add it to the meanScore
-            meanScore += curScore;
+        if(!useAlternate){
+            // For each training instance, find score, ReLU and max
+            for(b = 0; b < noTrain; b++){
+                // Get P score
+                pScore = cosDist[featVocabSize * trainTuples[b].p + holder[a].p];
+                
+                // Get R score
+                rScore = cosDist[featVocabSize * trainTuples[b].r + holder[a].r];
+                
+                // Get S score
+                sScore = cosDist[featVocabSize * trainTuples[b].s + holder[a].s];
+               
+                // ReLU
+                curScore = pScore + rScore + sScore - threshold;
+                if(curScore < 0) curScore = 0;
+                
+                // Add it to the meanScore
+                meanScore += curScore;
+            }
+        }
+        else{
+            // Do things differently, check for flag if current tuple p,r,s is 
+            // refined or not
+            // For each training instance, find score, ReLU and max
+            for(b = 0; b < noTrain; b++){
+                // Get P score
+                if(featHashWords[holder[a].p].useRaw)
+                    pScore = cosDistRaw[featVocabSize * trainTuples[b].p + holder[a].p];
+                else
+                    pScore = cosDist[featVocabSize * trainTuples[b].p + holder[a].p];
+                
+                // Get R score
+                if(featHashWords[holder[a].r].useRaw)
+                    rScore = cosDistRaw[featVocabSize * trainTuples[b].r + holder[a].r];
+                else
+                    rScore = cosDist[featVocabSize * trainTuples[b].r + holder[a].r];
+                
+                // Get S score
+                if(featHashWords[holder[a].s].useRaw)
+                    sScore = cosDistRaw[featVocabSize * trainTuples[b].s + holder[a].s];
+                else
+                    sScore = cosDist[featVocabSize * trainTuples[b].s + holder[a].s];
+               
+                // ReLU
+                curScore = pScore + rScore + sScore - threshold;
+                if(curScore < 0) curScore = 0;
+                
+                // Add it to the meanScore
+                meanScore += curScore;
+            }
+        
         }
 
         // Save the mean score for the current instance
@@ -1758,4 +1898,72 @@ void findBestTestTuple(float* baseScore, float* bestScore){
     //saveMultiTupleEmbeddings(tupleFile, embedFile, test, baseScore, bestScore, improvedInd, noTest);
 
     free(improvedInd);
+}
+
+// Record the refining vocab
+void recordRefineVocab(){
+    // Allocate memory
+    refineVocab = (int*) calloc(vocab_size, sizeof(int));
+    // Go through the refine tuples and record the presence
+    if(noRefine == 0){
+        printf("Reading refine vocab without refine tuples!\n");
+        exit(1);
+    }
+        
+    // Go through feature vocab
+    struct featureWord word;
+    long i, c;
+    for(i = 0; i < featVocabSize; i++){
+        word = featHashWords[i];
+        for(c = 0; c < word.count; c++)
+            // If not in vocab, continue
+            if(word.index[c] == -1) continue;
+            // Record
+            else refineVocab[word.index[c]] = 1;
+    }
+
+    // Save the refined vocab
+    char refinePath[] = "modelsNdata/refineVocab_wiki.bin";
+    saveRefineVocab(refinePath);    
+
+    // Just exit the program after this :p
+    exit(1);
+}
+
+// Mark the features words for raw/refined
+void markFeatureWords(){
+    struct featureWord word
+    long i, c; 
+    int useRaw;
+    for(i = 0; i < featVocabSize; i++){
+        word = featHashWords[i];
+        useRaw = 0;
+
+        for(c = 0; c < word.count; c++){
+            // If not in vocab, continue
+            if(word.index[c] == -1) continue;
+            // Check if refined
+            if(refineVocab[word.index[c]] == 0){
+                useRaw = 1;
+                break;
+            }
+        }
+
+        featHashWords[i].useRaw = useRaw;
+    }
+}
+
+// Save refine Vocabulary for other interface uses
+void saveRefineVocab(char* savePath){
+    printf("\nSaving the refined vocabulary!\n");
+    // Go through the refineVocab and save only that got refined
+    FILE* filePtr = fopen(savePath, "wb");
+
+    long long i;
+    for(i = 0; i < vocab_size; i++){
+        if(refineVocab[i])
+            fprintf(filePtr, "%s\n", vocab[i].word);
+    }
+
+    fclose(filePtr);
 }

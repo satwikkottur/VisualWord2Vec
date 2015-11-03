@@ -18,7 +18,7 @@
 // Functions, variables from orig word2vec
 // Declaring the extern variables allowing separation of code
 extern long long vocab_size, layer1_size;
-extern float *syn0, *syn1, *expTable;
+extern float *syn0, *syn1, *expTable, *syn0raw;
 extern long long vocab_size, layer1_size;
 extern int windowVP;
 

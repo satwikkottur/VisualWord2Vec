@@ -500,7 +500,7 @@ void saveTestScores(char* fileName, struct SentencePair* sentPairs){
     
     int i;
     for(i = 0; i < noTestSVM; i++){
-        fprintf(filePt, "%d %d %f %f\n", testInds[i], 
+        fprintf(filePt, "%ld %d %f %f\n", testInds[i], 
                                     sentPairs[testInds[i]].gt, 
                                     sentPairs[testInds[i]].baseScore,
                                     sentPairs[testInds[i]].newScore);

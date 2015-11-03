@@ -44,10 +44,11 @@ int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
 int clusterVQA = 1000; // Number of initial clusters to use
 int clusterVP = 100; // Number of initial clusters to use
-int usePCA = 1;  // Reduce the dimensions through PCA
+int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
 int windowVP = 5; // window size for the VP task
+int useAlternate = 1; // Use word2vec for unrefined words
 // Training the sentences in one of the modes
 // Could be one of DESCRIPTIONS, SENTENCES, WORDS, WINDOWS;
 enum TrainMode trainMode = SENTENCES;
@@ -69,6 +70,10 @@ clock_t start;
 int hs = 0, negative = 5;
 const int table_size = 1e8;
 int *table;
+
+int* refineVocab; // Keep track of words that are being refined
+float* syn0raw; // Backup for raw word2vec, without refining
+
 void InitUnigramTable() {
   int a, i;
   double train_words_pow = 0;
@@ -588,7 +593,7 @@ void commonSenseWrapper(){
     //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
     char wordPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
-    //loadWord2Vec(wordPath);
+    loadWord2Vec(wordPath);
 
     // [S] added
     char* visualPath = (char*) malloc(sizeof(char) * 100);
@@ -650,7 +655,7 @@ void commonSenseWrapper(){
     clusterVisualFeatures(clusterArg, NULL);
     //gmmVisualFeatures(clusterArg, NULL);
     //return;
-
+    
     // Read the validation and test sets    
     if(noTest == 0)
         // Clean the strings for test and validation sets, store features
@@ -681,7 +686,6 @@ void commonSenseWrapper(){
         performCommonSenseTask(baseTestScores);
     }
 
-    
     // Saving the embeddings, before refining
     /*if(trainMulti)
         saveMultiEmbeddings(prePath);
@@ -1081,7 +1085,7 @@ void TrainModel() {
     //***************************************************************************************
     
     // Visual paraphrase task
-    visualParaphraseWrapper();
+    //visualParaphraseWrapper();
 
     // Training from MS COCO
     //mscocoWrapper();
@@ -1093,7 +1097,7 @@ void TrainModel() {
     //printf("\nChange over!\n");
     
     // Common sense task
-    //commonSenseWrapper();
+    commonSenseWrapper();
     return;
 
     //***************************************************************************************

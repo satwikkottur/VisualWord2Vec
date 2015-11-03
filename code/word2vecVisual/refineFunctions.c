@@ -26,6 +26,14 @@ void initRefining(){
         //syn1[a * layer1_size + b] = 0.0;
         syn1[a * layer1_size + b] = (((next_random & 0xFFFF) / (float)65536) - 0.5) / layer1_size;
     }
+
+    // Allocate memory to syn0raw and copy from syn0
+    a = posix_memalign((void **) &syn0raw, 128, (long long)vocab_size * layer1_size * sizeof(float));
+    if( syn0raw == NULL){
+        printf("Memory allocation failed\n"); 
+        exit(1);
+    }
+    memcpy(syn0raw, syn0, (size_t)vocab_size * layer1_size * sizeof(float));
 }
 
 // Initializing the refining for the regression setup
