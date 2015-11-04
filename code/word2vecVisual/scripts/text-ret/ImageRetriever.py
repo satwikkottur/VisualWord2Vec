@@ -20,14 +20,16 @@ class ImageRetriever:
     tupleIdMap = {}; # Associate each unique ground tuple with an id
     tupleList = []; # List of tuples to ensure some ordering
     single = True;
- 
+    useRaw = True;
     # Constructor
     # Determines the mode of embeddings (single / multiple)
-    def __init__(self, mode = 'SINGLE'):
+    def __init__(self, mode = 'SINGLE', raw = False):
         if mode == 'SINGLE':
             self.single = True;
         else:
             self.single = False;
+
+        self.useRaw = raw;
 
     # Method to retrive the image
     def retrieveImage(self, imgTag):
@@ -60,15 +62,23 @@ class ImageRetriever:
         return (embeds, embedDim, vocabSize);
         
     # Read word2vec
-    def loadWord2Vec(self, embedPaths):
-        if(self.single):
+    def loadWord2Vec(self, embedPaths, mode = 'refine'):
+        # Reading the raw embeddings (used for word2vec only)
+        if(mode == 'raw'):
+            # read the raw embeds
+            (self.embedsRaw, embedDim, vocabSize) = \
+                                        self.__readWord2Vec(embedPaths);
+            self.__validateParams(embedDim, vocabSize);
+
+        elif(self.single):
             # Read the word2vec for one embedding
             if isinstance(embedPaths, list):
                 print 'Expected one path for single embedding!'
                 sys.exit(0);
 
-            (self.embeds, self.embedDim, self.vocabSize) = \
+            (self.embeds, embedDim, vocabSize) = \
                                         self.__readWord2Vec(embedPaths);
+            self.__validateParams(embedDim, vocabSize);
 
         else:
             # Reading the file, each for p, r, s
@@ -77,28 +87,29 @@ class ImageRetriever:
                 sys.exit(0);
 
             # P
-            (self.Pembeds, self.embedDim, self.vocabSize) = \
+            (self.Pembeds, embedDim, vocabSize) = \
                                 self.__readWord2Vec(embedPaths['p']);
+            self.__validateParams(embedDim, vocabSize);
+
             # R
             (self.Rembeds, embedDim, vocabSize) = \
                                 self.__readWord2Vec(embedPaths['r']);
-            if(embedDim != self.embedDim or vocabSize != self.vocabSize):
-                # Raise alarm
-                print 'Mismatch in dimensions or vocab size'
-                sys.exit(0);
+            self.__validateParams(embedDim, vocabSize);
 
             # S
             (self.Sembeds, embedDim, vocabSize) = \
                                 self.__readWord2Vec(embedPaths['s']);
-            if(embedDim != self.embedDim or vocabSize != self.vocabSize):
-                # Raise alarm
-                print 'Mismatch in dimensions or vocab size'
-                sys.exit(0);
+            self.__validateParams(embedDim, vocabSize);
 
         print 'Done reading the embeddings!'
 
         if len(self.tupleList) > 0:
             self.__getGroundEmbeddings()
+
+    def loadRefineVocab(self, vocabPath):
+        # Read the words that were refined and use raw/refined embeddings accordingly
+        with open(vocabPath, 'rb') as dataFile:
+            self.refineVocab = {i.strip('\n') for i in dataFile.readlines()};
         
     #Reading the ground truth tuples
     def readGroundTuples(self, gtPath):
@@ -155,15 +166,26 @@ class ImageRetriever:
             embed.append(self.__computeEmbedding(tup[1], self.Pembeds));
             embed.append(self.__computeEmbedding(tup[2], self.Sembeds));
 
-        return embed
+        # Also compute raw embeddings if available
+        embedRaw = [];
+        if self.useRaw:
+            embedRaw = [self.__computeEmbedding(i, self.embedsRaw) for i in tup];
+            # Check if all the words are in the refineVocab
+            
+        return (embed, embedRaw);
+        #return (embed, embedRaw);
 
     # Compute ground truth embeddings, avoid re-doing calculations
     def __getGroundEmbeddings(self):
         self.gtEmbed = {};
+        self.gtEmbedRaw = {};
+        self.gtRefined = {};
 
         # Compute for each ground tuple
         for tup in self.tupleIdMap:
             self.gtEmbed[tup] = self.__computeTupleEmbedding(tup);
+            if self.useRaw: 
+                self.gtRefined[tup] = [self.__isRefined(i) for i in tup];
 
     # Lemmatizing tuples
     def __lemmatizeTuples(self, tuples):
@@ -181,17 +203,46 @@ class ImageRetriever:
                             ' '.join([lmt.lemmatize(c.lower(), 'n') for c in tuples[2].split(' ')]));
         return lemmaTuples
 
+    # Checking consistency
+    def __validateParams(self, embedDim, vocabSize):
+        if(self.embedDim != 0 and embedDim != self.embedDim) or \
+            (self.vocabSize != 0 and self.vocabSize != vocabSize):
+            # Raise alarm
+            print 'Mismatch in dimensions or vocab size'
+            print 'Self: (%d, %d) given (%d, %d)' % \
+                        (self.embedDim, embedDim, self.vocabSize, vocabSize)
+            sys.exit(0);
+        else:
+            self.embedDim = embedDim;
+            self.vocabSize = vocabSize;
+
     # Compute score wrt ground tuples, given a tuple
     def __scoreQueryTuple(self, qTuple, qTag):
         qTupEmbeds = self.__computeTupleEmbedding(qTuple);
 
+        # Check if raw or not
+        if self.useRaw:
+            isRefine = [self.__isRefined(i) for i in qTuple];
+
         score = [];
-        for i in xrange(0, len(self.tupleList)):
-            gTupEmbeds = self.gtEmbed[self.tupleList[i]];
+        for i in self.tupleList:
+            gTupEmbeds = self.gtEmbed[i];
 
-            score.append(np.sum([qTupEmbeds[j].dot(gTupEmbeds[j].transpose()) \
-                                    for j in [0, 1, 2]]));
+            if not self.useRaw:
+                score.append(np.sum([qTupEmbeds[0][j].dot(gTupEmbeds[0][j].transpose()) \
+                                        for j in [0, 1, 2]]));
+            else:
+                # Check if ground truth is refined
+                sim = 0;
+                for j in xrange(len(isRefine)):
+                    if(self.gtRefined[i][j] and isRefine[j]):
+                        sim += qTupEmbeds[j][0].dot(gTupEmbeds[j][0].transpose())
+                    else:
+                        sim += qTupEmbeds[j][1].dot(gTupEmbeds[j][1].transpose())
 
+                # Append the score
+                score.append(sim);
+                        
         # Get the ground truth tuple
         gtTuple = self.tagTupleMap[qTag];
         gtInd = self.tupleIdMap[gtTuple];
@@ -245,6 +296,7 @@ class ImageRetriever:
                     if gtRank < recId:
                         recalls[recId] += 1;
             
+        return;
         # Print the results
         print '*********************'
         for i in recInds:
@@ -379,7 +431,13 @@ class ImageRetriever:
         print 'Med r: %d' % np.median(np.array(ranks))
         print '*********************'
 
+    # Check if we need to use raw / refined embeddings
+    def __isRefined(self, phrase):
+        isAbsent = [i for i in phrase.split(' ')\
+                            if i.lower() not in self.refineVocab];
 
-
-
-
+        # If any of the words is absent, use raw embeddings, else depends on other word
+        if len(isAbsent):
+            return False;
+        else:
+            return True;

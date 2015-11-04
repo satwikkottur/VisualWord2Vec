@@ -6,40 +6,51 @@ from ImageRetriever import ImageRetriever
 print 'Started the task'
 # Setting up paths
 dataPath = '/home/satwik/VisualWord2Vec/data/text-ret/';
-capPath = dataPath + 'captions_val2014.json';
-with open(capPath, 'rb') as dataFile:
-    captions = json.load(dataFile);
+tupPath = dataPath + 'text_ret_final_lemma.p';
+with open(tupPath, 'rb') as dataFile:
+    tupData = pickle.load(dataFile);
 
-
-
-
-
-'''# Order : Relation, Primary, Secondary
-tuples = tuplesData['data'];
+# Order : Relation, Primary, Secondary
+tuples = tupData['data'];
 
 # Create instance of the task (with multiple / single embeddings)
-#task = ImageRetriever('SINGLE');
-task = ImageRetriever('MULTI');
+task = ImageRetriever('SINGLE');
+#task = ImageRetriever('SINGLE', raw = True);
 # Read the ground truth
 gtPath = dataPath + 'pilot_gt.txt';
 task.readGroundTuples(gtPath);
+
 # Reading embeddings for multiple models
 modelPath = '/home/satwik/VisualWord2Vec/models/%s_wiki_model.txt';
 #modelPath = '/home/satwik/VisualWord2Vec/data/%s_model.bin';
-embedPaths = {};
-for i in ['r', 'p', 's']:
-    embedPaths[i] = modelPath % i;
-task.loadWord2Vec(embedPaths)
-task.performTask(tuples)'''
-
-'''embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt';
+embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/wiki_iters/word2vec_wiki_iter_24.bin";
 task.loadWord2Vec(embedPath)
 task.performTask(tuples)
 
+embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/wiki_iters/word2vec_wiki_iter_0.bin";
+task.loadWord2Vec(embedPath)
+task.performTask(tuples)
+
+embedPaths = {};
+for i in ['r', 'p', 's']:
+    embedPaths[i] = modelPath % i;
+task.loadWord2Vec(embedPath)
+task.performTask(tuples)
+
+
+'''embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt';
+task.loadWord2Vec(embedPath, 'raw')
+#task.performTask(tuples)
+
 embedPath = '/home/satwik/VisualWord2Vec/data/word2vec_output_bestmodel_single.bin';
 task.loadWord2Vec(embedPath)
-task.performTask(tuples)'''
 
+# Vocab file for coco
+vocabPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/refineVocab_coco.bin";
+# Load the refined vocab (words that got refined)
+task.loadRefineVocab(vocabPath);
+
+task.performTask(tuples);'''
 
 ####################### Examples ##########################
 

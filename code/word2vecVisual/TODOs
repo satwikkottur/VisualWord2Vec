@@ -82,6 +82,8 @@ Train VP for scratch:
 - Check MS COCO (whole minus test) for single and double refining (done)
 - Prepare dataset from MS COCO similar to ICCV (done)
 - Check performance on the ICCV like dataset from real images (done)
+- Train text-based image retrieval for MS COCO (done)
+- Compute median R metric (done)
 
 CVPR:
 - Make the code faster (tough to debug otherwise)
@@ -95,5 +97,17 @@ CVPR:
 - Setup regression task on abstract scenes
 - Switch off each of the features for ICCV and check performance
 - GMMs
-- Train text-based image retrieval for MS COCO
-- Compute median R metric
+
+Nov 3
+- Update minor changes to the paper
+- Make a list of major changes that needs discussion
+- Run raw embedding selection for text retrieval task
+- Regress model for abstract features
+- Check the odd-one-out task
+- Add captions to say what is better
+- Make changes to ICCV task reporting accuracies
+- Mail Devi regarding raw embedding ideas
+- Get features space neighbor images
+- Get embeddings for relations for wikipedia
+- GMMs (optional)
+- GMMs (optional)

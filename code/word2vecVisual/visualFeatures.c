@@ -1923,16 +1923,16 @@ void recordRefineVocab(){
     }
 
     // Save the refined vocab
-    char refinePath[] = "modelsNdata/refineVocab_wiki.bin";
+    /*char refinePath[] = "modelsNdata/refineVocab_wiki.bin";
     saveRefineVocab(refinePath);    
 
     // Just exit the program after this :p
-    exit(1);
+    exit(1);*/
 }
 
 // Mark the features words for raw/refined
 void markFeatureWords(){
-    struct featureWord word
+    struct featureWord word;
     long i, c; 
     int useRaw;
     for(i = 0; i < featVocabSize; i++){

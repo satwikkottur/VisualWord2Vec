@@ -20,6 +20,10 @@ task = ImageRetriever('SINGLE');
 embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_wiki_iter_24.bin";
 #embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_before_refine.bin';
 task.loadWord2Vec(embedPath);
+task.loadWord2Vec(embedPath, 'raw');
+# Load the refined vocab (words that got refined)
+task.loadRefineVocab(vocabPath);
+
 # Setup the mutliprocessing framework
 task.setupTrainTestCOCO(captions);
 
