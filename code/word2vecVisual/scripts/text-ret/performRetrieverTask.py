@@ -14,7 +14,7 @@ with open(tupPath, 'rb') as dataFile:
 tuples = tupData['data'];
 
 # Create instance of the task (with multiple / single embeddings)
-task = ImageRetriever('SINGLE');
+task = ImageRetriever('MULTI');
 #task = ImageRetriever('SINGLE', raw = True);
 # Read the ground truth
 gtPath = dataPath + 'pilot_gt.txt';
@@ -23,18 +23,18 @@ task.readGroundTuples(gtPath);
 # Reading embeddings for multiple models
 modelPath = '/home/satwik/VisualWord2Vec/models/%s_wiki_model.txt';
 #modelPath = '/home/satwik/VisualWord2Vec/data/%s_model.bin';
-embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/wiki_iters/word2vec_wiki_iter_24.bin";
-task.loadWord2Vec(embedPath)
-task.performTask(tuples)
+#embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/wiki_iters/word2vec_wiki_iter_24.bin";
+#task.loadWord2Vec(embedPath)
+#task.performTask(tuples)
 
-embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/wiki_iters/word2vec_wiki_iter_0.bin";
-task.loadWord2Vec(embedPath)
-task.performTask(tuples)
+#embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/wiki_iters/word2vec_wiki_iter_0.bin";
+#task.loadWord2Vec(embedPath)
+#task.performTask(tuples)
 
 embedPaths = {};
 for i in ['r', 'p', 's']:
     embedPaths[i] = modelPath % i;
-task.loadWord2Vec(embedPath)
+task.loadWord2Vec(embedPaths)
 task.performTask(tuples)
 
 

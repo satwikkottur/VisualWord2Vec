@@ -42,13 +42,13 @@ int trainPhrases = 0; // Handle phrases as a unit / separately
 int trainMulti = 0; // Train single / multiple models for P,R,S
 int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
-int clusterVQA = 1000; // Number of initial clusters to use
+int clusterVQA = 100; // Number of initial clusters to use
 int clusterVP = 100; // Number of initial clusters to use
-int usePCA = 1;  // Reduce the dimensions through PCA
+int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
 int windowVP = 5; // window size for the VP task
-int useAlternate = 1; // Use word2vec for unrefined words
+int useAlternate = 0; // Use word2vec for unrefined words
 // Training the sentences in one of the modes
 // Could be one of DESCRIPTIONS, SENTENCES, WORDS, WINDOWS;
 enum TrainMode trainMode = SENTENCES;
@@ -590,8 +590,8 @@ void commonSenseWrapper(){
     int clusterArg = clusterCommonSense;
 
     // Load the word2vec embeddings from Xiao's
-    char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
-    //char wordPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
+    //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
+    char wordPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
     loadWord2Vec(wordPath);
 
@@ -983,6 +983,7 @@ void vqaWrapper(){
     else{
         visualPath = "/home/satwik/VisualWord2Vec/data/vqa/float_features_vqa.txt";
     }
+    mapPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_feature_map.txt";
 
     // Paths for train sentences and their cluster ids for VQA captions
     char trainPath[] = "/home/satwik/VisualWord2Vec/data/vqa/vqa_train_captions_lemma.txt";
@@ -994,7 +995,7 @@ void vqaWrapper(){
     readRefineTrainFeatureFiles(featurePath, NULL);
     
     // Reading cluster file for ms coco
-    readTrainSentencesVQA(trainPath);
+    readTrainSentencesVQA(trainPath, mapPath);
 
     // Read the features and cluster to get the ids
     readVisualFeatureFileVQA(visualPath);
@@ -1090,14 +1091,14 @@ void TrainModel() {
     // Training from MS COCO
     //mscocoWrapper();
 
-    // Training from MS COCO
-    //vqaWrapper();
+    // Training from VQA abstract 
+    vqaWrapper();
 
     // Marking the change
     //printf("\nChange over!\n");
     
     // Common sense task
-    commonSenseWrapper();
+    //commonSenseWrapper();
     return;
 
     //***************************************************************************************
@@ -1106,7 +1107,7 @@ void TrainModel() {
     /***************************************************************************************/
     // Write the three models separately (P,R,S)
     // P 
-    /*char outputP[] = "/home/satwik/VisualWord2Vec/models/p_wiki_model.txt";
+    char outputP[] = "/home/satwik/VisualWord2Vec/models/p_wiki_model.txt";
     fo = fopen(outputP, "wb");
     syn0 = syn0P;
     // Save the word vectors
@@ -1145,7 +1146,8 @@ void TrainModel() {
       else for (b = 0; b < layer1_size; b++) fprintf(fo, "%lf ", syn0[a * layer1_size + b]);
       fprintf(fo, "\n");
     }
-    fclose(fo);*/
+    fclose(fo);
+    return;
     /***************************************************************************************/
     
     fo = fopen(output_file, "wb");

@@ -18,16 +18,16 @@ gtPath = dataPath + 'pilot_gt.txt';
 task.readGroundTuples(gtPath);
 
 # Reading embeddings for multiple models
-#embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt';
-embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/wiki_iters/word2vec_wiki_iter_0.bin";
+embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt';
+#embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/wiki_iters/word2vec_wiki_iter_0.bin";
 task.loadWord2Vec(embedPath, 'raw');
 
-#embedPath = '/home/satwik/VisualWord2Vec/data/word2vec_output_bestmodel_single.bin';
-embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/wiki_iters/word2vec_wiki_iter_24.bin";
+embedPath = '/home/satwik/VisualWord2Vec/data/word2vec_output_bestmodel_single.bin';
+#embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/wiki_iters/word2vec_wiki_iter_24.bin";
 task.loadWord2Vec(embedPath);
 
 # Vocab file for coco
-vocabPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/refineVocab_wiki.bin";
+vocabPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/refineVocab_coco.bin";
 # Load the refined vocab (words that got refined)
 task.loadRefineVocab(vocabPath);
 

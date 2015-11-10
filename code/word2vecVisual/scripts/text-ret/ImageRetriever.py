@@ -296,7 +296,6 @@ class ImageRetriever:
                     if gtRank < recId:
                         recalls[recId] += 1;
             
-        return;
         # Print the results
         print '*********************'
         for i in recInds:

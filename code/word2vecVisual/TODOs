@@ -99,15 +99,15 @@ CVPR:
 - GMMs
 
 Nov 3
-- Update minor changes to the paper
-- Make a list of major changes that needs discussion
-- Run raw embedding selection for text retrieval task
-- Regress model for abstract features
-- Check the odd-one-out task
-- Add captions to say what is better
-- Make changes to ICCV task reporting accuracies
-- Mail Devi regarding raw embedding ideas
-- Get features space neighbor images
-- Get embeddings for relations for wikipedia
+- Update minor changes to the paper (done)
+- Make a list of major changes that needs discussion (done)
+- Run raw embedding selection for text retrieval task (done)
+- Regress model for abstract features (done)
+- Check the odd-one-out task (done, doesn't make a lot of sense)
+- Add captions to say what is better (done)
+- Make changes to ICCV task reporting accuracies (done)
+- Mail Devi regarding raw embedding ideas (done)
+- Get features space neighbor images (deferred to supp)
+- Get embeddings for relations for wikipedia (deferred to sup)
 - GMMs (optional)
-- GMMs (optional)
+- Redo multi for text-retrieval wikipedia (to be done)
