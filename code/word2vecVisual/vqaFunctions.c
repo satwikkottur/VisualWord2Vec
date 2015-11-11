@@ -8,7 +8,7 @@ static long noTrain = 0;
 static long noFeats = 0;
 
 // Reading the  training sentences
-void readTrainSentencesVQA(char* trainPath){
+void readTrainSentencesVQA(char* trainPath, char* mapPath){
     long noSents = 0;
     // Use readSentences
     trainSents = *readSentences(trainPath, &noSents);
@@ -21,14 +21,21 @@ void readTrainSentencesVQA(char* trainPath){
     }
     else noTrain = noSents;
 
-    // Now map each sentence to corresponding feature
-    // Five consecutive sentences belong to a feature
-    int featId = -1, i;
-    for(i = 0; i < noTrain; i++){
-        // Increment the feature id
-        if( i % 5 == 0) featId++;
-        trainSents[i].featInd = featId;
+    // Now read the map ids
+    FILE* mapPtr = fopen(mapPath, "rb");
+
+    if(mapPtr == NULL){
+        printf("File doesnt exist at %s!\n", mapPath);
+        exit(1);
     }
+
+    int i, mapId;
+    for(i = 0; i < noTrain; i++)
+        if(fscanf(mapPtr, "%d\n", &mapId) != EOF)
+            trainSents[i].featInd = mapId;
+
+    fclose(mapPtr);
+    printf("\nRead %ld sentences for training!\n", noTrain);
 
     // Debug, checking the feature indices
     /*for(i = 0; i < noTrain; i++){

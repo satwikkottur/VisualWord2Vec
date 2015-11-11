@@ -23,8 +23,8 @@ extern enum TrainMode trainMode;
 extern int noClusters;
 extern int visualFeatSize;
 
-// Reading the  training sentences
-void readTrainSentencesVQA(char*);
+// Reading the  training sentences, along with the map ids
+void readTrainSentencesVQA(char*, char*);
 // Reading the cluster ids
 void readClusterIdVQA(char*);
 // Tokenize the sentences for training

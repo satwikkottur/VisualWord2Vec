@@ -16,8 +16,8 @@ noComp = sum(cumsum(latent) < 0.95 * sum(latent));
 
 % Writing pca features back to the file
 filePt = fopen(savePath, 'wb');
-% Writing the feature dimension
-fprintf(filePt, '%d\n', noComp);
+% Writing the feature dimension and number of features
+fprintf(filePt, '%d %d\n', size(features, 1), noComp);
 for i = 1:size(score, 1)
     if(rem(i, 100) == 0)
         fprintf('Saving : %d / %d\n', i, size(score, 1))

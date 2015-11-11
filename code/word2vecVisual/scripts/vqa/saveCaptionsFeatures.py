@@ -32,8 +32,8 @@ with open(fileName, 'rb') as dataFile:
     features = np.load(dataFile);
 
 # Brute force dump
-np.savetxt(dataPath + 'float_features_vqa.txt', features[0:19999], fmt = '%.6f', \
-                    delimiter = ' ', header = str(features.shape[1]), comments='');
+np.savetxt(dataPath + 'float_features_vqa.txt', features[0:20000], fmt = '%.6f', \
+                    delimiter = ' ', header = str(features.shape[0]) + ' ' + str(features.shape[1]), comments='');
                     
 '''# Read the features
 featName = '/srv/share/vqa/release_data/abstract_v002/scene_json/features/abstract_v002_%s2015_features.npy';

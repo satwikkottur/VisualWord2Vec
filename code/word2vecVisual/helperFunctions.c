@@ -207,7 +207,7 @@ void tokenizeSentences(struct Sentence* collection, long noSents){
             
             // Adjust end of line count
             if(lineEnd){
-                collection[i].endIndex[sentCount] = count;
+                collection[i].endIndex[sentCount] = count-1;
                 sentCount++;
                 lineEnd = 0;
             }
@@ -219,7 +219,7 @@ void tokenizeSentences(struct Sentence* collection, long noSents){
         // Punctuations absent, treat everything as one setnence
         if(sentCount == 0){
             sentCount = 1;
-            collection[i].endIndex[0] = count;
+            collection[i].endIndex[0] = count-1;
         }
 
         // Now store the word components, looping over them

@@ -42,12 +42,13 @@ int trainPhrases = 0; // Handle phrases as a unit / separately
 int trainMulti = 0; // Train single / multiple models for P,R,S
 int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
-int clusterVQA = 100; // Number of initial clusters to use
+int clusterVQA = 500; // Number of initial clusters to use
 int clusterVP = 100; // Number of initial clusters to use
 int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
-int windowVP = 5; // window size for the VP task
+int debugModeVQA = 0; // Debug mode for VQA task
+int windowVP = 5; // window size for training on sentences
 int useAlternate = 0; // Use word2vec for unrefined words
 // Training the sentences in one of the modes
 // Could be one of DESCRIPTIONS, SENTENCES, WORDS, WINDOWS;
@@ -947,8 +948,8 @@ void vqaWrapper(){
     // Load the embeddings (pre-trained) to save time
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
     // Load the word2vec embeddings from Xiao's
-    char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
-    //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/vqa/word2vec_vqa_before.bin";
+    //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
+    char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/vqa/word2vec_vqa_before.bin";
     loadWord2Vec(beforeEmbedPath);
 
     ////////// Dirty work of setting up paths//////////////////////////////////////////////////////////
@@ -959,6 +960,7 @@ void vqaWrapper(){
     char* vocabPath = (char*) malloc(sizeof(char) * 100);
     char* embedDumpPath = (char*) malloc(sizeof(char) * 100);
     char* mapPath = (char*) malloc(sizeof(char) * 100);
+    char* trainPath = (char*) malloc(sizeof(char) * 100);
 
     // Common sense task
     // Reading the file for relation word
@@ -978,15 +980,24 @@ void vqaWrapper(){
     char testFile[] = "/home/satwik/VisualWord2Vec/data/test_features.txt";
     char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
 
-    if(usePCA)
-        visualPath = "/home/satwik/VisualWord2Vec/data/vqa/float_features_vqa_pca.txt";
-    else{
-        visualPath = "/home/satwik/VisualWord2Vec/data/vqa/float_features_vqa.txt";
+    if(debugModeVQA){
+        visualPath = "/home/satwik/VisualWord2Vec/data/vqa/float_features_vqa_debug.txt";
+        mapPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_feature_map_debug.txt";
     }
-    mapPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_feature_map.txt";
+    else{
+        if(usePCA)
+            visualPath = "/home/satwik/VisualWord2Vec/data/vqa/float_features_vqa_pca.txt";
+        else
+            visualPath = "/home/satwik/VisualWord2Vec/data/vqa/float_features_vqa.txt";
+        mapPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_feature_map.txt";
+    }
 
     // Paths for train sentences and their cluster ids for VQA captions
-    char trainPath[] = "/home/satwik/VisualWord2Vec/data/vqa/vqa_train_captions_lemma.txt";
+    if(debugModeVQA)
+        trainPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_train_captions_debug.txt";
+    else
+        trainPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_train_captions_lemma.txt";
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     
     // Initializing the hash
@@ -1008,13 +1019,16 @@ void vqaWrapper(){
         sprintf(clusterPath, "/home/satwik/VisualWord2Vec/data/vqa/C_cluster_%d.txt",
                                 clusterArg);
     // Check if cluster file exists, else cluster
-    if( access(clusterPath, F_OK) != -1){
+    if( access(clusterPath, F_OK) != -1 && !debugModeVQA){
         // Reading the cluster ids
         readClusterIdVQA(clusterPath);
     }
     else{
         // To save clusterId / distance, provide save path; else NULL
-        clusterVisualFeaturesVQA(clusterArg, clusterPath);
+        if(debugModeVQA)
+            clusterVisualFeaturesVQA(2, NULL);
+        else
+            clusterVisualFeaturesVQA(clusterArg, clusterPath);
     }
                         
     // Tokenizing the files
