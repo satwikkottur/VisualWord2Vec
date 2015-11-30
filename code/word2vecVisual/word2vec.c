@@ -42,9 +42,9 @@ int trainPhrases = 0; // Handle phrases as a unit / separately
 int trainMulti = 0; // Train single / multiple models for P,R,S
 int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
-int clusterVQA = 500; // Number of initial clusters to use
+int clusterVQA = 100; // Number of initial clusters to use
 int clusterVP = 100; // Number of initial clusters to use
-int usePCA = 0;  // Reduce the dimensions through PCA
+int usePCA = 1;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
 int debugModeVQA = 0; // Debug mode for VQA task
@@ -986,9 +986,11 @@ void vqaWrapper(){
     }
     else{
         if(usePCA)
-            visualPath = "/home/satwik/VisualWord2Vec/data/vqa/float_features_vqa_pca.txt";
+            visualPath = "/home/satwik/VisualWord2Vec/data/vqa/float_features_yash_pca.txt";
+            //visualPath = "/home/satwik/VisualWord2Vec/data/vqa/float_features_vqa_pca.txt";
         else
-            visualPath = "/home/satwik/VisualWord2Vec/data/vqa/float_features_vqa.txt";
+            visualPath = "/home/satwik/VisualWord2Vec/data/vqa/float_features_yash.txt";
+            //visualPath = "/home/satwik/VisualWord2Vec/data/vqa/float_features_vqa.txt";
         mapPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_feature_map.txt";
     }
 

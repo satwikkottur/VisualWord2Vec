@@ -19,6 +19,7 @@ class ImageRetriever:
     tagTupleMap = {}; # Compute the ground tuple given the tag
     tupleIdMap = {}; # Associate each unique ground tuple with an id
     tupleList = []; # List of tuples to ensure some ordering
+    scores = {}; # Save scores for the query tuples
     single = True;
     useRaw = True;
     # Constructor
@@ -263,6 +264,10 @@ class ImageRetriever:
         print self.tupleList[score.index(sortedScore[4])]'''
         #print gtRank, gtInd, gtScore
         #return self.gt[self.gt.keys()[predInd]]
+
+        # Save the score, gtrank for query tuple
+        newId = len(self.scores);
+        self.scores[newId] = {'query':qTuple, 'ground':gtTuple, 'score':score, 'gtRank':gtRank};
         return gtRank
 
     # Perform the task

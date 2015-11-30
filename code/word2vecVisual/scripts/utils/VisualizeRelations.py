@@ -51,12 +51,12 @@ tsneAfter = tsne(np.array([embedRAfter[i] for i in relations]), initial_dims = i
 
 
 # Save the embeddings for local display
-data = {};
-data['relations'] = relations;
-data['tsneBefore'] = tsneBefore;
-data['tsneAfter'] = tsneAfter;
+#data = {};
+#data['relations'] = relations;
+#data['tsneBefore'] = tsneBefore;
+#data['tsneAfter'] = tsneAfter;
 
-with open('tsne_pickledump.pickle', 'wb') as dataFile:
-    pickle.dump(data, dataFile);
+#with open('tsne_pickledump.pickle', 'wb') as dataFile:
+#    pickle.dump(data, dataFile);
 
 #plot.show()

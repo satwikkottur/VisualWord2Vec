@@ -6,6 +6,7 @@ from ImageRetriever import ImageRetriever
 print 'Started the task'
 # Setting up paths
 dataPath = '/home/satwik/VisualWord2Vec/data/text-ret/';
+#tupPath = dataPath + 'text_ret_pilot_lemma.p';
 tupPath = dataPath + 'text_ret_final_lemma.p';
 with open(tupPath, 'rb') as dataFile:
     tupData = pickle.load(dataFile);
@@ -14,28 +15,34 @@ with open(tupPath, 'rb') as dataFile:
 tuples = tupData['data'];
 
 # Create instance of the task (with multiple / single embeddings)
-task = ImageRetriever('MULTI');
+task = ImageRetriever('SINGLE');
 #task = ImageRetriever('SINGLE', raw = True);
 # Read the ground truth
 gtPath = dataPath + 'pilot_gt.txt';
 task.readGroundTuples(gtPath);
 
 # Reading embeddings for multiple models
-modelPath = '/home/satwik/VisualWord2Vec/models/%s_wiki_model.txt';
+#modelPath = '/home/satwik/VisualWord2Vec/models/%s_wiki_model.txt';
 #modelPath = '/home/satwik/VisualWord2Vec/data/%s_model.bin';
 #embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/wiki_iters/word2vec_wiki_iter_24.bin";
 #task.loadWord2Vec(embedPath)
 #task.performTask(tuples)
 
-#embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/wiki_iters/word2vec_wiki_iter_0.bin";
-#task.loadWord2Vec(embedPath)
-#task.performTask(tuples)
+# Save the scores, ground list and top queries
+#pickle.dump(task.scores, open('after_scores.pickle', 'wb'));
+#pickle.dump(task.tupleList, open('tupleList.pickle', 'wb'));
 
-embedPaths = {};
+embedPath = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/wiki_iters/word2vec_wiki_iter_0.bin";
+task.loadWord2Vec(embedPath)
+task.performTask(tuples)
+pickle.dump(task.scores, open('before_scores_redone.pickle', 'wb'));
+print 'Saved pickle files'
+
+'''embedPaths = {};
 for i in ['r', 'p', 's']:
     embedPaths[i] = modelPath % i;
 task.loadWord2Vec(embedPaths)
-task.performTask(tuples)
+task.performTask(tuples)'''
 
 
 '''embedPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt';
