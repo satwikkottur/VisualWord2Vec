@@ -83,11 +83,10 @@ simPost = 1 - pdist2(uniqPostR, uniqPostR, 'cosine');
 
 % Upper and lower thresholds
 upperThresh = 0.60;
-lowerThresh = 0.45;
+lowerThresh = 0.50;
 
 % Opening the file and writing
 fileId = fopen('visual-closer.txt', 'wb');
-
 % Checking for similarities between A, B, C
 % Isolate relations vis-w2v thinks are similar
 % simPre(A, B) > simPre(A, C)
@@ -105,20 +104,20 @@ for i = 1:noR
         otherInds = find(otherR);
         [~, maxInd] = max(simPre(i, otherR));
         j = otherInds(maxInd);
-        fprintf('%s : %s : %s | %f %f | %f %f |\n', ...
-                rLabels{i}, rLabels{j}, rLabels{k}, ...
-                simPre(i, j), simPre(i, k), simPost(i, j), simPost(i, k));
+        fprintf(fileId, '%s:%s:%s|%f %f|%f %f|\n', ...
+            rLabels{i}, rLabels{j}, rLabels{k}, ...
+            simPre(i, j), simPre(i, k), simPost(i, j), simPost(i, k));
 
         otherInds = find(otherR);
         [~, minInd] = min(simPost(i, otherR));
         j = otherInds(minInd);
-        fprintf('%s : %s : %s | %f %f | %f %f |\n', ...
-                rLabels{i}, rLabels{j}, rLabels{k}, ...
-                simPre(i, j), simPre(i, k), simPost(i, j), simPost(i, k));
+        fprintf(fileId, '%s:%s:%s|%f %f|%f %f|\n', ...
+            rLabels{i}, rLabels{j}, rLabels{k}, ...
+            simPre(i, j), simPre(i, k), simPost(i, j), simPost(i, k));
 
         continue;
         for j = find(otherR)
-            fprintf('%s : %s : %s | %f %f | %f %f |\n', ...
+            fprintf(fileId, '%s:%s:%s|%f %f|%f %f|\n', ...
                     rLabels{i}, rLabels{j}, rLabels{k}, ...
                     simPre(i, j), simPre(i, k), simPost(i, j), simPost(i, k));
         end
@@ -170,25 +169,26 @@ for i = 1:noR
         otherInds = find(otherR);
         [~, maxInd] = max(simPost(i, otherR));
         j = otherInds(maxInd);
-        fprintf('%s # %s # %s | %f %f | %f %f |\n', ...
-                rLabels{i}, rLabels{j}, rLabels{k}, ...
-                simPre(i, j), simPre(i, k), simPost(i, j), simPost(i, k));
+        fprintf(fileId, '%s:%s:%s|%f %f|%f %f|\n', ...
+            rLabels{i}, rLabels{j}, rLabels{k}, ...
+            simPre(i, j), simPre(i, k), simPost(i, j), simPost(i, k));
 
         otherInds = find(otherR);
         [~, minInd] = min(simPre(i, otherR));
         j = otherInds(minInd);
-        fprintf('%s # %s # %s | %f %f | %f %f |\n', ...
-                rLabels{i}, rLabels{j}, rLabels{k}, ...
-                simPre(i, j), simPre(i, k), simPost(i, j), simPost(i, k));
+        fprintf(fileId, '%s:%s:%s|%f %f|%f %f|\n', ...
+            rLabels{i}, rLabels{j}, rLabels{k}, ...
+            simPre(i, j), simPre(i, k), simPost(i, j), simPost(i, k));
         continue;
 
         for j = find(otherR)
-            fprintf('%s <> %s <> %s | %f %f | %f %f |\n', ...
+            fprintf(fileId, '%s:%s:%s|%f %f|%f %f|\n', ...
                     rLabels{i}, rLabels{j}, rLabels{k}, ...
                     simPre(i, j), simPre(i, k), simPost(i, j), simPost(i, k));
         end
     end
 end
+fclose(fileId);
 return;
 
 % Find the vector diffs for all the vectors

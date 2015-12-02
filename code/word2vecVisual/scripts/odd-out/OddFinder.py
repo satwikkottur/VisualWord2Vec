@@ -45,5 +45,5 @@ class OddFinder:
 
         for i in xrange(len(data)):
             if oddIdVis[i] != oddIdW2v[i]:
-                print "%-100s  (%-25s) {%-25s}" % \
+                print "%-60s  (%-20s) {%-20s}" % \
                     (str(data[i]), data[i][oddIdVis[i]], data[i][oddIdW2v[i]])

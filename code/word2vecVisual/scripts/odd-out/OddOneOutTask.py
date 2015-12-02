@@ -24,6 +24,6 @@ modelPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/';
 w2vPath = modelPath + 'al_vectors.txt';
 visPath = modelPath + 'word2vec_after_refine_bestmodel.bin';
 
-finder = OddFinder();
-finder.readEmbeddings(visPath, w2vPath);
-finder.performTask(data);
+#finder = OddFinder();
+#finder.readEmbeddings(visPath, w2vPath);
+#finder.performTask(data);
