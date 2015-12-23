@@ -1,9 +1,0 @@
-
-visual_test_score=zeros(ntest,1);
-for i=1:ntest
-	disp(num2str(i));
-	[~,pind]=min(pdist2(P_embedding,test_P_embedding(test_P_id(i),:)),[],1);
-	[~,rind]=min(pdist2(R_embedding,test_R_embedding(test_R_id(i),:)),[],1);
-	[~,sind]=min(pdist2(S_embedding,test_S_embedding(test_S_id(i),:)),[],1);
-	visual_test_score(i,1)=mean(max(P_score_test(:,pind)+R_score_test(:,rind)+S_score_test(:,sind)-threshold,0),1);
-end
