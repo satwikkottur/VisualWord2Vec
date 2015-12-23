@@ -29,7 +29,6 @@ class OddFinder:
 
             # Odd one out if very far away
             oddId.append(dist.index(max(dist)));
-
         return oddId;
         
     def performTask(self, data):
