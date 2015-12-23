@@ -1,13 +1,10 @@
-# VisualWord2Vec
-Incorporating visual context while training word2vec features.
+# Visual Word2Vec (vis-w2v)
+Learning visually grounded word embeddings from abstract image  
 
-Useful links:
-* Code : /home/linxiao/test/abstract_scenes_new/features/test
-* Data Original : /home/linxiao/public_html/browser_sentint_full4/image_json
-* Data Features : /home/linxiao/public_html/browser_sentint_full4/image_features_tanmay
+####Paper
+**Satwik Kottur, Ramakrishna Vedantam, Jos&eacute; Moura, Devi Parikh**  
+*Visual Word2Vec (vis-w2v): Learning Visually grounded embeddings from abstract images*  
+[[ArXiv](http://arxiv.org/abs/1511.07067)] [[Project Page](https://satwikkottur.github.io/research/vis-w2v/)]  
 
-Check learn_model.m to understand how the model is trained.
-
-Folder stucture:
-a) Original/ : Contains the original code obtained from the above link
-b) data/ : Contains both the rawdata/ and features/ from above links
+####Folder stucture
+To-be-updated!
