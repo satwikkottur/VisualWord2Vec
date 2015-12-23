@@ -10,21 +10,21 @@ err*
 
 # Models folder
 models/*
-code/word2vecVisual/modelsNdata/*
+word2vecVisual/modelsNdata/*
 
 # Ignore the vp-fitb code
-code/word2vecVisual/vp-fitb/
+word2vecVisual/vp-fitb/
 
 # Ignoring files from python
 *.py[cod]
 # Ignoring the swig folder
 libs/swig-3.0.7/
 # Ignoring the compiled binaries
-code/word2vecVisual/bin
+word2vecVisual/bin
 
 # Ignoring big data files from relationshipModeling
-relationshipModeling/myTupleExtractor/SimpleSentences/
-relationshipModeling/myTupleExtractor/data/
+libs/relationshipModeling/myTupleExtractor/SimpleSentences/
+libs/relationshipModeling/myTupleExtractor/data/
 
 # Ignoring dumps in the code folder
 code/src/dumps/*
