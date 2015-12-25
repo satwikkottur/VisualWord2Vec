@@ -24,6 +24,7 @@ import reverb
 from nltk.corpus import wordnet as wn
 import nltk_to_wn as nwn
 from pyInflector.inflector import Inflector
+import pickle
 
 def explore_tuples(tok):
     """
@@ -288,3 +289,7 @@ def main(json_file):
 
 if __name__ == "__main__":
     tuples, count_rels, count_nouns = main(sys.argv[1])
+    # Saving the final tuples
+    savePath = 'data/vqa_train_captions_lemma_tuples.pickle';
+    pickle.dump(tuples, open(savePath, 'w'));
+    print 'Saved processed tuples at %s' % savePath

@@ -21,19 +21,28 @@ def run_reverb(tokens):
     """
     reverb_input = 'reverb_in.txt'
     reverb_executable = "./reverb.sh"
-    path_to_reverb = "reverb-1.0 2/"
+    path_to_reverb = "reverb-1.0/"
+    #path_to_reverb = "reverb-1.0 2/"
     reverb_options = " -q "
     f = open(path_to_reverb + reverb_input, 'w')
 
+    # Writing sentence in reverb
+    print 'Writing sentences to begin reVerb...'
     for sentences in tokens:
         f.write(sentences + "\n")
     f.close()
 
-    reverb_out = subprocess.Popen(reverb_executable + reverb_options + reverb_input, cwd=path_to_reverb,
-                                  shell=True, stdout=subprocess.PIPE).stdout.readlines()
+    # Running reVerb
+    print 'Calling reVerb script...'
+    #reverb_out = subprocess.Popen(reverb_executable + reverb_options + reverb_input, cwd=path_to_reverb,
+   #                               shell=True, stdout=subprocess.PIPE).stdout.readlines()
+    with open('reverb-1.0/reverb_out.txt', 'r') as dataFile:
+        reverb_out = [i.strip('\n') for i in dataFile.readlines()];
 
     reverb_tuples_raw = defaultdict(list)
     reverb_sentence_raw = dict()
+    
+    print len(reverb_out)
 
     for line in reverb_out:
         spl_line = line.strip().split('\t')
@@ -107,6 +116,7 @@ class TupleExtractor():
             pickle.dump(pos, open(path_to_pos, 'w'))
 
         print "Running Reverb Tuple Extraction"
+        print path_to_rev
         if os.path.exists(path_to_rev):
             rev = pickle.load(open(path_to_rev, 'r'))
         else:

@@ -19,6 +19,8 @@ word2vecVisual/vp-fitb/
 *.py[cod]
 # Ignoring the swig folder
 libs/swig-3.0.7/
+libs/vgg-19-feature-extractor
+libs/relationshipModeling/*
 # Ignoring the compiled binaries
 word2vecVisual/bin
 
