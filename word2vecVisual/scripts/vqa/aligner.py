@@ -114,35 +114,43 @@ class Aligner:
             self.mi1[(w, c)] = self.nWC1[(w, c)] * math.log(self.nWC1[(w, c)]/\
                                                 (self.nW1[w] * self.nC1[c]));
 
-        artList = self.nC0.keys();
-        for w in self.nW0:
-            mi = np.array(self.getCount(self.mi0, [(w, c) for c in artList]));
-            bestC = np.argmax(mi);
-            self.align0[w] = artList[bestC];
-
-        artList = self.nC1.keys();
-        for w in self.nW1:
-            mi = np.array(self.getCount(self.mi1, [(w, c) for c in artList]));
-            bestC = np.argmax(mi);
-            self.align1[w] = artList[bestC];
 
     # Compute the alignment for all the scenes, a wrapper for alignClipart
     def computeAlignment(self):
         # Scenes that have tuples
-        sceneId = [i for i in self.tuples if len(self.tuples[i]) > 0];
+        nonZeroId = [i for i in self.tuples if len(self.tuples[i]) > 0];
 
-        self.alignClipart(self.tuples[sceneId[0]][0][0], \
-                            self.cliparts[int(self.maps[sceneId[0]])]\
-                            self.types[self.maps]);
+        iterId = 0;
+        for capId in nonZeroId:
+            sceneId = capId/5;
+            print self.cliparts[sceneId]
+            print sceneId
+            print self.capWords[int(self.maps[capId])]
+
+            for tup in self.tuples[capId]:
+                clipP = self.alignClipart(tup[0], \
+                            self.cliparts[sceneId], self.types[sceneId]);
+                clipS = self.alignClipart(tup[2], \
+                            self.cliparts[sceneId], self.types[sceneId]);
+
+                print '%s : (%s, %s)' % (tup, clipP, clipS)
+
+            print '\n'
+
+            iterId += 1;
+            if iterId > 20:
+                break;
+        #pdb.set_trace();
+        #print self.mi0[(person, Doll)]
 
     # Compute the alignment for a word
     def alignClipart(self, word, cliparts, sceneType):
         if sceneType:
-            mi = np.array(self.getCount(self.mi1, [(w, c) for c in self.nC1.keys()]));
-            bestAlign = self.nC1.keys()[np.argmax(mi)]
+            mi = np.array(self.getCount(self.mi1, [(word, c) for c in cliparts]));
+            bestAlign = cliparts[np.argmax(mi)]
         else:
-            mi = np.array(self.getCount(self.mi0, [(w, c) for c in self.nC0.keys()]));
-            bestAlign = self.nC0.keys()[np.argmax(mi)]
+            mi = np.array(self.getCount(self.mi0, [(word, c) for c in cliparts]));
+            bestAlign = cliparts[np.argmax(mi)]
            
         return bestAlign
 
@@ -194,7 +202,8 @@ if __name__ == '__main__':
     #align.computeAlignment();
 
     # Saving the pickle for align
-    dataPath = '/home/satwik/VisualWord2Vec/data/vqa/';
+    dataPath = '/Users/skottur/CMU/Personal/VisualWord2Vec/data/vqa/';
+    #dataPath = '/home/satwik/VisualWord2Vec/data/vqa/';
     savePath = dataPath + 'vqa_captions_mi.pickle';
     #with open(savePath, 'w') as dataFile:
     #    pickle.dump(align, dataFile);
@@ -231,18 +240,30 @@ if __name__ == '__main__':
 
 ###################################################################################
 # Unique clipart (scene0, scene1) and words (P, S) from tuples
-'''self.art1 = [];
-self.art0 = [];
-for i in self.cliparts:
-    if self.types[i]:
-        self.art1.extend(self.cliparts[i]);
-    else:
-        self.art0.extend(self.cliparts[i]);
-self.art1 = set(self.art1);
-self.art0 = set(self.art0);
+#self.art1 = [];
+#self.art0 = [];
+#for i in self.cliparts:
+#    if self.types[i]:
+#        self.art1.extend(self.cliparts[i]);
+#    else:
+#        self.art0.extend(self.cliparts[i]);
+#self.art1 = set(self.art1);
+#self.art0 = set(self.art0);
+#
+#self.word = [k for i in self.tuples.values() for j in i \
+#                                        for k in (j[0], j[2])];
+#self.word = set(self.word);
 
-self.word = [k for i in self.tuples.values() for j in i \
-                                        for k in (j[0], j[2])];
-self.word = set(self.word);'''
-
+###################################################################################
+#artList = self.nC0.keys();
+#for w in self.nW0:
+#    mi = np.array(self.getCount(self.mi0, [(w, c) for c in artList]));
+#    bestC = np.argmax(mi);
+#    self.align0[w] = artList[bestC];
+#
+#artList = self.nC1.keys();
+#for w in self.nW1:
+#    mi = np.array(self.getCount(self.mi1, [(w, c) for c in artList]));
+#    bestC = np.argmax(mi);
+#    self.align1[w] = artList[bestC];
 ###################################################################################
