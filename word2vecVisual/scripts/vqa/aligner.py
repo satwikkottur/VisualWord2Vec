@@ -4,39 +4,34 @@ import cPickle as pickle
 import numpy as np
 import pdb
 import itertools as it
+from collections import defaultdict
 import math
 
-# Input:
-#   1. List of training scenes (20000, currently)
-#   2. Type of scene for each of the training scenes
-#   3. List of cliparts present in the each of the training scenes
-#   4. Captions for each scene
-#   5. Image map between the captions and scenes
+# Setup:
+#   1. Type of scene for each of the training scenes
+#           - pickle file with scene index : scene type (0 / 1)
+#   2. List of cliparts present in the each of the training scenes
+#           - pickle file with scene index : list of cliparts
+#   3. Captions for each scene
+#           - txt file with each caption in one line (5 per scene in order)
+#   4. Image map between the captions and scenes (depleted) - always use ordered captions
 # 
-# Output:
-#   1. Alignment between the clipart and the words
+# Test Input:
+#   1. Tuples(P, S) from the caption sentences (to align)
 #
-# Test time:
-#   1. Tuples from the caption sentences (to align)
+# Test Output:
+#   1. Alignment between the clipart and the words
 
 class Aligner:
-    # Setting up things
+    # Minimum number of times a word must occur
     minOccurance = 2;
-    # Read the scene-caption map, scene types, scene clipart, 
-    # tuples for the image
-    def __init__(self):
-        # Add data path
-        dataPath = '/home/satwik/VisualWord2Vec/data/vqa/';
-
-        with open(dataPath + 'vqa_feature_map.txt', 'r') as fileId:
-            self.maps = [i.strip('\n') for i in fileId.readlines()];
-        with open(dataPath + 'scene_type.cPickle', 'r') as fileId:
+    # Read the scene types, scene clipart and captions
+    def __init__(self, sceneTypePath, clipartPath, captionPath):
+        with open(sceneTypePath, 'r') as fileId:
             self.types = pickle.load(fileId);
-        with open(dataPath + 'clipart_occurance.cPickle', 'r') as fileId:
+        with open(clipartPath, 'r') as fileId:
             self.cliparts = pickle.load(fileId);
-        with open(dataPath + 'vqa_train_tuples.pickle','r') as fileId:
-            self.tuples = pickle.load(fileId);
-        with open(dataPath + 'vqa_train_captions_lemma.txt', 'r') as fileId:
+        with open(captionPath, 'r') as fileId:
             self.capWords = [l.strip('\n').split(' ') for l in fileId.readlines()];
             
     # Collecting unique clipart objects and tuples, getting counts
@@ -45,12 +40,16 @@ class Aligner:
         # nWx : word occurance
         # nCx : clipart occurance
         # nWCx : word-clipart co-occurance
-        self.nW0 = {}; self.nC0 = {}; self.nWC0 = {};
-        self.nW1 = {}; self.nC1 = {}; self.nWC1 = {};
+        self.nW0 = defaultdict(int); 
+        self.nC0 = defaultdict(int); 
+        self.nWC0 = defaultdict(int);
+        self.nW1 = defaultdict(int);  
+        self.nC1 = defaultdict(int);  
+        self.nWC1 = defaultdict(int); 
 
         # Weed out the words that dont occur more than some time
         for capId in xrange(0, len(self.capWords)):
-            sceneId = int(self.maps[capId]);
+            sceneId = int(capId/5);
             if self.types[sceneId]:
                 # Register the clipart
                 self.increaseCount(self.nC1, self.cliparts[sceneId]);
@@ -68,7 +67,7 @@ class Aligner:
                 # Register co-occurances
                 for pair in it.product(self.capWords[capId], self.cliparts[sceneId]):
                     self.increaseCount(self.nWC0, pair);
-        #pdb.set_trace();
+
         # Remove all the words that dont occur min number of times
         cutOff = [i for i in self.nW0 if self.nW0[i] < self.minOccurance];
         [self.nW0.pop(i, None) for i in cutOff];
@@ -102,8 +101,8 @@ class Aligner:
         # Normalize to get probabilities
         self.normalizeCounts();
 
-        self.mi0 = {}; self.mi1 = {};
-        self.align0 = {}; self.align1 = {};
+        self.mi0 = defaultdict(float); 
+        self.mi1 = defaultdict(float);
         # Compute mutual information and then find max
         for (w, c) in self.nWC0:
             self.mi0[(w, c)] = self.nWC0[(w, c)] * math.log(self.nWC0[(w, c)]/\
@@ -114,44 +113,43 @@ class Aligner:
             self.mi1[(w, c)] = self.nWC1[(w, c)] * math.log(self.nWC1[(w, c)]/\
                                                 (self.nW1[w] * self.nC1[c]));
 
-
-    # Compute the alignment for all the scenes, a wrapper for alignClipart
-    def computeAlignment(self):
+    # Get the alignment for all the train tuples at once, a wrapper for alignClipart
+    # Input:
+    #   tuples : dictionary of caption id : tuples
+    def getTupleAlignment(self, tuples):
         # Scenes that have tuples
-        nonZeroId = [i for i in self.tuples if len(self.tuples[i]) > 0];
+        nonZeroId = [i for i in tuples if len(tuples[i]) > 0];
 
-        iterId = 0;
+        iterId = 0; # Premature stop
         for capId in nonZeroId:
             sceneId = capId/5;
             print self.cliparts[sceneId]
             print sceneId
-            print self.capWords[self.maps.index(str(sceneId)) + capId % 5];
+            print self.capWords[capId];
 
-            for tup in self.tuples[capId]:
-                clipP = self.alignClipart(tup[0], \
+            for tup in tuples[capId]:
+                (clipP, clipS) = self.alignClipart(tup[0::2], \
                             self.cliparts[sceneId], self.types[sceneId]);
-                clipS = self.alignClipart(tup[2], \
-                            self.cliparts[sceneId], self.types[sceneId]);
-
                 print '%s : (%s, %s)' % (tup, clipP, clipS)
-
             print '\n'
 
             iterId += 1;
             if iterId > 20:
                 break;
         #pdb.set_trace();
-        #print self.mi0[(person, Doll)]
 
-    # Compute the alignment for a word
+    # Compute the alignment for a (list of) word, given the word, sceneType and cliparts in the scene
     def alignClipart(self, word, cliparts, sceneType):
-        if sceneType:
-            mi = np.array(self.getCount(self.mi1, [(word, c) for c in cliparts]));
-            bestAlign = cliparts[np.argmax(mi)]
+        if(isinstance(word, list)):
+            bestAlign = tuple([self.alignClipart(w, cliparts,sceneType) \
+                                                        for w in word]);
         else:
-            mi = np.array(self.getCount(self.mi0, [(word, c) for c in cliparts]));
-            bestAlign = cliparts[np.argmax(mi)]
-           
+            if sceneType:
+                mi = np.array(self.getCount(self.mi1, [(word, c) for c in cliparts]));
+                bestAlign = cliparts[np.argmax(mi)]
+            else:
+                mi = np.array(self.getCount(self.mi0, [(word, c) for c in cliparts]));
+                bestAlign = cliparts[np.argmax(mi)]
         return bestAlign
 
     # Handy function to increment counter for a given list / element
@@ -160,50 +158,33 @@ class Aligner:
         # Handle lists and single values separately
         if(isinstance(keyList, list)):
             for key in keyList:
-                if key in counter:
-                    counter[key] += 1;
-                else:
-                    counter[key] = 1;
-        else:
-            key = keyList;
-            if key in counter:
                 counter[key] += 1;
-            else:
-                counter[key] = 1;
+        else:
+            counter[keyList] += 1;
 
     # Handy function to check for a given list / element in counts
     # checks if a key exists, returns value if yes or 0 otherwise
     def getCount(self, counter, keyList):
         # Handle lists and single values separately
         if(isinstance(keyList, list)):
-            counts = [];
-            for key in keyList:
-                if key in counter:
-                    counts.append(counter[key]);
-                else:
-                    counts.append(0);
+            return [counter[key] for key in keyList];
         else:
-            key = keyList;
-            if key in counter:
-                counts = counter[key];
-            else:
-                counts = 0;
-
-        return counts;
+            return counter[keyList]
 #**********************************************************************
-        
+# Main function showing the usage of the class Aligner
 if __name__ == '__main__':
-    #align = Aligner();
+    # Add data path
+    dataPath = '/home/satwik/VisualWord2Vec/data/vqa/';
+    sceneTypePath = dataPath + 'scene_type.cPickle';
+    clipartPath = dataPath + 'clipart_occurance.cPickle';
+    captionPath = dataPath + 'vqa_train_captions_lemma_order.txt';
+
+    #align = Aligner(sceneTypePath, clipartPath, captionPath);
 
     # Compute mutual information between words and clipart
     #align.computeMI();
 
-    # For a given word and set of cliparts, get the alignment
-    #align.computeAlignment();
-
     # Saving the pickle for align
-    dataPath = '/Users/skottur/CMU/Personal/VisualWord2Vec/data/vqa/';
-    #dataPath = '/home/satwik/VisualWord2Vec/data/vqa/';
     savePath = dataPath + 'vqa_captions_mi.pickle';
     #with open(savePath, 'w') as dataFile:
     #    pickle.dump(align, dataFile);
@@ -214,16 +195,14 @@ if __name__ == '__main__':
         align = pickle.load(dataFile);
     print 'Loaded model from: %s' % savePath
 
-    # For a given word and set of cliparts, get the alignment
-    align.computeAlignment();
-    #align.alignClipart();
+    tuplesPath = dataPath + 'vqa_train_tuples.pickle';
+    with open(tuplesPath, 'r') as fileId:
+        tuples = pickle.load(fileId);
+    # Get the alignments for the training tuples
+    align.getTupleAlignment(tuples);
 
-    #pdb.set_trace();
-    # Print the alignment 
-    '''for i in align.align0:
-        print '%s : %s' % (i, align.align0[i])
-    for i in align.align1:
-        print '%s : %s' % (i, align.align1[i])'''
+    # For a given word and set of cliparts, get the alignment
+    #align.alignClipart(word, cliparts, sceneType);
 
 ###################################################################################
 # Collection Bin (for extra code)
