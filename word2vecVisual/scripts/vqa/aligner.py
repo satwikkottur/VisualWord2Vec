@@ -6,6 +6,7 @@ import pdb
 import itertools as it
 from collections import defaultdict
 import math
+from copy import deepcopy
 
 # Setup:
 #   1. Type of scene for each of the training scenes
@@ -32,7 +33,8 @@ class Aligner:
         with open(clipartPath, 'r') as fileId:
             self.cliparts = pickle.load(fileId);
         with open(captionPath, 'r') as fileId:
-            self.capWords = [l.strip('\n').split(' ') for l in fileId.readlines()];
+            self.captions = [l.strip('\n') for l in fileId.readlines()];
+            self.capWords = [l.split(' ') for l in self.captions];
             
     # Collecting unique clipart objects and tuples, getting counts
     def computeCounts(self):
@@ -98,32 +100,40 @@ class Aligner:
         # Scenes that have tuples
         nonZeroId = [i for i in tuples if len(tuples[i]) > 0];
 
-        iterId = 0; # Premature stop
+        # Get everything under one hood
+        alignment = defaultdict(lambda : defaultdict(list));
         for capId in nonZeroId:
             sceneId = capId/5;
-            print self.cliparts[sceneId]
-            print sceneId
-            print self.capWords[capId];
+            captionData = {'caption':self.captions[capId], \
+                            'tuples':[]};
 
             for tup in tuples[capId]:
                 (clipP, clipS) = self.alignClipart(tup[0::2], \
                             self.cliparts[sceneId], self.types[sceneId]);
-                print '%s : (%s, %s)' % (tup, clipP, clipS)
-            print '\n'
+                captionData['tuples'].append({'tuple':tup, 'P':clipP, 'S':clipS});
 
-            iterId += 1;
-            if iterId > 20:
-                break;
-        #pdb.set_trace();
+            alignment[sceneId]['captions'].append(deepcopy(captionData));
+            alignment[sceneId]['clipart'] = self.cliparts[sceneId];
 
-    # Compute the alignment for a (list of) word, given the word, sceneType and cliparts in the scene
+    # Compute the alignment for a (list of) word, given the word, 
+    # sceneType and cliparts in the scene
     def alignClipart(self, word, cliparts, sceneType):
         if(isinstance(word, list)):
             bestAlign = tuple([self.alignClipart(w, cliparts,sceneType) \
                                                         for w in word]);
         else:
-            mi = np.array(self.getCount(self.mi[sceneType], [(word, c) for c in cliparts]));
-            bestAlign = cliparts[np.argmax(mi)]
+            # Handle phrases as well
+            matches = [];
+            scores = [];
+            for part in word.split(' '):
+                mi = np.array(self.getCount(self.mi[sceneType], \
+                                        [(part, c) for c in cliparts]));
+                best = np.argmax(mi);
+                matches.append(cliparts[best]);
+                scores.append(mi[best]);
+
+            # Predict one alignment for all the phrases based on the mutual information
+            bestAlign = matches[scores.index(max(scores))];
 
         return bestAlign
 
@@ -161,20 +171,27 @@ if __name__ == '__main__':
 
     # Saving the pickle for align
     savePath = dataPath + 'vqa_captions_mi.pickle';
-    #with open(savePath, 'w') as dataFile:
-    #    pickle.dump(align, dataFile);
+    #with open(savePath, 'w') as fileId:
+    #    pickle.dump(align, fileId);
     #print 'Saved at : %s' % savePath
         
     # Load the pickle for align
-    with open(savePath, 'r') as dataFile:
-        align = pickle.load(dataFile);
+    with open(savePath, 'r') as fileId:
+        align = pickle.load(fileId);
     print 'Loaded model from: %s' % savePath
 
     tuplesPath = dataPath + 'vqa_train_tuples.pickle';
     with open(tuplesPath, 'r') as fileId:
         tuples = pickle.load(fileId);
+
     # Get the alignments for the training tuples
-    align.getTupleAlignment(tuples);
+    alignment = align.getTupleAlignment(tuples);
+
+    # Save the alignment
+    alignPath = dataPath + 'vqa_train_alignment.pickle';
+    with open(alignPath, 'w') as fileId:
+        pickle.dump(alignment, fileId);
+    print 'Saved the alignment : %s' % alignPath
 
     # For a given word and set of cliparts, get the alignment
     #align.alignClipart(word, cliparts, sceneType);
