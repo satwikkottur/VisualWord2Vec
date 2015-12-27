@@ -132,14 +132,19 @@ class Aligner:
         sceneId = [i for i in self.tuples if len(self.tuples[i]) > 0];
 
         self.alignClipart(self.tuples[sceneId[0]][0][0], \
-                            self.cliparts[int(self.maps[sceneId[0]])]);
+                            self.cliparts[int(self.maps[sceneId[0]])]\
+                            self.types[self.maps]);
 
     # Compute the alignment for a word
     def alignClipart(self, word, cliparts, sceneType):
         if sceneType:
-                
-        mi = np.array([elf.);
-        print word, cliparts
+            mi = np.array(self.getCount(self.mi1, [(w, c) for c in self.nC1.keys()]));
+            bestAlign = self.nC1.keys()[np.argmax(mi)]
+        else:
+            mi = np.array(self.getCount(self.mi0, [(w, c) for c in self.nC0.keys()]));
+            bestAlign = self.nC0.keys()[np.argmax(mi)]
+           
+        return bestAlign
 
     # Handy function to increment counter for a given list / element
     # checks if a key exists else inserts otherwise
