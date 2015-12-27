@@ -96,7 +96,7 @@ class Aligner:
             counts[i] = float(counts[i])/sumTotal;
 
     # Compute the alignment between words and cliparts
-    def computeAlignment(self):
+    def computeMI(self):
         # First compute counts
         self.computeCounts();
         # Normalize to get probabilities
@@ -125,6 +125,21 @@ class Aligner:
             mi = np.array(self.getCount(self.mi1, [(w, c) for c in artList]));
             bestC = np.argmax(mi);
             self.align1[w] = artList[bestC];
+
+    # Compute the alignment for all the scenes, a wrapper for alignClipart
+    def computeAlignment(self):
+        # Scenes that have tuples
+        sceneId = [i for i in self.tuples if len(self.tuples[i]) > 0];
+
+        self.alignClipart(self.tuples[sceneId[0]][0][0], \
+                            self.cliparts[int(self.maps[sceneId[0]])]);
+
+    # Compute the alignment for a word
+    def alignClipart(self, word, cliparts, sceneType):
+        if sceneType:
+                
+        mi = np.array([elf.);
+        print word, cliparts
 
     # Handy function to increment counter for a given list / element
     # checks if a key exists else inserts otherwise
@@ -162,19 +177,39 @@ class Aligner:
                 counts = 0;
 
         return counts;
+#**********************************************************************
         
 if __name__ == '__main__':
-    align = Aligner();
-    # Compute alignment between words and clipart
-    align.computeAlignment();
+    #align = Aligner();
 
-    pdb.set_trace();
+    # Compute mutual information between words and clipart
+    #align.computeMI();
+
+    # For a given word and set of cliparts, get the alignment
+    #align.computeAlignment();
+
+    # Saving the pickle for align
+    dataPath = '/home/satwik/VisualWord2Vec/data/vqa/';
+    savePath = dataPath + 'vqa_captions_mi.pickle';
+    #with open(savePath, 'w') as dataFile:
+    #    pickle.dump(align, dataFile);
+    #print 'Saved at : %s' % savePath
+        
+    # Load the pickle for align
+    with open(savePath, 'r') as dataFile:
+        align = pickle.load(dataFile);
+    print 'Loaded model from: %s' % savePath
+
+    # For a given word and set of cliparts, get the alignment
+    align.computeAlignment();
+    #align.alignClipart();
+
+    #pdb.set_trace();
     # Print the alignment 
     '''for i in align.align0:
         print '%s : %s' % (i, align.align0[i])
     for i in align.align1:
         print '%s : %s' % (i, align.align1[i])'''
-
 
 ###################################################################################
 # Collection Bin (for extra code)
@@ -190,19 +225,19 @@ if __name__ == '__main__':
 #        self.increaseCount(self.nWC1, (w, c));
 
 ###################################################################################
-        # Unique clipart (scene0, scene1) and words (P, S) from tuples
-        '''self.art1 = [];
-        self.art0 = [];
-        for i in self.cliparts:
-            if self.types[i]:
-                self.art1.extend(self.cliparts[i]);
-            else:
-                self.art0.extend(self.cliparts[i]);
-        self.art1 = set(self.art1);
-        self.art0 = set(self.art0);
+# Unique clipart (scene0, scene1) and words (P, S) from tuples
+'''self.art1 = [];
+self.art0 = [];
+for i in self.cliparts:
+    if self.types[i]:
+        self.art1.extend(self.cliparts[i]);
+    else:
+        self.art0.extend(self.cliparts[i]);
+self.art1 = set(self.art1);
+self.art0 = set(self.art0);
 
-        self.word = [k for i in self.tuples.values() for j in i \
-                                                for k in (j[0], j[2])];
-        self.word = set(self.word);'''
+self.word = [k for i in self.tuples.values() for j in i \
+                                        for k in (j[0], j[2])];
+self.word = set(self.word);'''
 
 ###################################################################################
