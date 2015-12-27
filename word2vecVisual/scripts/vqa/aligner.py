@@ -37,56 +37,38 @@ class Aligner:
     # Collecting unique clipart objects and tuples, getting counts
     def computeCounts(self):
         # Count (co)-occurance for each caption and clipart (based on scene)
-        # nWx : word occurance
-        # nCx : clipart occurance
-        # nWCx : word-clipart co-occurance
-        self.nW0 = defaultdict(int); 
-        self.nC0 = defaultdict(int); 
-        self.nWC0 = defaultdict(int);
-        self.nW1 = defaultdict(int);  
-        self.nC1 = defaultdict(int);  
-        self.nWC1 = defaultdict(int); 
+        # nW[x] : word occurance
+        # nC[x] : clipart occurance
+        # nWC[x] : word-clipart co-occurance
+        self.nW ={0:defaultdict(int), 1:defaultdict(int)};
+        self.nC ={0:defaultdict(int), 1:defaultdict(int)};
+        self.nWC ={0:defaultdict(int), 1:defaultdict(int)};
 
         # Weed out the words that dont occur more than some time
         for capId in xrange(0, len(self.capWords)):
             sceneId = int(capId/5);
-            if self.types[sceneId]:
-                # Register the clipart
-                self.increaseCount(self.nC1, self.cliparts[sceneId]);
-                # Register the word in the caption
-                self.increaseCount(self.nW1, self.capWords[capId]);
-                # Register co-occurances
-                for pair in it.product(self.capWords[capId], self.cliparts[sceneId]):
-                    self.increaseCount(self.nWC1, pair);
+            sceneType = self.types[sceneId];
+            # Register the clipart
+            self.increaseCount(self.nC[sceneType], self.cliparts[sceneId]);
+            # Register the word in the caption
+            self.increaseCount(self.nW[sceneType], self.capWords[capId]);
+            # Register co-occurances
+            for pair in it.product(self.capWords[capId], self.cliparts[sceneId]):
+                self.increaseCount(self.nWC[sceneType], pair);
 
-            else:
-                # Register the clipart
-                self.increaseCount(self.nC0, self.cliparts[sceneId])
-                # Register the word
-                self.increaseCount(self.nW0, self.capWords[capId]);
-                # Register co-occurances
-                for pair in it.product(self.capWords[capId], self.cliparts[sceneId]):
-                    self.increaseCount(self.nWC0, pair);
-
-        # Remove all the words that dont occur min number of times
-        cutOff = [i for i in self.nW0 if self.nW0[i] < self.minOccurance];
-        [self.nW0.pop(i, None) for i in cutOff];
-        [self.nWC0.pop((i, c), None) for i in cutOff for c in self.nC0];
-
-        cutOff = [i for i in self.nW1 if self.nW1[i] < self.minOccurance];
-        [self.nW1.pop(i, None) for i in cutOff];
-        [self.nWC1.pop((i, c), None) for i in cutOff for c in self.nC1];
-
+        # Remove all the words that dont occur min number of times, for both the scenes
+        for s in [0, 1]:
+            cutOff = [i for i in self.nW[s] if self.nW[s][i] < self.minOccurance];
+            [self.nW[s].pop(i, None) for i in cutOff];
+            [self.nWC[s].pop((i, c), None) for i in cutOff for c in self.nC[s]];
 
     # Normalize counts to get probabilities
     def normalizeCounts(self):
-        # Normalize 
-        self.normalize(self.nW0);
-        self.normalize(self.nW1);
-        self.normalize(self.nC0);
-        self.normalize(self.nC1);
-        self.normalize(self.nWC0);
-        self.normalize(self.nWC1);
+        for s in [0, 1]: # For both the scene types
+            # Normalize 
+            self.normalize(self.nW[s]);
+            self.normalize(self.nC[s]);
+            self.normalize(self.nWC[s]);
 
     # Normalize a count
     def normalize(self, counts):
@@ -101,17 +83,13 @@ class Aligner:
         # Normalize to get probabilities
         self.normalizeCounts();
 
-        self.mi0 = defaultdict(float); 
-        self.mi1 = defaultdict(float);
-        # Compute mutual information and then find max
-        for (w, c) in self.nWC0:
-            self.mi0[(w, c)] = self.nWC0[(w, c)] * math.log(self.nWC0[(w, c)]/\
-                                                (self.nW0[w] * self.nC0[c]));
-
-        # Compute mutual information and then find max
-        for (w, c) in self.nWC1:
-            self.mi1[(w, c)] = self.nWC1[(w, c)] * math.log(self.nWC1[(w, c)]/\
-                                                (self.nW1[w] * self.nC1[c]));
+        self.mi = {0:defaultdict(float), 1:defaultdict(float)}
+        # Compute mutual information for (w, c) pairs
+        for s in [0, 1]:
+            for (w, c) in self.nWC[s]:
+                self.mi[s][(w, c)] = self.nWC[s][(w, c)] * \
+                                        math.log(self.nWC[s][(w, c)]/\
+                                        (self.nW[s][w] * self.nC[s][c]));
 
     # Get the alignment for all the train tuples at once, a wrapper for alignClipart
     # Input:
@@ -144,12 +122,9 @@ class Aligner:
             bestAlign = tuple([self.alignClipart(w, cliparts,sceneType) \
                                                         for w in word]);
         else:
-            if sceneType:
-                mi = np.array(self.getCount(self.mi1, [(word, c) for c in cliparts]));
-                bestAlign = cliparts[np.argmax(mi)]
-            else:
-                mi = np.array(self.getCount(self.mi0, [(word, c) for c in cliparts]));
-                bestAlign = cliparts[np.argmax(mi)]
+            mi = np.array(self.getCount(self.mi[sceneType], [(word, c) for c in cliparts]));
+            bestAlign = cliparts[np.argmax(mi)]
+
         return bestAlign
 
     # Handy function to increment counter for a given list / element
@@ -181,7 +156,7 @@ if __name__ == '__main__':
 
     #align = Aligner(sceneTypePath, clipartPath, captionPath);
 
-    # Compute mutual information between words and clipart
+    ## Compute mutual information between words and clipart
     #align.computeMI();
 
     # Saving the pickle for align
