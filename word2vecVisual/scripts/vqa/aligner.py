@@ -125,7 +125,7 @@ class Aligner:
             sceneId = capId/5;
             print self.cliparts[sceneId]
             print sceneId
-            print self.capWords[int(self.maps[capId])]
+            print self.capWords[self.maps.index(str(sceneId)) + capId % 5];
 
             for tup in self.tuples[capId]:
                 clipP = self.alignClipart(tup[0], \
