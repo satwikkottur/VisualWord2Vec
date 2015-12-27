@@ -4,19 +4,24 @@ import cPickle as pickle
 import numpy as np
 import pdb
 import itertools as it
+import math
 
 # Input:
 #   1. List of training scenes (20000, currently)
 #   2. Type of scene for each of the training scenes
 #   3. List of cliparts present in the each of the training scenes
-#   4. Tuples for each of the caption sentences
+#   4. Captions for each scene
 #   5. Image map between the captions and scenes
 # 
 # Output:
 #   1. Alignment between the clipart and the words
+#
+# Test time:
+#   1. Tuples from the caption sentences (to align)
 
 class Aligner:
     # Setting up things
+    minOccurance = 2;
     # Read the scene-caption map, scene types, scene clipart, 
     # tuples for the image
     def __init__(self):
@@ -31,65 +36,95 @@ class Aligner:
             self.cliparts = pickle.load(fileId);
         with open(dataPath + 'vqa_train_tuples.pickle','r') as fileId:
             self.tuples = pickle.load(fileId);
-
+        with open(dataPath + 'vqa_train_captions_lemma.txt', 'r') as fileId:
+            self.capWords = [l.strip('\n').split(' ') for l in fileId.readlines()];
+            
     # Collecting unique clipart objects and tuples, getting counts
     def computeCounts(self):
-        # Unique clipart (scene0, scene1) and words (P, S) from tuples
-        self.art1 = [];
-        self.art0 = [];
-        for i in self.cliparts:
-            if self.types[i]:
-                self.art1.extend(self.cliparts[i]);
-            else:
-                self.art0.extend(self.cliparts[i]);
-        self.art1 = set(self.art1);
-        self.art0 = set(self.art0);
-
-        self.word = [k for i in self.tuples.values() for j in i \
-                                                for k in (j[0], j[2])];
-        self.word = set(self.word);
-
-        # Count (co)-occurance for each tuple and tuple (based on scene)
+        # Count (co)-occurance for each caption and clipart (based on scene)
         # nWx : word occurance
         # nCx : clipart occurance
-        # nWCx : Word-clipart co-occurance
-        nW0 = {}; nC0 = {}; nWC0 = {};
-        nW1 = {}; nC1 = {}; nWC1 = {};
+        # nWCx : word-clipart co-occurance
+        self.nW0 = {}; self.nC0 = {}; self.nWC0 = {};
+        self.nW1 = {}; self.nC1 = {}; self.nWC1 = {};
 
-        for capId in self.tuples:
+        # Weed out the words that dont occur more than some time
+        for capId in xrange(0, len(self.capWords)):
             sceneId = int(self.maps[capId]);
             if self.types[sceneId]:
                 # Register the clipart
-                for i in self.cliparts[sceneId]:
-                    self.increaseCount(nC1, i)
-
-                # Register the word
-                for i in self.tuples[capId]:
-                    # Only primary and secondary
-                    self.increaseCount(nW1, i[0])
-                    self.increaseCount(nW1, i[2])
-
-                    # Register co-occurances
-                    for (w, c) in it.product(i[0::2], self.cliparts[sceneId]):
-                        self.increaseCount(nWC1, (w, c));
+                self.increaseCount(self.nC1, self.cliparts[sceneId]);
+                # Register the word in the caption
+                self.increaseCount(self.nW1, self.capWords[capId]);
+                # Register co-occurances
+                for pair in it.product(self.capWords[capId], self.cliparts[sceneId]):
+                    self.increaseCount(self.nWC1, pair);
 
             else:
                 # Register the clipart
-                for i in self.cliparts[sceneId]:
-                    self.increaseCount(nC0, i)
-
+                self.increaseCount(self.nC0, self.cliparts[sceneId])
                 # Register the word
-                for i in self.tuples[capId]:
-                    self.increaseCount(nW0, i[0])
-                    self.increaseCount(nW0, i[2])
-
-                    # Register co-occurances
-                    for (w, c) in it.product(i[0::2], self.cliparts[sceneId]):
-                        self.increaseCount(nWC0, (w, c));
-
+                self.increaseCount(self.nW0, self.capWords[capId]);
+                # Register co-occurances
+                for pair in it.product(self.capWords[capId], self.cliparts[sceneId]):
+                    self.increaseCount(self.nWC0, pair);
         #pdb.set_trace();
+        # Remove all the words that dont occur min number of times
+        cutOff = [i for i in self.nW0 if self.nW0[i] < self.minOccurance];
+        [self.nW0.pop(i, None) for i in cutOff];
+        [self.nWC0.pop((i, c), None) for i in cutOff for c in self.nC0];
 
-    # Compute the alignment between 
+        cutOff = [i for i in self.nW1 if self.nW1[i] < self.minOccurance];
+        [self.nW1.pop(i, None) for i in cutOff];
+        [self.nWC1.pop((i, c), None) for i in cutOff for c in self.nC1];
+
+
+    # Normalize counts to get probabilities
+    def normalizeCounts(self):
+        # Normalize 
+        self.normalize(self.nW0);
+        self.normalize(self.nW1);
+        self.normalize(self.nC0);
+        self.normalize(self.nC1);
+        self.normalize(self.nWC0);
+        self.normalize(self.nWC1);
+
+    # Normalize a count
+    def normalize(self, counts):
+        sumTotal = sum(counts.values());
+        for i in counts:
+            counts[i] = float(counts[i])/sumTotal;
+
+    # Compute the alignment between words and cliparts
+    def computeAlignment(self):
+        # First compute counts
+        self.computeCounts();
+        # Normalize to get probabilities
+        self.normalizeCounts();
+
+        self.mi0 = {}; self.mi1 = {};
+        self.align0 = {}; self.align1 = {};
+        # Compute mutual information and then find max
+        for (w, c) in self.nWC0:
+            self.mi0[(w, c)] = self.nWC0[(w, c)] * math.log(self.nWC0[(w, c)]/\
+                                                (self.nW0[w] * self.nC0[c]));
+
+        # Compute mutual information and then find max
+        for (w, c) in self.nWC1:
+            self.mi1[(w, c)] = self.nWC1[(w, c)] * math.log(self.nWC1[(w, c)]/\
+                                                (self.nW1[w] * self.nC1[c]));
+
+        artList = self.nC0.keys();
+        for w in self.nW0:
+            mi = np.array(self.getCount(self.mi0, [(w, c) for c in artList]));
+            bestC = np.argmax(mi);
+            self.align0[w] = artList[bestC];
+
+        artList = self.nC1.keys();
+        for w in self.nW1:
+            mi = np.array(self.getCount(self.mi1, [(w, c) for c in artList]));
+            bestC = np.argmax(mi);
+            self.align1[w] = artList[bestC];
 
     # Handy function to increment counter for a given list / element
     # checks if a key exists else inserts otherwise
@@ -130,7 +165,44 @@ class Aligner:
         
 if __name__ == '__main__':
     align = Aligner();
-    align.computeCounts();
     # Compute alignment between words and clipart
     align.computeAlignment();
 
+    pdb.set_trace();
+    # Print the alignment 
+    '''for i in align.align0:
+        print '%s : %s' % (i, align.align0[i])
+    for i in align.align1:
+        print '%s : %s' % (i, align.align1[i])'''
+
+
+###################################################################################
+# Collection Bin (for extra code)
+# Code for counting from tuples
+
+# Register the word
+#for i in self.tuples[capId]:
+#    # Only primary and secondary
+#    self.increaseCount(self.nW1, i[0::2])
+
+#    # Register co-occurances
+#    for (w, c) in it.product(i[0::2], self.cliparts[sceneId]):
+#        self.increaseCount(self.nWC1, (w, c));
+
+###################################################################################
+        # Unique clipart (scene0, scene1) and words (P, S) from tuples
+        '''self.art1 = [];
+        self.art0 = [];
+        for i in self.cliparts:
+            if self.types[i]:
+                self.art1.extend(self.cliparts[i]);
+            else:
+                self.art0.extend(self.cliparts[i]);
+        self.art1 = set(self.art1);
+        self.art0 = set(self.art0);
+
+        self.word = [k for i in self.tuples.values() for j in i \
+                                                for k in (j[0], j[2])];
+        self.word = set(self.word);'''
+
+###################################################################################
