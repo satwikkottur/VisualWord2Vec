@@ -1,3 +1,12 @@
+# Utilities for visual-genome dataset
+
+# Get dataset along with annotations
+def getDataset:
+    pass
+
+
+if __name__ == '__main__':
+    # Use the driver to get the dataset
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from PIL import Image as PIL_Image

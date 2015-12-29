@@ -114,6 +114,7 @@ class Aligner:
 
             alignment[sceneId]['captions'].append(deepcopy(captionData));
             alignment[sceneId]['clipart'] = self.cliparts[sceneId];
+        return dict(alignment)
 
     # Compute the alignment for a (list of) word, given the word, 
     # sceneType and cliparts in the scene
@@ -188,10 +189,10 @@ if __name__ == '__main__':
     alignment = align.getTupleAlignment(tuples);
 
     # Save the alignment
-    alignPath = dataPath + 'vqa_train_alignment.pickle';
-    with open(alignPath, 'w') as fileId:
-        pickle.dump(alignment, fileId);
-    print 'Saved the alignment : %s' % alignPath
+    #alignPath = dataPath + 'vqa_train_alignment.pickle';
+    #with open(alignPath, 'w') as fileId:
+    #    pickle.dump(alignment, fileId);
+    #print 'Saved the alignment : %s' % alignPath
 
     # For a given word and set of cliparts, get the alignment
     #align.alignClipart(word, cliparts, sceneType);
