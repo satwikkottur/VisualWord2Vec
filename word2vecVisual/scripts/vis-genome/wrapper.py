@@ -9,6 +9,7 @@ import urllib
 import pdb
 import multiprocessing
 import sys
+import os
 
 # Add the path for importing src module
 import sys
@@ -16,13 +17,28 @@ sys.path.append('visual_genome_python_driver/');
 from src import api as vg
 
 # Get dataset along with annotations
-def getDataset(imageData, savePath, workerId):
-    imgSavePath = savePath + '%d_%d.png';
+def getDataset(imageData, savePath, reverseInd, workerId):
+    imgSaveFolder = savePath + '%d/%d/'
+    imgSavePath = imgSaveFolder + '%d_%d.png';
+
     # For each image, get subregion and captions
     curIter = 0;
     for i in imageData:
         curIter += 1;
         print 'Saving %d / %d (%d) image...' % (curIter, len(imageData), workerId);
+
+        # Check the folders and their existance
+        imgIndex = reverseInd[i['id']];
+        innerFolder = imgIndex % 1000;
+        outerFolder = int(imgIndex / 1000);
+
+        if not os.path.exists(savePath + str(outerFolder)):
+            os.makedirs(savePath + str(outerFolder));
+
+        destination = imgSaveFolder % (outerFolder, innerFolder);
+        if not os.path.exists(destination):
+            os.makedirs(destination);
+        imgSavePath = destination + '%d_%d.png';
 
         fileURL = StringIO(urllib.urlopen(i['url']).read());
         img = PIL_Image.open(fileURL);
@@ -104,16 +120,23 @@ if __name__ == '__main__':
     with open(imagePath, 'r') as fileId:
         imageData = json.load(fileId);
 
+    # Write a list of images vs image id
+    reverseInd = {};
+    with open(savePath + 'index.txt', 'w') as fileId:
+        for i in xrange(len(imageData)):
+            fileId.write('%d : %d\n' % (i, imageData[i]['id']));
+            reverseInd[imageData[i]['id']] = i;
+
     # Save the images, in parallel
-    #jobs = [];
-    #noThreads = 48;
-    #for i in xrange(0, noThreads):
-    #    thread = multiprocessing.Process(target=getDataset, \
-    #                args=(imageData[i::noThreads], savePath, i));
-    #    jobs.append(thread);
-    #    thread.start();
+    jobs = [];
+    noThreads = 128;
+    for i in xrange(0, noThreads):
+        thread = multiprocessing.Process(target=getDataset, \
+               args=(imageData[i::noThreads], savePath, reverseInd, i));
+        jobs.append(thread);
+        thread.start();
 
     #getDataset(imageData, savePath);
 
     # Save the captions
-    saveCaptions(imageData, capPath);
+    #saveCaptions(imageData, capPath);
