@@ -65,6 +65,7 @@ def getDataset(imageData, savePath, reverseInd, workerId):
                 print cropDims, maxDims, reg, workerId
                 sys.exit(0);
 
+# Save captions for the image regions
 def saveCaptions(imageData, capPath):
     capId = open(capPath, 'w');
     # Save captiosn for each of the image
@@ -101,14 +102,34 @@ def visualize_regions(image, regions):
     fig.set_size_inches(18.5, 10.5);
 
 # Create the list of images for extracting vgg features
-## Getting the list of images
-##basePath = 'srv/share/vqa/release_data/abstract_v002/scene_img/img/%d.png';
-#basePath = '/home/satwik/vqa_images/%d.png';
-#
-## Write the image list
-#with open('/home/satwik/imageList.txt', 'w') as fileId:
-#    [fileId.write('%d\t%s\n' %(i, basePath % i)) for i in xrange(0, 50000)];
-#
+def saveImageList(imageData, reverseInd, listPath, savePath):
+    fileId = open(listPath, 'w');
+
+    imgSaveFolder = savePath + '%d/%d/'
+    imgSavePath = imgSaveFolder + '%d_%d.png';
+
+    # For each image, get subregion and captions
+    curIter = 0;
+    for i in imageData:
+        curIter += 1;
+        print 'Saving %d / %d image...' % (curIter, len(imageData));
+
+        # Check the folders and their existance
+        imgIndex = reverseInd[i['id']];
+        innerFolder = imgIndex % 1000;
+        outerFolder = int(imgIndex / 1000);
+
+        destination = imgSaveFolder % (outerFolder, innerFolder);
+        if os.path.exists(destination):
+            listing = os.listdir(destination);
+
+            # Printing the image list
+            for img in listing:
+                regionId = int(img.split('_')[1].split('.')[0]);
+                fileId.write('%04d%04d%04d\t%s\n' % (outerFolder, innerFolder, \
+                                            regionId, destination + img));
+    fileId.close();
+
 # Use the driver to get the dataset
 if __name__ == '__main__':
     dataPath = '/home/satwik/VisualWord2Vec/data/vis-genome/';
@@ -128,15 +149,19 @@ if __name__ == '__main__':
             reverseInd[imageData[i]['id']] = i;
 
     # Save the images, in parallel
-    jobs = [];
-    noThreads = 128;
-    for i in xrange(0, noThreads):
-        thread = multiprocessing.Process(target=getDataset, \
-               args=(imageData[i::noThreads], savePath, reverseInd, i));
-        jobs.append(thread);
-        thread.start();
+    #jobs = [];
+    #noThreads = 128;
+    #for i in xrange(0, noThreads):
+    #    thread = multiprocessing.Process(target=getDataset, \
+    #           args=(imageData[i::noThreads], savePath, reverseInd, i));
+    #    jobs.append(thread);
+    #    thread.start();
 
     #getDataset(imageData, savePath);
 
     # Save the captions
     #saveCaptions(imageData, capPath);
+
+    # Save the image lists
+    listPath = dataPath + 'image_list.txt';
+    saveImageList(imageData, reverseInd, listPath, savePath);
