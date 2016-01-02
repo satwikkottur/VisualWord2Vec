@@ -101,7 +101,11 @@ class Aligner:
         nonZeroId = [i for i in tuples if len(tuples[i]) > 0];
 
         # Get everything under one hood
-        alignment = defaultdict(lambda : defaultdict(list));
+        # Scenes, captions, cliparts, tuples, alignment
+        alignment = {};
+        for i in xrange(len(tuples)):
+            alignment[i] = defaultdict(list);
+        #alignment = defaultdict(lambda : defaultdict(list));
         for capId in nonZeroId:
             sceneId = capId/5;
             captionData = {'caption':self.captions[capId], \
@@ -114,7 +118,7 @@ class Aligner:
 
             alignment[sceneId]['captions'].append(deepcopy(captionData));
             alignment[sceneId]['clipart'] = self.cliparts[sceneId];
-        return dict(alignment)
+        return alignment
 
     # Compute the alignment for a (list of) word, given the word, 
     # sceneType and cliparts in the scene
@@ -189,10 +193,10 @@ if __name__ == '__main__':
     alignment = align.getTupleAlignment(tuples);
 
     # Save the alignment
-    #alignPath = dataPath + 'vqa_train_alignment.pickle';
-    #with open(alignPath, 'w') as fileId:
-    #    pickle.dump(alignment, fileId);
-    #print 'Saved the alignment : %s' % alignPath
+    alignPath = dataPath + 'vqa_train_alignment.pickle';
+    with open(alignPath, 'w') as fileId:
+        pickle.dump(alignment, fileId);
+    print 'Saved the alignment : %s' % alignPath
 
     # For a given word and set of cliparts, get the alignment
     #align.alignClipart(word, cliparts, sceneType);
