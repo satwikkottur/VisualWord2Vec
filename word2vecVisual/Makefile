@@ -57,5 +57,11 @@ common:
 	make
 	./$(BIN)word2vec -train modelsNdata/coco_train_minus_cs_test.txt -output modelsNdata/word2vec_output_bestmodel_single.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -read-vocab modelsNdata/large-vocab.txt
 
+# New vqa data
+newvqa:
+	make
+	./$(BIN)word2vec -train modelsNdata/coco_vqa_train_captions_lemma.txt -output modelsNdata/word2vec_vqa_train_captions.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -read-vocab modelsNdata/vqa_train_captions_vocab.txt
+
+
 clean:
 	rm -rf word2vec visualFeatures *.o $(BIN)*
