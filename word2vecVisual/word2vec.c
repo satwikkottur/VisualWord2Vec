@@ -591,10 +591,10 @@ void commonSenseWrapper(){
     int clusterArg = clusterCommonSense;
 
     // Load the word2vec embeddings from Xiao's
-    //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/al_vectors.txt";
+    char wordPath[] = "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/al_vectors.txt";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
-    //loadWord2Vec(wordPath);
+    loadWord2Vec(wordPath);
 
     // [S] added
     char* visualPath = (char*) malloc(sizeof(char) * 100);
@@ -633,8 +633,8 @@ void commonSenseWrapper(){
     else{
         //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_18.txt";
         //visualPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/float_features_coco.txt";
-        visualPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_float_features.txt";
-        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+        //visualPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_float_features.txt";
+        visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
         //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_R_120.txt";
     }
 
@@ -646,7 +646,7 @@ void commonSenseWrapper(){
     initFeatureHash();
     // Reading for the word features, cluster ids and visual features
     // clusterid reading will be avoided when clustering is ported to c
-    readRefineTrainFeatureFiles(featurePathVQA, featurePathICCV);
+    readRefineTrainFeatureFiles(featurePathICCV, featurePathICCV);
     
     // reading cluster files from matlab
     //char clusterpath[] = "/home/satwik/visualword2vec/data/coco-cnn/cluster_100_coco_train.txt";
@@ -1100,8 +1100,8 @@ void TrainModel() {
 
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/vqa/word2vec_vqa_before.bin";
-    char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/vqa/word2vec_vqa_train_captions.bin";
-    loadWord2Vec(beforeEmbedPath);
+    //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/vqa/word2vec_vqa_train_captions.bin";
+    //loadWord2Vec(beforeEmbedPath);
     //saveWord2Vec(beforeEmbedPath);
     //***************************************************************************************
     
