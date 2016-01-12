@@ -76,7 +76,7 @@ def saveCaptions(imageData, capPath):
         for j in xrange(len(regions)):
             reg = regions[j];
             # Write the caption
-            capId.write('%d : %d : %s\n' % (i['id'], j, reg.phrase.encode('utf-8')));
+            capId.write('%d : %d : %s\n' % (i['id'], j, reg.phrase.encode('utf-8').strip('\n')));
 
     capId.close();
 
@@ -160,8 +160,8 @@ if __name__ == '__main__':
     #getDataset(imageData, savePath);
 
     # Save the captions
-    #saveCaptions(imageData, capPath);
+    saveCaptions(imageData, capPath);
 
     # Save the image lists
-    listPath = dataPath + 'image_list.txt';
-    saveImageList(imageData, reverseInd, listPath, savePath);
+    #listPath = dataPath + 'image_list.txt';
+    #saveImageList(imageData, reverseInd, listPath, savePath);
