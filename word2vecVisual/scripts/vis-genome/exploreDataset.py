@@ -61,22 +61,10 @@ def prepareTrainDataset():
 
 # Reading the image captions
 def readTrainCaptions(captionPath):
-    # Remove the new lines
-    with open(captionPath, 'r') as fileId:
-        captions = [i.strip('\n') for i in fileId.readlines()];
-
-    newCaptions = [i for i in captions if len(i) > 0];
-
-    with open(captionPath, 'w') as fileId:
-        [fileId.write(i + '\n') for i in newCaptions];
-
-    print 'Done removing the new lines'
-    return
-
+    # Read the captions line
     with open(captionPath, 'r') as fileId:
         rawCaps = [i.strip('\n') for i in fileId.readlines()];
         capList = [re.search('([^: ]*) : ([^: ]*) : ([^:]*)', i) for i in rawCaps];
-
     pdb.set_trace();
 
     # Construct the dictionary

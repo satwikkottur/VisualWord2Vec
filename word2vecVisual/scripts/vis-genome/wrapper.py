@@ -68,17 +68,39 @@ def getDataset(imageData, savePath, reverseInd, workerId):
 # Save captions for the image regions
 def saveCaptions(imageData, capPath):
     capId = open(capPath, 'w');
+    curIter = 0;
     # Save captiosn for each of the image
     for i in imageData:
-        print 'Saving %d / %d image...' % (i['id'], len(imageData));
+        print 'Saving %d (%d) / %d image...' % (curIter, i['id'], len(imageData));
+        curIter += 1;
 
         regions = vg.GetRegionDescriptionsOfImage(id=i['id']);
         for j in xrange(len(regions)):
             reg = regions[j];
-            # Write the caption
-            capId.write('%d : %d : %s\n' % (i['id'], j, reg.phrase.encode('utf-8').strip('\n')));
+            # Write the regions description
+            regDesc = reg.phrase.encode('utf-8').strip('\n').replace('\n', ' ');
+            capId.write('%d : %d : %s\n' % (i['id'], j, regDesc));
 
     capId.close();
+
+# Save captions for the image regions, using multiple workers
+def saveCaptionsMulti(imageData, capPath, noWorkers):
+    workerId = 0;
+    # List of all the current jobs
+    jobs = [];
+
+    for piece in chunks(imageData, len(imageData)/noWorkers + 1):
+        # Start the thread
+        thread = multiprocessing.Process(target = saveCaptions, \
+                           args = (piece, '%s_%03d' % (capPath, workerId)));
+        jobs.append(thread);
+        thread.start();
+        workerId += 1;
+
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in xrange(0, len(l), n):
+        yield l[i:i+n]
 
 # Visualizating the regions
 def visualize_regions(image, regions):
@@ -135,6 +157,7 @@ if __name__ == '__main__':
     dataPath = '/home/satwik/VisualWord2Vec/data/vis-genome/';
     imagePath = dataPath + 'image_data.json';
     savePath = dataPath + 'images/';
+    splitCapPath = dataPath + 'captionSplits/' + 'genome_train_captions.txt';
     capPath = dataPath + 'genome_train_captions.txt';
 
     # First read all the images
@@ -160,7 +183,10 @@ if __name__ == '__main__':
     #getDataset(imageData, savePath);
 
     # Save the captions
-    saveCaptions(imageData, capPath);
+    #saveCaptions(imageData, capPath);
+
+    # Save the captions in multiple files
+    saveCaptionsMulti(imageData, splitCapPath, 15);
 
     # Save the image lists
     #listPath = dataPath + 'image_list.txt';
