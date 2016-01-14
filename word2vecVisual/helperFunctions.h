@@ -45,7 +45,10 @@ void tokenizeSentences(struct Sentence*, long);
 void writeSentenceEmbeddings(char*, struct Sentence*, long);
 
 /***************************************************/
-// Save the sentences back into a text file
-void saveSentences(struct Sentence*, int, char*);
+// Read the features from the text file
+float*** readVisualFeatures(char*, long*, int*);
 
 # endif
+// Save the sentences back into a text file
+void saveSentences(struct Sentence*, int, char*);
+/***************************************************/

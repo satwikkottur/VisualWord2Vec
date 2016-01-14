@@ -1092,14 +1092,16 @@ void visualGenomeWrapper(){
         visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_debug";
     }
     else{
-        featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_debug_big";
+        featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_debug_small";
+        //featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_debug_big";
         //featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_features_00";
 
         // Use PCA
         if (usePCA)
             visualPath = "/home/satwik/VisualWord2Vec/data/abstract_features_train_pca.txt";
         else
-            visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_debug_big";
+            visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_debug_small";
+            //visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_debug_big";
             //visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_features_header";
     }
 
@@ -1115,15 +1117,11 @@ void visualGenomeWrapper(){
 
     // Reading for the word features and visual features
     readTrainSentencesGenome(featurePath);
-    //readVisualFeatureFileGenome(visualPath);
-    return;
+    readVisualFeatureFileGenome(visualPath);
     
     // Tokenizing the training sentences
-    //tokenizeTrainSentencesGenome();
+    tokenizeTrainSentencesGenome();
     
-    // Compute embeddings
-    //performVPTask();
-
     char* clusterPath = (char*) malloc(sizeof(char) * 100);
     if(usePCA)
         sprintf(clusterPath, "/home/satwik/VisualWord2Vec/data/vis-genome/C_pca_cluster_%d.txt",
@@ -1143,7 +1141,7 @@ void visualGenomeWrapper(){
     //}
 
     // Clustering the visual features
-    /*if(debugModeGenome)
+    if(debugModeGenome)
         clusterVisualFeaturesGenome(2, NULL);
     else
         clusterVisualFeaturesGenome(clusterArg, NULL);
@@ -1180,7 +1178,7 @@ void visualGenomeWrapper(){
         refineNetworkGenome();
         // Perform common sense task
         noOverfit = performCommonSenseTask(bestTestScores);
-    }*/
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////

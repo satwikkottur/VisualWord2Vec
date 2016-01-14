@@ -13,6 +13,7 @@ void readTrainSentencesGenome(char* trainPath){
     // Use readSentences
     trainSents = *readSentences(trainPath, &noSents);
 
+    // Double check if read before
     if(noTrain != 0){
         if(noTrain != noSents){
             printf("Mismatch with number of training examples: %s\n", trainPath);
@@ -34,9 +35,9 @@ void readTrainSentencesGenome(char* trainPath){
     exit(1);*/
     // Debug, re write the sentences back to cross check
     // Write the sentences back to check debug
-    char* writePath = (char*) malloc(sizeof(char) * 100);
+    /*char* writePath = (char*) malloc(sizeof(char) * 100);
     writePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/re-written.txt";
-    saveSentences(trainSents, noTrain, writePath);
+    saveSentences(trainSents, noTrain, writePath);*/
 }
 
 // Reading the cluster ids
@@ -86,7 +87,6 @@ void readClusterIdGenome(char* clusterPath){
 void tokenizeTrainSentencesGenome(){
     // Call the function to tokenize sentences
     tokenizeSentences(trainSents, noTrain);
-
 }
 
 // Refining the network using VQA
@@ -97,51 +97,8 @@ void refineNetworkGenome(){
 
 // Reading the visual feature file for VQA
 void readVisualFeatureFileGenome(char* featPath){
-    FILE* filePt = fopen(featPath, "rb");
-
-    if(filePt == NULL){
-        printf("File at %s doesnt exist!\n", featPath);
-        exit(1);
-    }
-
-    float feature;
-    int i, noLines = 0;
-
-    // Read the first line and get the feature size
-    fscanf(filePt, "%ld %d", &noFeats, &visualFeatSize);
-    printf("\nVisual features are of size: %d...\nNumber of features: %ld ...\n", 
-                                visualFeatSize, noFeats);
-
-    // Setting up the memory
-    features = (float**) malloc(sizeof(float*) * noFeats);
-    for (i = 0; i < noFeats; i++)
-        features[i] = (float*) malloc(sizeof(float) * visualFeatSize);
-
-    // Reading till EOF
-    while(fscanf(filePt, "%f", &feature) != EOF){
-        // Save the already read feature
-        features[noLines][0] = feature;
-
-        for(i = 1; i < visualFeatSize; i++){
-            fscanf(filePt, "%f", &feature);
-            features[noLines][i] = feature;
-        }
-
-        // Debugging printing
-        if(noLines % 1000 == 0)
-            printf("Reading features : %d\n", noLines);
-        noLines++;
-    }
-
-    if(noLines != noFeats){
-        printf("Number of features incorrectly read!\n");
-        exit(1);
-    }
-
-    printf("\nRead visual features for %d sentences...\n", noLines);
-
-    // Closing the file
-    fclose(filePt);
+    // Read the features for the genome dataset
+    features = *readVisualFeatures(featPath, &noFeats, &visualFeatSize);
 }
 
 // Clustering kmeans wrapper

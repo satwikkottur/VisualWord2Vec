@@ -255,6 +255,70 @@ void writeSentenceEmbeddings(char* saveName, struct Sentence* collection, long n
 }
 
 /***************************************************/
+// Read the visual features (common for all the tasks)
+// Input: 1. Path where features are stored
+//        2. placeholder to capture the number of features
+//
+// Output: 1. Returns the feature (float***)
+float*** readVisualFeatures(char* featPath, long* noFeats, int* visualFeatSize){
+    FILE* filePt = fopen(featPath, "rb");
+
+    if(filePt == NULL){
+        printf("File at %s doesnt exist!\n", featPath);
+        exit(1);
+    }
+
+    // Local declarations
+    float*** features;
+    float feature;
+    int i, noLines = 0;
+    long noFeatures = 0; // Local variable for noFeats
+    int visualFeatureSize = 0; // local variable for visualFeatSize
+
+    // Read the first line and get the feature size
+    fscanf(filePt, "%ld %d", &noFeatures, &visualFeatureSize);
+    printf("\nVisual features are of size: %d...\nNumber of features: %ld ...\n", 
+                                visualFeatureSize, noFeatures);
+
+    // Setting up the memory
+    features = (float***) malloc(sizeof(float**));
+    features[0] = (float**) malloc(sizeof(float*) * noFeatures);
+    for (i = 0; i < noFeatures; i++)
+        features[0][i] = (float*) malloc(sizeof(float) * visualFeatureSize);
+
+    // Reading till EOF
+    while(fscanf(filePt, "%f", &feature) != EOF){
+        // Save the already read feature
+        features[0][noLines][0] = feature;
+
+        for(i = 1; i < visualFeatureSize; i++){
+            fscanf(filePt, "%f", &feature);
+            features[0][noLines][i] = feature;
+        }
+
+        // Debugging printing
+        if(noLines % 5000 == 0)
+            printf("Reading features : %d\n", noLines);
+
+        noLines++;
+    }
+
+    if(noLines != noFeatures){
+        printf("Number of features incorrectly read!\n");
+        exit(1);
+    }
+
+    printf("\nRead visual features for %d sentences...\n", noLines);
+    // Closing the file
+    fclose(filePt);
+
+    // Assigning the variables
+    *noFeats = noFeatures;
+    *visualFeatSize = visualFeatureSize;
+
+    return features;
+}
+/***************************************************/
 // Debugging functions
 // Write the sentences back to the file to check
 void saveSentences(struct Sentence* sents, int noSents, char* savePath){
