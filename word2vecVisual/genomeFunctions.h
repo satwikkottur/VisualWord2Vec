@@ -24,7 +24,7 @@ extern int noClusters;
 extern int visualFeatSize;
 
 // Reading the  training sentences, along with the map ids
-void readTrainSentencesGenome(char*, char*);
+void readTrainSentencesGenome(char*);
 // Reading the cluster ids
 void readClusterIdGenome(char*);
 // Tokenize the sentences for training

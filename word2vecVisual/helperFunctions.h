@@ -44,7 +44,8 @@ void tokenizeSentences(struct Sentence*, long);
 // Save the sentence embeddings
 void writeSentenceEmbeddings(char*, struct Sentence*, long);
 
-
 /***************************************************/
+// Save the sentences back into a text file
+void saveSentences(struct Sentence*, int, char*);
 
 # endif

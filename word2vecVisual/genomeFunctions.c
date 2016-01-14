@@ -7,9 +7,8 @@ static int* featClusterId = NULL;
 static long noTrain = 0;
 static long noFeats = 0;
 
-// Reading the  training sentences
-// If null is given for mapPath, then use identity map
-void readTrainSentencesGenome(char* trainPath, char* mapPath){
+// Reading the  training sentences, ignore the map
+void readTrainSentencesGenome(char* trainPath){
     long noSents = 0;
     // Use readSentences
     trainSents = *readSentences(trainPath, &noSents);
@@ -22,29 +21,10 @@ void readTrainSentencesGenome(char* trainPath, char* mapPath){
     }
     else noTrain = noSents;
 
-    // Now read the map ids
-    if(mapPath != NULL){
-        FILE* mapPtr = fopen(mapPath, "rb");
+    int i;
+    for(i = 0; i < noTrain; i++)
+        trainSents[i].featInd = i;
 
-        if(mapPtr == NULL){
-            printf("File doesnt exist at %s!\n", mapPath);
-            exit(1);
-        }
-    }
-
-    int i, mapId;
-    if (mapPath == NULL){
-        for(i = 0; i < noTrain; i++)
-            if(fscanf(mapPtr, "%d\n", &mapId) != EOF)
-                trainSents[i].featInd = mapId;
-    }
-    else{
-        for(i = 0; i < noTrain; i++)
-            if(fscanf(mapPtr, "%d\n", &mapId) != EOF)
-                trainSents[i].featInd = mapId;
-    }
-
-    fclose(mapPtr);
     printf("\nRead %ld sentences for training!\n", noTrain);
 
     // Debug, checking the feature indices
@@ -52,6 +32,11 @@ void readTrainSentencesGenome(char* trainPath, char* mapPath){
         printf("Train map index: %d => %d\n", i, trainSents[i].featInd);
     }
     exit(1);*/
+    // Debug, re write the sentences back to cross check
+    // Write the sentences back to check debug
+    char* writePath = (char*) malloc(sizeof(char) * 100);
+    writePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/re-written.txt";
+    saveSentences(trainSents, noTrain, writePath);
 }
 
 // Reading the cluster ids
@@ -101,11 +86,12 @@ void readClusterIdGenome(char* clusterPath){
 void tokenizeTrainSentencesGenome(){
     // Call the function to tokenize sentences
     tokenizeSentences(trainSents, noTrain);
+
 }
 
 // Refining the network using VQA
 void refineNetworkGenome(){
-    printf("\nRefining using MSVQA training sentences....\n");
+    printf("\nRefining using Visual Genome training sentences....\n");
     refineNetworkSentences(trainSents, noTrain, trainMode);
 }
 
@@ -229,3 +215,4 @@ void clusterVisualFeaturesGenome(int clusters, char* savePath){
     // Free memory
     free(v); free(centroids); free(dis); free(assign); free(nassign);
 }
+

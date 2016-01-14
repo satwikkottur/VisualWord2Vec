@@ -255,3 +255,23 @@ void writeSentenceEmbeddings(char* saveName, struct Sentence* collection, long n
 }
 
 /***************************************************/
+// Debugging functions
+// Write the sentences back to the file to check
+void saveSentences(struct Sentence* sents, int noSents, char* savePath){
+    // Open the file
+    FILE* filePtr = fopen(savePath, "wb");
+
+    if(noSents == 0){
+        printf("Sentences not available to save!\n");
+        exit(1);
+    }
+
+    // Save the cluster ids
+    int i;
+    for (i = 0; i < noSents; i++)
+        fprintf(filePtr, "%s\n", sents[i].sent);
+        //fprintf(filePtr, "%d %f\n", assign[i], dis[i]);
+
+    // Close the file
+    fclose(filePtr); 
+}

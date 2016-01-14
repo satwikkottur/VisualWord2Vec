@@ -30,6 +30,7 @@
 # include "helperFunctions.h"
 # include "cocoFunctions.h"
 # include "vqaFunctions.h"
+# include "genomeFunctions.h"
 /***********************************************************************************/
 // Extern variables
 extern float prevTestAcc, prevValAcc;
@@ -44,10 +45,12 @@ int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
 int clusterVQA = 100; // Number of initial clusters to use
 int clusterVP = 100; // Number of initial clusters to use
+int clusterGenome = 25; // Number of initial clusters to use for genome
 int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
 int debugModeVQA = 0; // Debug mode for VQA task
+int debugModeGenome = 0; // Debug mode for genome visual
 int windowVP = 5; // window size for training on sentences
 int useAlternate = 0; // Use word2vec for unrefined words
 // Training the sentences in one of the modes
@@ -214,7 +217,7 @@ void ReduceVocab() {
     while (vocab_hash[hash] != -1) hash = (hash + 1) % vocab_hash_size;
     vocab_hash[hash] = a;
   }
-  fflush(stdout);
+  //fflush(stdout);
   min_reduce++;
 }
 
@@ -303,7 +306,7 @@ void LearnVocabFromTrainFile() {
     train_words++;
     if ((debug_mode > 1) && (train_words % 100000 == 0)) {
       printf("%lldK%c", train_words / 1000, 13);
-      fflush(stdout);
+      //fflush(stdout);
     }
     i = SearchVocab(word);
     if (i == -1) {
@@ -406,7 +409,7 @@ void *TrainModelThread(void *id) {
         printf("%cAlpha: %f  Progress: %.2f%%  Words/thread/sec: %.2fk  ", 13, alpha,
          word_count_actual / (real)(iter * train_words + 1) * 100,
          word_count_actual / ((real)(now - start + 1) / (real)CLOCKS_PER_SEC * 1000));
-        fflush(stdout);
+        //fflush(stdout);
       }
       alpha = starting_alpha * (1 - word_count_actual / (real)(iter * train_words + 1));
       if (alpha < starting_alpha * 0.0001) alpha = starting_alpha * 0.0001;
@@ -573,7 +576,7 @@ void *TrainModelThread(void *id) {
   pthread_exit(NULL);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // [S] : Most of the changes are made here
 // TODO:
 // 1. Train the word2vec through coco
@@ -583,7 +586,7 @@ void *TrainModelThread(void *id) {
 // 5. Derive equations for loss
 // 6. Run the system for N = 10
 // 7. Get clustering into C code for avoiding writing into files
-//***************************************************************************************************
+//****************************************************************************
 
 // Function for common sense task
 void commonSenseWrapper(){
@@ -591,7 +594,8 @@ void commonSenseWrapper(){
     int clusterArg = clusterCommonSense;
 
     // Load the word2vec embeddings from Xiao's
-    char wordPath[] = "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/al_vectors.txt";
+    //char wordPath[] = "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/al_vectors.txt";
+    char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_train.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
     loadWord2Vec(wordPath);
@@ -646,7 +650,7 @@ void commonSenseWrapper(){
     initFeatureHash();
     // Reading for the word features, cluster ids and visual features
     // clusterid reading will be avoided when clustering is ported to c
-    readRefineTrainFeatureFiles(featurePathICCV, featurePathICCV);
+    readRefineTrainFeatureFiles(featurePathICCV, NULL);
     
     // reading cluster files from matlab
     //char clusterpath[] = "/home/satwik/visualword2vec/data/coco-cnn/cluster_100_coco_train.txt";
@@ -1071,7 +1075,115 @@ void vqaWrapper(){
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+// Function for training using visual-genome dataset
+void visualGenomeWrapper(){
+    int clusterArg = clusterGenome;
+    // Read the embeddings from the file
+    char embedFile[] = "modelsNdata/vis-genome/word2vec_genome_train.bin";
+    loadWord2Vec(embedFile);
+
+    // Reading the file for training
+    char* visualPath = (char*) malloc(sizeof(char) * 100);
+    char* featurePath = (char*) malloc(sizeof(char) * 100);
+
+    // Either debug mode or full run mode
+    if(debugModeGenome){
+        featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_debug";
+        visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_debug";
+    }
+    else{
+        featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_debug_big";
+        //featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_features_00";
+
+        // Use PCA
+        if (usePCA)
+            visualPath = "/home/satwik/VisualWord2Vec/data/abstract_features_train_pca.txt";
+        else
+            visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_debug_big";
+            //visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_features_header";
+    }
+
+    // Test and validation sets for the common sense task
+    char tuplePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    char testFile[] = "/home/satwik/VisualWord2Vec/data/test_features.txt";
+    char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
+    
+    // Initializing the hash
+    initFeatureHash();
+    // Reading for the word features, cluster ids and visual features
+    readRefineTrainFeatureFiles(tuplePath, NULL);
+
+    // Reading for the word features and visual features
+    readTrainSentencesGenome(featurePath);
+    //readVisualFeatureFileGenome(visualPath);
+    return;
+    
+    // Tokenizing the training sentences
+    //tokenizeTrainSentencesGenome();
+    
+    // Compute embeddings
+    //performVPTask();
+
+    char* clusterPath = (char*) malloc(sizeof(char) * 100);
+    if(usePCA)
+        sprintf(clusterPath, "/home/satwik/VisualWord2Vec/data/vis-genome/C_pca_cluster_%d.txt",
+                                clusterArg);
+    else
+        sprintf(clusterPath, "/home/satwik/VisualWord2Vec/data/vis-genome/C_cluster_%d.txt",
+                                clusterArg);
+
+    // Check if cluster file exists, else cluster
+    /*if( access(clusterPath, F_OK) != -1){
+        // Reading the cluster ids
+        readClusterIdGenome(clusterPath);
+    }
+    else{*/
+        // To save clusterId / distance, provide save path; else NULL
+        //clusterVisualFeaturesGenome(clusterArg, clusterPath);
+    //}
+
+    // Clustering the visual features
+    /*if(debugModeGenome)
+        clusterVisualFeaturesGenome(2, NULL);
+    else
+        clusterVisualFeaturesGenome(clusterArg, NULL);
+
+    // Begin the refining, based on the cross validation performance
+    // Initializing the refining network
+    initRefining();
+
+    // Read the validation and test sets    
+    if(noTest == 0)
+        // Clean the strings for test and validation sets, store features
+        readTestValFiles(valFile, testFile);
+
+    // Store the basemodel test tuple scores and best model test tuple scores
+    float* baseTestScores = (float*) malloc(sizeof(float) * noTest);
+    float* bestTestScores = (float*) malloc(sizeof(float) * noTest);
+
+    // Refine the embeddings (single only)
+    // Initializing the refining network
+    initRefining();
+    // Perform common sense task
+    performCommonSenseTask(baseTestScores);
+
+    // Reset valAccuracy as the first run doesnt count
+    prevValAcc = 0; 
+    prevTestAcc = 0;
+
+    printf("\n\n (PCA, phrases, multi, noClusters) = (%d, %d, %d, %d)\n\n", 
+                                        usePCA, trainPhrases, trainMulti, clusterArg);
+    
+    int noOverfit = 1;
+    while(noOverfit){
+        // Refine the network
+        refineNetworkGenome();
+        // Perform common sense task
+        noOverfit = performCommonSenseTask(bestTestScores);
+    }*/
+}
+
+///////////////////////////////////////////////////////////////////////////
 void TrainModel() {
     long a, b, c, d;
     FILE *fo;
@@ -1118,7 +1230,10 @@ void TrainModel() {
     //printf("\nChange over!\n");
     
     // Common sense task
-    commonSenseWrapper();
+    //commonSenseWrapper();
+
+    // Visual genome task
+    visualGenomeWrapper();
     return;
 
     //***************************************************************************************

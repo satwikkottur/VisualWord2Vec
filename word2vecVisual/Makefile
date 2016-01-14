@@ -22,7 +22,8 @@ NAMES = word2vec.o	 \
 	refineFunctions.o\
 	liblinearWrapper.o\
 	cocoFunctions.o\
-	vqaFunctions.o
+	vqaFunctions.o\
+	genomeFunctions.o
 
 OBJ=$(NAMES:%=$(BIN)%)
 SRCS=$(NAMES:%.o=%.c)
@@ -62,6 +63,10 @@ newvqa:
 	make
 	./$(BIN)word2vec -train modelsNdata/coco_vqa_train_captions_lemma.txt -output modelsNdata/word2vec_vqa_train_captions.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -read-vocab modelsNdata/vqa_train_captions_vocab.txt
 
+genome:
+	make
+	./$(BIN)word2vec -train modelsNdata/vis-genome/coco_train_captions_genome.txt -output modelsNdata/vis-genome/word2vec_genome_train.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 24 -binary 0 -min-count 0 -load-vocab modelsNdata/vis-genome/genome_train_vocab.txt
+	
 
 clean:
 	rm -rf word2vec visualFeatures *.o $(BIN)*
