@@ -88,4 +88,29 @@ struct SentencePair{
 // Training mode for vp task
 // Refining using either entire descriptions/sentences/words
 enum TrainMode {DESCRIPTIONS, SENTENCES, WINDOWS, WORDS};
+
+// Parameters for reading features using pthreads
+struct FeatureReadParams{
+    // Features
+    float*** features;
+    // Visual feature length
+    int visualFeatSize;
+    // Starting and ending index for that thread
+    long startInd;
+    long endInd;
+};
+
+// Parameters to refine using multiple threads
+struct RefineParameter{
+    // Training sentence
+    struct Sentence* trainSents;
+    // Number of training sentences
+    long noTrain;
+    // Start and end indices
+    long startIndex, endIndex;
+    // Training mode
+    enum TrainMode mode;
+    // Id for the thread
+    int threadId;
+};
 #endif

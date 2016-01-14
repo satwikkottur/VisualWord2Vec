@@ -1,5 +1,4 @@
 # include "helperFunctions.h"
-
 // Saving the word2vec vectors for further use
 void saveWord2Vec(char* fileName){
     FILE* filePt = fopen(fileName, "wb");
@@ -318,6 +317,8 @@ float*** readVisualFeatures(char* featPath, long* noFeats, int* visualFeatSize){
 
     return features;
 }
+
+
 /***************************************************/
 // Debugging functions
 // Write the sentences back to the file to check

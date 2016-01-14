@@ -11,6 +11,7 @@ err*
 # Models folder
 models/*
 word2vecVisual/modelsNdata/*
+word2vecVisual/test/*
 
 # Ignore the vp-fitb code
 word2vecVisual/vp-fitb/

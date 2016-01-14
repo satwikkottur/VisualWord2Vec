@@ -312,7 +312,59 @@ void computeSentenceEmbeddings(struct Sentence* collection, long noSents){
 }
 
 // Refine the network based on the cluster id, given sentences
-void refineNetworkSentences(struct Sentence* trainSents, long noTrain, enum TrainMode mode){
+void refineNetworkSentences(struct Sentence* trainSents, 
+                            long noTrain, 
+                            enum TrainMode mode){
+    // Initialize the threads, datastructures
+    pthread_t* threads = (pthread_t*) malloc(num_threads * sizeof(pthread_t));
+    struct RefineParameter* params = (struct RefineParameter*) 
+                            malloc(num_threads * sizeof(struct RefineParameter));
+
+    int i;
+    long startId = 0, endId = noTrain/num_threads;
+    for(i = 0; i < num_threads; i++){
+        // Create the corresponding datastructures
+        params[i].trainSents = trainSents;
+        params[i].noTrain = noTrain;
+        params[i].mode = mode;
+        params[i].threadId = i;
+        params[i].startIndex = startId;
+        params[i].endIndex = endId;
+    
+        // Start the threads
+        if(pthread_create(&threads[i], NULL, refineNetworkThread, &params[i])){
+            fprintf(stderr, "Error creating thread\n");
+            return;
+        }
+        
+        //printf("Thread: %d (%d, %d)\n", i, startId, endId);
+        // Compute the start and ends for the next thread
+        startId = endId + 1; // Start from the next one
+        if (i != num_threads - 2)
+            // Add another chunk if not calculating for the last thread
+            endId = endId + noTrain/num_threads;
+        else
+            // Everything till the end for the last thread
+            endId = noTrain;
+    }
+
+    // Wait for all the threads to finish
+    for(i = 0 ; i < num_threads; i++){
+        if(pthread_join(threads[i], NULL)){
+            fprintf(stderr, "Error joining thread\n");
+            return;
+        }
+   } 
+}
+
+// Thread to refine the network parallelly
+void* refineNetworkThread(void* refineParams){
+    // Local aliases (for compatibility)
+    struct RefineParameter* params = refineParams;
+    enum TrainMode mode = params->mode;
+    long noTrain = params->noTrain;
+    struct Sentence* trainSents = params->trainSents;
+
     long c, i, s, w;
     float* y = (float*) malloc(sizeof(float) * noClusters);
     int wordCount = 0;
@@ -326,10 +378,11 @@ void refineNetworkSentences(struct Sentence* trainSents, long noTrain, enum Trai
     }
 
     // Read each of the training sentences
-    for(i = 0; i < noTrain; i++){
-        // Print after every thousand sentences
-        if(i%1000 == 0)
-            printf("Training %ld / %ld instance ....\n", i, noTrain);
+    for(i = params->startIndex; i < params->endIndex; i++){
+        // Print status
+        if (i%5000 == 0)
+            printf("Training (%d) : %ld (%ld - %ld)....\n", params->threadId, i,
+                                        params->startIndex, params->endIndex);
         
         // Checking possible fields to avoid segmentation error
         if(trainSents[i].cId < 1 || trainSents[i].cId > noClusters) {
@@ -398,4 +451,5 @@ void refineNetworkSentences(struct Sentence* trainSents, long noTrain, enum Trai
                 exit(1);
         }
     }
+    return NULL;
 }

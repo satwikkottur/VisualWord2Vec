@@ -20,6 +20,8 @@
 extern long long vocab_size, layer1_size;
 extern float *syn0, *syn1, *expTable;
 extern struct vocab_word* vocab;
+extern int num_threads;
+
 // Returns position of a word in the vocabulary; if the word is not found, returns -1
 int SearchVocab(char *word);
 

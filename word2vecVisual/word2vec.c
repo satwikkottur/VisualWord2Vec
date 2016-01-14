@@ -55,7 +55,7 @@ int windowVP = 5; // window size for training on sentences
 int useAlternate = 0; // Use word2vec for unrefined words
 // Training the sentences in one of the modes
 // Could be one of DESCRIPTIONS, SENTENCES, WORDS, WINDOWS;
-enum TrainMode trainMode = SENTENCES;
+enum TrainMode trainMode = WORDS;
 
 /***********************************************************************************/
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
