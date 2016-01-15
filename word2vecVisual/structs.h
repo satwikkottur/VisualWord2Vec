@@ -105,6 +105,18 @@ struct ReadParameter{
     int threadId;
 };
 
+// Structure to hold the paramters for multi threaded common sense task
+struct CSTestParameter{
+    // The holder for either test or validation tuples
+    struct prsTuple* holder;
+    // Start and end index where to start
+    long startIndex, endIndex;
+    // Threshold
+    float threshold;
+    // ScoreList
+    float* scoreList;
+};
+
 // Parameters to refine using multiple threads
 struct RefineParameter{
     // Training sentence

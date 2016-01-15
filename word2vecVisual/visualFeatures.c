@@ -1226,15 +1226,18 @@ int performCommonSenseTask(float* testTupleScores){
     // Keep a local copy of the test scores for the best model based on threshold
     float* bestTestScore = (float*) malloc(sizeof(float) * noTest);
 
+    //printf("Reading test and value files..\n");
     if(noTest == 0 || noVal == 0)
         // Clean the strings for test and validation sets, store features
         readTestValFiles(valFile, testFile);
 
     // Get the features for test and validation sets
     // Re-evaluate the features for the entire vocab
+    //printf("Starting to compute embeddings..\n");
     computeEmbeddings();
 
     // Evaluate the cosine distance
+    //printf("Computing distances...\n");
     evaluateCosDistance();
 
     // Going through all the test / validation examples
@@ -1255,7 +1258,7 @@ int performCommonSenseTask(float* testTupleScores){
     float* precTest = (float*) malloc(sizeof(float) * 2);
     float* iterPrecTest = (float*) malloc(sizeof(float) * 2);
     float* iterPrecVal = (float*) malloc(sizeof(float) * 2);
-    for(threshold = 1.0; threshold < 2.0; threshold += 0.1){
+    for(threshold = 1.5; threshold < 2.0; threshold += 0.1){
         computeTestValScores(val, noVal, threshold, valScore);
         computeTestValScores(test, noTest, threshold, testScore);
 
@@ -1507,10 +1510,55 @@ void evaluateCosDistance(){
     if(cosDist == NULL)
         cosDist = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
     
+    int i;  
+    // Setup the threads and datastructures
+    pthread_t* threads = (pthread_t*) malloc(num_threads * sizeof(pthread_t));
+    long** params = (long**) malloc(num_threads * sizeof(long*));
+    for (i = 0; i < num_threads; i++)
+        params[i] = (long*) malloc(2 * sizeof(long));
+
+    // Launch the threads
+    long startId = 0, endId = featVocabSize/num_threads;
+    for(i = 0; i < num_threads; i++){
+        // create the corresponding parameters
+        params[i][0] = startId;
+        params[i][1] = endId;
+    
+        // start the threads
+        if(pthread_create(&threads[i], NULL, evaluateCosDistanceThread, &params[i])){
+            fprintf(stderr, "error creating thread\n");
+            return;
+        }
+
+        //printf("thread: %d (%d, %d)\n", i, startId, endId);
+        // compute the start and ends for the next thread
+        startId = endId; // start from the next one
+        if (i != num_threads - 2)
+            // add another chunk if not calculating for the last thread
+            endId = endId + featVocabSize/num_threads;
+        else
+            // everything till the end for the last thread
+            endId = featVocabSize;
+    }
+    
+    // wait for all the threads to finish
+    for(i = 0 ; i < num_threads; i++){
+        if(pthread_join(threads[i], NULL)){
+            fprintf(stderr, "error joining thread\n");
+            return;
+        }
+    }
+
+    free(threads); free(params);
+}
+
+// Thread for evaluating the cos distance, gives the range for the start and end
+void* evaluateCosDistanceThread(void* rangeParams){
+    long** params = rangeParams;
     // For each pair, we evaluate the dot product along with normalization
     long a, b, i, offset;
     float magProd = 0, dotProduct;
-    for(a = 0; a < featVocabSize; a++){
+    for(a = params[0][0]; a < params[0][1]; a++){
         offset = featVocabSize * a;
         for(b = a; b < featVocabSize; b++){
             if(featHashWords[a].embed == NULL || featHashWords[b].embed == NULL)
@@ -1534,6 +1582,7 @@ void evaluateCosDistance(){
             }
         }
     }
+    return NULL;
 }
 
 // Cosine distance evaluation (raw embeddings)
@@ -1658,11 +1707,63 @@ void evaluateMultiCosDistance(){
 // Computing the test and validation scores
 void computeTestValScores(struct prsTuple* holder, long noInst, float threshold, float* scoreList){
     if(verbose) printf("Computing the scores...\n\n");
+    // Setup the threads and data structures
+    int i;  
+    // Setup the threads and datastructures
+    pthread_t* threads = (pthread_t*) malloc(num_threads * sizeof(pthread_t));
+    struct CSTestParameter* params = (struct CSTestParameter*) 
+                                    malloc(num_threads * sizeof(struct CSTestParameter));
+
+    // Launch the threads
+    long startId = 0, endId = noInst/num_threads;
+    for(i = 0; i < num_threads; i++){
+        // create the corresponding parameters
+        params[i].holder = holder;
+        params[i].startIndex = startId;
+        params[i].endIndex = endId;
+        params[i].threshold = threshold;
+        params[i].scoreList = scoreList;
+    
+        // start the threads
+        if(pthread_create(&threads[i], NULL, computeTestValScoresThread, &params[i])){
+            fprintf(stderr, "error creating thread\n");
+            return;
+        }
+
+        //printf("thread: %d (%d, %d)\n", i, startId, endId);
+        // compute the start and ends for the next thread
+        startId = endId; // start from the next one
+        if (i != num_threads - 2)
+            // add another chunk if not calculating for the last thread
+            endId = endId + noInst/num_threads;
+        else
+            // everything till the end for the last thread
+            endId = noInst;
+    }
+    
+    // wait for all the threads to finish
+
+    for(i = 0 ; i < num_threads; i++){
+        if(pthread_join(threads[i], NULL)){
+            fprintf(stderr, "error joining thread\n");
+            return;
+        }
+    }
+    free(threads); free(params);
+}
+
+// Threads for computing the test and validation scores
+void* computeTestValScoresThread(void* csParams){
+    // Local aliases
+    struct CSTestParameter* params = csParams;
+    float threshold = params->threshold;
+    float* scoreList = params->scoreList;
+    struct prsTuple* holder = params->holder;
 
     // Iteration variables
     long a, b;
     float meanScore, pScore, rScore, sScore, curScore; 
-    for(a = 0; a < noInst; a++){
+    for(a = params->startIndex; a < params->endIndex; a++){
         meanScore = 0.0;
         if(!useAlternate){
             // For each training instance, find score, ReLU and max
@@ -1714,13 +1815,13 @@ void computeTestValScores(struct prsTuple* holder, long noInst, float threshold,
                 // Add it to the meanScore
                 meanScore += curScore;
             }
-        
         }
 
         // Save the mean score for the current instance
         scoreList[a] = meanScore / noTrain;
         //printf("%ld : %f\n", a, scoreList[a]);
     }
+    return NULL;
 }
 
 // Computing the test and validation scores

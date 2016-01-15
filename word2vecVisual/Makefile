@@ -65,7 +65,7 @@ newvqa:
 
 genome:
 	make
-	./$(BIN)word2vec -train modelsNdata/vis-genome/coco_train_captions_genome.txt -output modelsNdata/vis-genome/word2vec_genome_train.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 24 -binary 0 -min-count 0 -load-vocab modelsNdata/vis-genome/genome_train_vocab.txt
+	./$(BIN)word2vec -train modelsNdata/vis-genome/coco_train_captions_genome.txt -output modelsNdata/vis-genome/word2vec_genome_train.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -load-vocab modelsNdata/vis-genome/genome_train_vocab.txt
 	
 
 clean:

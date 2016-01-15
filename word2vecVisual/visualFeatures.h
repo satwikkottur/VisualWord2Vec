@@ -29,6 +29,7 @@ extern int useAlternate;
 // From refineFunctions.h
 extern int noClusters;
 extern int visualFeatSize;
+extern int num_threads;
 /************************************************************************/
 // Signatures of original functions
 /************************************************************************/
@@ -121,12 +122,15 @@ int performMultiCommonSenseTask(float*);
 void readTestValFiles(char*, char*);
 // Computing the cos distances
 void evaluateCosDistance();
+// Computing the cos distances through threads
+void* evaluateCosDistanceThread(void*);
 // Computing the cos distances for raw word2vec embeddings
 void evaluateRawCosDistance();
 // Computing the cos distances for multi-model
 void evaluateMultiCosDistance();
-// Computing the test and val scores
+// Computing the test and val scores (along with the thread)
 void computeTestValScores(struct prsTuple*, long, float, float*);
+void* computeTestValScoresThread(void*);
 // Computing the test and val scores with multi models
 void computeMultiTestValScores(struct prsTuple*, long, float, float*);
 // Computing the mean AP and basic precision
