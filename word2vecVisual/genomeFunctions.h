@@ -22,6 +22,7 @@
 extern enum TrainMode trainMode;
 extern int noClusters;
 extern int visualFeatSize;
+extern int num_threads;
 
 // Reading the  training sentences, along with the map ids
 void readTrainSentencesGenome(char*);

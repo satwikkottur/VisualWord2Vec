@@ -107,7 +107,7 @@ void clusterVisualFeaturesGenome(int clusters, char* savePath){
     int k = clusters;                           /* number of cluster to create */
     int d = visualFeatSize;                           /* dimensionality of the vectors */
     int n = noFeats;                         /* number of vectors */
-    int nt = 12;                           /* number of threads to use */
+    int nt = num_threads;                           /* number of threads to use */
     int niter = 0;                        /* number of iterations (0 for convergence)*/
     int redo = 1;                         /* number of redo */
     

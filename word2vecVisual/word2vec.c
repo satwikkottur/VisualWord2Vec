@@ -1118,7 +1118,7 @@ void visualGenomeWrapper(){
     // Reading for the word features and visual features
     readTrainSentencesGenome(featurePath);
     readVisualFeatureFileGenome(visualPath);
-    
+    return;
     // Tokenizing the training sentences
     tokenizeTrainSentencesGenome();
     

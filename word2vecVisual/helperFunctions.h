@@ -49,6 +49,8 @@ void writeSentenceEmbeddings(char*, struct Sentence*, long);
 /***************************************************/
 // Read the features from the text file
 float*** readVisualFeatures(char*, long*, int*);
+// Thread for reading the visual feature
+void* readVisualFeaturesThread(void*);
 
 # endif
 // Save the sentences back into a text file

@@ -90,14 +90,17 @@ struct SentencePair{
 enum TrainMode {DESCRIPTIONS, SENTENCES, WINDOWS, WORDS};
 
 // Parameters for reading features using pthreads
-struct FeatureReadParams{
+struct ReadParameter{
+    // File path
+    char* filePath;
     // Features
     float*** features;
     // Visual feature length
     int visualFeatSize;
-    // Starting and ending index for that thread
-    long startInd;
-    long endInd;
+    // Starting and ending position for that thread
+    long startPos, endPos;
+    // Id for the thread
+    int threadId;
 };
 
 // Parameters to refine using multiple threads

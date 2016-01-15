@@ -255,11 +255,13 @@ void writeSentenceEmbeddings(char* saveName, struct Sentence* collection, long n
 
 /***************************************************/
 // Read the visual features (common for all the tasks)
+// (parallel)
 // Input: 1. Path where features are stored
 //        2. placeholder to capture the number of features
 //
 // Output: 1. Returns the feature (float***)
 float*** readVisualFeatures(char* featPath, long* noFeats, int* visualFeatSize){
+    // Read the file and setup the threads
     FILE* filePt = fopen(featPath, "rb");
 
     if(filePt == NULL){
@@ -269,15 +271,21 @@ float*** readVisualFeatures(char* featPath, long* noFeats, int* visualFeatSize){
 
     // Local declarations
     float*** features;
-    float feature;
     int i, noLines = 0;
     long noFeatures = 0; // Local variable for noFeats
     int visualFeatureSize = 0; // local variable for visualFeatSize
 
     // Read the first line and get the feature size
-    fscanf(filePt, "%ld %d", &noFeatures, &visualFeatureSize);
+    fscanf(filePt, "%ld %d\n", &noFeatures, &visualFeatureSize);
     printf("\nVisual features are of size: %d...\nNumber of features: %ld ...\n", 
                                 visualFeatureSize, noFeatures);
+    // Get the initial offset and size of each line
+    long offset = ftell(filePt);
+    fseek(filePt, 0, SEEK_END);
+    long fileSize = ftell(filePt);
+    long sizePerLine = (fileSize - offset)/noFeatures;
+    // Close the file
+    fclose(filePt);
 
     // Setting up the memory
     features = (float***) malloc(sizeof(float**));
@@ -285,32 +293,49 @@ float*** readVisualFeatures(char* featPath, long* noFeats, int* visualFeatSize){
     for (i = 0; i < noFeatures; i++)
         features[0][i] = (float*) malloc(sizeof(float) * visualFeatureSize);
 
-    // Reading till EOF
-    while(fscanf(filePt, "%f", &feature) != EOF){
-        // Save the already read feature
-        features[0][noLines][0] = feature;
+    // Initialize the threads, datastructures
+    pthread_t* threads = (pthread_t*) malloc(num_threads * sizeof(pthread_t));
+    struct ReadParameter* params = (struct ReadParameter*) 
+                            malloc(num_threads * sizeof(struct ReadParameter));
 
-        for(i = 1; i < visualFeatureSize; i++){
-            fscanf(filePt, "%f", &feature);
-            features[0][noLines][i] = feature;
+    long startId = 0;
+    long endId = noFeatures/num_threads;
+    for(i = 0; i < num_threads; i++){
+        // create the corresponding datastructures
+        params[i].filePath = featPath;
+        params[i].features = features;
+        params[i].visualFeatSize = visualFeatureSize;
+        params[i].threadId = i;
+        params[i].startPos = offset + sizePerLine * startId;
+        params[i].endPos = offset + sizePerLine * endId;
+    
+        // start the threads
+        if(pthread_create(&threads[i], NULL, readVisualFeaturesThread, &params[i])){
+            fprintf(stderr, "error creating thread\n");
+            return NULL;
+        }
+        
+        printf("thread: %d (%ld, %ld)  ", i, startId, endId);
+        printf("Size: %ld (%ld, %ld) %ld %ld\n\n", params[i].startPos, 
+                        params[i].endPos, offset, sizePerLine, fileSize);
+        // compute the start and ends for the next thread
+        startId = endId; // start from the next one
+        if (i != num_threads - 2)
+            // add another chunk if not calculating for the last thread
+            endId = endId + noFeatures/num_threads;
+        else
+            // everything till the end for the last thread
+            endId = noFeatures;
+    }
+
+    // wait for all the threads to finish
+    for(i = 0 ; i < num_threads; i++)
+        if(pthread_join(threads[i], NULL)){
+            fprintf(stderr, "error joining thread\n");
+            return NULL;
         }
 
-        // Debugging printing
-        if(noLines % 5000 == 0)
-            printf("Reading features : %d\n", noLines);
-
-        noLines++;
-    }
-
-    if(noLines != noFeatures){
-        printf("Number of features incorrectly read!\n");
-        exit(1);
-    }
-
     printf("\nRead visual features for %d sentences...\n", noLines);
-    // Closing the file
-    fclose(filePt);
-
     // Assigning the variables
     *noFeats = noFeatures;
     *visualFeatSize = visualFeatureSize;
@@ -318,6 +343,38 @@ float*** readVisualFeatures(char* featPath, long* noFeats, int* visualFeatSize){
     return features;
 }
 
+// Thread for reading the visual features
+void* readVisualFeaturesThread(void* readParams){
+    // Local aliase
+    struct ReadParameter* params = readParams;
+    float feature;
+    float*** features = params->features;
+    FILE* filePt = fopen(params->filePath, "r");
+    int visualFeatureSize = params->visualFeatSize;
+    int i, noLines = 0;
+
+    // Open the file
+    // Go to the designated place and start reading until end
+    fseek(filePt, params->startPos, SEEK_SET);
+
+    // Reading till designated end is reached
+    while(ftell(filePt) <= params->endPos){
+        // Read the features
+        for(i = 0; i < visualFeatureSize; i++){
+            fscanf(filePt, "%f", &feature);
+            features[0][noLines][i] = feature;
+        }
+
+        // Debugging printing
+        if(noLines % 5000 == 0)
+            printf("Reading features (%d) : %d\n", params->threadId, noLines);
+        noLines++;
+    }
+    // Closing the file
+    fclose(filePt);
+
+    return NULL;
+}
 
 /***************************************************/
 // Debugging functions

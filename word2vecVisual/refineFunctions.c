@@ -323,7 +323,7 @@ void refineNetworkSentences(struct Sentence* trainSents,
     int i;
     long startId = 0, endId = noTrain/num_threads;
     for(i = 0; i < num_threads; i++){
-        // Create the corresponding datastructures
+        // create the corresponding datastructures
         params[i].trainSents = trainSents;
         params[i].noTrain = noTrain;
         params[i].mode = mode;
@@ -331,30 +331,30 @@ void refineNetworkSentences(struct Sentence* trainSents,
         params[i].startIndex = startId;
         params[i].endIndex = endId;
     
-        // Start the threads
+        // start the threads
         if(pthread_create(&threads[i], NULL, refineNetworkThread, &params[i])){
-            fprintf(stderr, "Error creating thread\n");
+            fprintf(stderr, "error creating thread\n");
             return;
         }
         
-        //printf("Thread: %d (%d, %d)\n", i, startId, endId);
-        // Compute the start and ends for the next thread
-        startId = endId + 1; // Start from the next one
+        //printf("thread: %d (%d, %d)\n", i, startid, endid);
+        // compute the start and ends for the next thread
+        startId = endId; // start from the next one
         if (i != num_threads - 2)
-            // Add another chunk if not calculating for the last thread
+            // add another chunk if not calculating for the last thread
             endId = endId + noTrain/num_threads;
         else
-            // Everything till the end for the last thread
+            // everything till the end for the last thread
             endId = noTrain;
     }
 
-    // Wait for all the threads to finish
+    // wait for all the threads to finish
     for(i = 0 ; i < num_threads; i++){
         if(pthread_join(threads[i], NULL)){
-            fprintf(stderr, "Error joining thread\n");
+            fprintf(stderr, "error joining thread\n");
             return;
         }
-   } 
+    } 
 }
 
 // Thread to refine the network parallelly
@@ -380,7 +380,7 @@ void* refineNetworkThread(void* refineParams){
     // Read each of the training sentences
     for(i = params->startIndex; i < params->endIndex; i++){
         // Print status
-        if (i%5000 == 0)
+        if (i%1000 == 0)
             printf("Training (%d) : %ld (%ld - %ld)....\n", params->threadId, i,
                                         params->startIndex, params->endIndex);
         
