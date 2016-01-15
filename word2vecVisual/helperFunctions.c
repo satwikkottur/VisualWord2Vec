@@ -270,7 +270,7 @@ float*** readVisualFeatures(char* featPath, long* noFeats, int* visualFeatSize){
     }
     // Local declarations
     float*** features;
-    int i, noLines = 0;
+    int i;
     long noFeatures = 0; // Local variable for noFeats
     int visualFeatureSize = 0; // local variable for visualFeatSize
 
@@ -340,12 +340,12 @@ float*** readVisualFeatures(char* featPath, long* noFeats, int* visualFeatSize){
     // Assigning the variables
     *noFeats = noFeatures;
     *visualFeatSize = visualFeatureSize;
-    printf("\nRead visual features for %d sentences...\n", noFeatures);
+    printf("\nRead visual features for %ld sentences...\n", noFeatures);
 
     //************************************************
     // Debugging
-    char savePath[] = "/home/satwik/VisualWord2Vec/data/vis-genome/train/written_vis_features.txt";
-    saveVisualFeatures(features[0], noFeatures, visualFeatureSize, savePath);
+    //char savePath[] = "/home/satwik/VisualWord2Vec/data/vis-genome/train/written_vis_features.txt";
+    //saveVisualFeatures(features[0], noFeatures, visualFeatureSize, savePath);
     //************************************************
     free(params); free(threads);
     return features;
