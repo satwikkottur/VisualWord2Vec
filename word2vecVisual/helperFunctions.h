@@ -55,4 +55,6 @@ void* readVisualFeaturesThread(void*);
 # endif
 // Save the sentences back into a text file
 void saveSentences(struct Sentence*, int, char*);
+// Save the features back into a text file
+void saveVisualFeatures(float**, long, int, char*);
 /***************************************************/

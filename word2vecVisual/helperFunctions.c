@@ -268,7 +268,6 @@ float*** readVisualFeatures(char* featPath, long* noFeats, int* visualFeatSize){
         printf("File at %s doesnt exist!\n", featPath);
         exit(1);
     }
-
     // Local declarations
     float*** features;
     int i, noLines = 0;
@@ -307,7 +306,8 @@ float*** readVisualFeatures(char* featPath, long* noFeats, int* visualFeatSize){
         params[i].visualFeatSize = visualFeatureSize;
         params[i].threadId = i;
         params[i].startPos = offset + sizePerLine * startId;
-        params[i].endPos = offset + sizePerLine * endId;
+        params[i].startFeatId = startId;
+        params[i].noLines = endId - startId;
     
         // start the threads
         if(pthread_create(&threads[i], NULL, readVisualFeaturesThread, &params[i])){
@@ -315,9 +315,11 @@ float*** readVisualFeatures(char* featPath, long* noFeats, int* visualFeatSize){
             return NULL;
         }
         
-        printf("thread: %d (%ld, %ld)  ", i, startId, endId);
-        printf("Size: %ld (%ld, %ld) %ld %ld\n\n", params[i].startPos, 
-                        params[i].endPos, offset, sizePerLine, fileSize);
+        // Debugging information
+        //printf("thread: %d (%ld, %ld)  ", i, startId, endId);
+        //printf("Size: (%ld, %ld) %ld %ld %ld\n\n", params[i].startPos, 
+        //                params[i].endPos, offset, sizePerLine, fileSize);
+        
         // compute the start and ends for the next thread
         startId = endId; // start from the next one
         if (i != num_threads - 2)
@@ -335,11 +337,17 @@ float*** readVisualFeatures(char* featPath, long* noFeats, int* visualFeatSize){
             return NULL;
         }
 
-    printf("\nRead visual features for %d sentences...\n", noLines);
     // Assigning the variables
     *noFeats = noFeatures;
     *visualFeatSize = visualFeatureSize;
+    printf("\nRead visual features for %d sentences...\n", noFeatures);
 
+    //************************************************
+    // Debugging
+    char savePath[] = "/home/satwik/VisualWord2Vec/data/vis-genome/train/written_vis_features.txt";
+    saveVisualFeatures(features[0], noFeatures, visualFeatureSize, savePath);
+    //************************************************
+    free(params); free(threads);
     return features;
 }
 
@@ -349,26 +357,30 @@ void* readVisualFeaturesThread(void* readParams){
     struct ReadParameter* params = readParams;
     float feature;
     float*** features = params->features;
-    FILE* filePt = fopen(params->filePath, "r");
     int visualFeatureSize = params->visualFeatSize;
     int i, noLines = 0;
+    long curFeatId = params->startFeatId;
 
     // Open the file
     // Go to the designated place and start reading until end
+    //printf("Thread id: %d Start : %ld End : %ld\n", params->threadId,
+                        //params->startPos, params->endPos);
+    FILE* filePt = fopen(params->filePath, "r");
     fseek(filePt, params->startPos, SEEK_SET);
 
     // Reading till designated end is reached
-    while(ftell(filePt) <= params->endPos){
+    while(noLines < params->noLines){
         // Read the features
         for(i = 0; i < visualFeatureSize; i++){
             fscanf(filePt, "%f", &feature);
-            features[0][noLines][i] = feature;
+            features[0][curFeatId][i] = feature;
         }
 
         // Debugging printing
         if(noLines % 5000 == 0)
             printf("Reading features (%d) : %d\n", params->threadId, noLines);
         noLines++;
+        curFeatId++;
     }
     // Closing the file
     fclose(filePt);
@@ -396,4 +408,28 @@ void saveSentences(struct Sentence* sents, int noSents, char* savePath){
 
     // Close the file
     fclose(filePtr); 
+}
+
+// Write the features back to the file to check
+void saveVisualFeatures(float** features, long noFeatures, 
+                        int visualFeatureSize, char* savePath){
+    // Open the file
+    FILE* filePt = fopen(savePath, "w");
+
+    // Write the number of features and feature size on the first line
+    fprintf(filePt, "%ld %d\n", noFeatures, visualFeatureSize);
+
+    long i, j;
+    for (i = 0; i < noFeatures; i++){
+        // Printing out the current line
+        if (i%5000 == 0) printf("Saving line: %ld ...\n", i);
+
+        for (j = 0; j < visualFeatureSize-1; j++)
+            fprintf(filePt, "%f ", features[i][j]);
+        // Write the last feature along with \n
+        fprintf(filePt, "%f\n", features[i][visualFeatureSize-1]);
+    }
+
+    // Close the file
+    fclose(filePt);
 }

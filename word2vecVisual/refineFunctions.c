@@ -355,6 +355,8 @@ void refineNetworkSentences(struct Sentence* trainSents,
             return;
         }
     } 
+
+    free(params); free(threads);
 }
 
 // Thread to refine the network parallelly

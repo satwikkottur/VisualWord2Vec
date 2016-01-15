@@ -97,8 +97,10 @@ struct ReadParameter{
     float*** features;
     // Visual feature length
     int visualFeatSize;
-    // Starting and ending position for that thread
-    long startPos, endPos;
+    // Starting position and line Id for that thread
+    long startPos, startFeatId;
+    // The number of features designated to read
+    long noLines;
     // Id for the thread
     int threadId;
 };
