@@ -45,7 +45,7 @@ int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
 int clusterVQA = 100; // Number of initial clusters to use
 int clusterVP = 100; // Number of initial clusters to use
-int clusterGenome = 25; // Number of initial clusters to use for genome
+int clusterGenome = 5000; // Number of initial clusters to use for genome
 int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
@@ -55,7 +55,7 @@ int windowVP = 5; // window size for training on sentences
 int useAlternate = 0; // Use word2vec for unrefined words
 // Training the sentences in one of the modes
 // Could be one of DESCRIPTIONS, SENTENCES, WORDS, WINDOWS;
-enum TrainMode trainMode = WORDS;
+enum TrainMode trainMode = SENTENCES;
 
 /***********************************************************************************/
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
@@ -1092,17 +1092,17 @@ void visualGenomeWrapper(){
         visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_debug";
     }
     else{
-        featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_debug_small";
+        //featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_debug_small";
         //featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_debug_big";
-        //featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_features_00";
+        featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_features_00";
 
         // Use PCA
         if (usePCA)
             visualPath = "/home/satwik/VisualWord2Vec/data/abstract_features_train_pca.txt";
         else
-            visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_debug_small";
+            //visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_debug_small";
             //visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_debug_big";
-            //visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_features_header";
+            visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_features_header";
     }
 
     // Test and validation sets for the common sense task
@@ -1131,20 +1131,20 @@ void visualGenomeWrapper(){
                                 clusterArg);
 
     // Check if cluster file exists, else cluster
-    /*if( access(clusterPath, F_OK) != -1){
+    if( access(clusterPath, F_OK) != -1){
         // Reading the cluster ids
         readClusterIdGenome(clusterPath);
     }
     else{
         // To save clusterId / distance, provide save path; else NULL
         clusterVisualFeaturesGenome(clusterArg, clusterPath);
-    }*/
+    }
 
     // Clustering the visual features
-    if(debugModeGenome)
+    /*if(debugModeGenome)
         clusterVisualFeaturesGenome(2, NULL);
     else
-        clusterVisualFeaturesGenome(clusterArg, NULL);
+        clusterVisualFeaturesGenome(clusterArg, NULL);*/
 
     // Begin the refining, based on the cross validation performance
     // Initializing the refining network

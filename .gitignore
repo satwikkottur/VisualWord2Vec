@@ -22,6 +22,7 @@ word2vecVisual/vp-fitb/
 libs/swig-3.0.7/
 libs/vgg-19-feature-extractor
 libs/relationshipModeling/*
+libs/sofia-ml-read-only/demo
 # Ignoring the compiled binaries
 word2vecVisual/bin
 
