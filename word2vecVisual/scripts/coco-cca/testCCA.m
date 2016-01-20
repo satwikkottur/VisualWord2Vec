@@ -13,6 +13,7 @@ function[topRecall, medRecall] = testCCA(trainCCAFeats, testCCAFeats, testGtruth
     % topRecall - top 1, 5, 10, 50 recalls
     % medRecall - median recall
 
+    fprintf('Computing pariwise distances...\n');
     cosDist = 1 - pdist2(testCCAFeats, trainCCAFeats, 'cosine');
     [~, ranks] = sort(cosDist, 2, 'descend');
 

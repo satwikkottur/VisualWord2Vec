@@ -170,6 +170,14 @@ def changeVisualFeatureFormat(inPath, outPath):
     
     outFile.close();
 
+def changeClusterFileFormat(inPath, outPath):
+    # Open the in file and read the clsuters (ignore the original class)
+    with open(inPath, 'r') as fileId:
+        ids = [int(i.split('\t')[0].split(' ')[0]) for i in fileId.readlines()];
+
+    with open(outPath, 'w') as fileId:
+        [fileId.write(str(i) + '\n') for i in ids];
+
 ###############################################################################
 if __name__ == '__main__':
     # Call appropriate function (equivalent to multiple independent scripts)
@@ -187,8 +195,15 @@ if __name__ == '__main__':
     #    pickle.dump(captions, fileId);
 
     # Change the format of the visual features
-    for i in xrange(1, 11):
+    #for i in xrange(1, 11):
+    #    print 'Current file : %d' % i
+    #    inPath = dataPath + 'train/vis_features_%02d';
+    #    outPath = dataPath + 'train/vis_features_%02d_libsvm';
+    #    changeVisualFeatureFormat(inPath % i, outPath % i);
+
+    # Change the format of the cluster file
+    for i in xrange(10, 11):
         print 'Current file : %d' % i
-        inPath = dataPath + 'train/vis_features_%02d';
-        outPath = dataPath + 'train/vis_features_%02d_libsvm';
-        changeVisualFeatureFormat(inPath % i, outPath % i);
+        inPath = dataPath + 'train/cluster_assignment_%02d_10k';
+        outPath = dataPath + 'train/cluster_C_%02d_10k';
+        changeClusterFileFormat(inPath % i, outPath % i);

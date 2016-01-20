@@ -9,7 +9,15 @@ from Word2Vec import *
 
 # Read embeddings
 dataPath = '/home/satwik/VisualWord2Vec/data/';
-embedPath = dataPath + 'word2vec_output_bestmodel_single.bin';
+
+# MSCOCO before
+#embedPath = dataPath + 'al_vectors.txt';
+# MSCOCO after
+#embedPath = dataPath + 'word2vec_output_bestmodel_single.bin';
+# Wiki before
+embedPath = dataPath + 'word2vec_wiki_iter_before.bin';
+# Wiki after
+#embedPath = dataPath + 'word2vec_wiki_iter_after.bin';
 (embeds, embedDim, vocabSize) = loadWord2Vec(embedPath);
 
 # Read all the coco captions and write training and testing separately
@@ -21,9 +29,9 @@ with open(cocoPath, 'r') as fileId:
 # features = [computeEmbedding(line[1], embeds, embedDim) for line in lines];
 
 # Opening the files to save the embeddings
-trainPath = dataPath + 'coco-cca/train_caption_embeds.txt';
-testPath = dataPath + 'coco-cca/test_caption_embeds.txt';
-mapPath = dataPath + 'coco-cca/test_caption_maps.txt';
+trainPath = dataPath + 'coco-cca/wiki/train_caption_embeds_before.txt';
+testPath = dataPath + 'coco-cca/wiki/test_caption_embeds_before.txt';
+mapPath = dataPath + 'coco-cca/wiki/test_caption_maps.txt';
 
 testFeats = [];
 trainFeats = [];
