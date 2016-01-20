@@ -71,5 +71,5 @@ mapId.close();
 print 'Preparing to dump feature file'
 # Dump all the features
 #np.savetxt(featDumpPath, np.array(trainFeats), delimiter = ' ', \
-#                                         fmt = '%.6f', header = '%d %d' % (len(trainFeats), trainFeats[0].shape[0]));
+     #fmt = '%.6f', header = '%d %d' % (len(trainFeats), trainFeats[0].shape[0]));
 print 'Finished dumping feature file'

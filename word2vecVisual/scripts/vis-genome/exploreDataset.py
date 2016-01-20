@@ -144,15 +144,41 @@ def readTrainCaptions(captionPath):
 
     return captions;
 
+# Change the visual feature format to suite svm format
+def changeVisualFeatureFormat(inPath, outPath):
+    inFile = open(inPath, "r");
+    outFile = open(outPath, "w");
+
+    # Read the lines and write in specific form
+    with open(inPath, "r") as fileId:
+        lines = [i.strip('\n').split(' ') for i in fileId.readlines()];
+
+    # For each line, check if zero or not, and record
+    ind = 0;
+    for line in lines[1:]:
+        outFile.write('1 ');
+        ind += 1;
+        # Print after every 5000 lines
+        if ind % 5000 == 0:
+            print '%d / %d' % (ind, len(lines))
+        for i in xrange(len(lines[1]) - 1):
+            if float(line[i - 1]) != 0.0:
+                outFile.write(str(i+1) + ':' + line[i - 1] + ' ');
+
+        # Always have the last feature
+        outFile.write(str(len(lines[1])) + ':' + line[-1] + '\n')
+    
+    outFile.close();
+
 ###############################################################################
 if __name__ == '__main__':
     # Call appropriate function (equivalent to multiple independent scripts)
     #crossCheckImageLists();
 
     # Preparing the data through multiple threads
-    prepareTrainDatasetMulti(11);
+    #prepareTrainDatasetMulti(11);
 
-    #dataPath = '/home/satwik/VisualWord2Vec/data/vis-genome/';
+    dataPath = '/home/satwik/VisualWord2Vec/data/vis-genome/';
     #captionPath = dataPath + 'captionSplits/genome_train_captions.txt';
     #captions = readTrainCaptions(captionPath);
 
@@ -160,3 +186,9 @@ if __name__ == '__main__':
     #with open(dataPath + 'caption_dictinary.pickle', 'w') as fileId:
     #    pickle.dump(captions, fileId);
 
+    # Change the format of the visual features
+    for i in xrange(1, 11):
+        print 'Current file : %d' % i
+        inPath = dataPath + 'train/vis_features_%02d';
+        outPath = dataPath + 'train/vis_features_%02d_libsvm';
+        changeVisualFeatureFormat(inPath % i, outPath % i);
