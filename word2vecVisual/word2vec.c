@@ -45,7 +45,8 @@ int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
 int clusterVQA = 100; // Number of initial clusters to use
 int clusterVP = 100; // Number of initial clusters to use
-int clusterGenome = 5000; // Number of initial clusters to use for genome
+int clusterGenome = 10000; // Number of initial clusters to use for genome
+int batchGenome = 5; // Use the curent batch for visual genome
 int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
@@ -1094,7 +1095,9 @@ void visualGenomeWrapper(){
     else{
         //featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_debug_small";
         //featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_debug_big";
-        featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_features_00";
+        //featurePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_features_00";
+        sprintf(featurePath, "/home/satwik/VisualWord2Vec/data/vis-genome/train/text_features_%02d",
+                                                    batchGenome);
 
         // Use PCA
         if (usePCA)
@@ -1102,7 +1105,9 @@ void visualGenomeWrapper(){
         else
             //visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_debug_small";
             //visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_debug_big";
-            visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_features_header";
+            //visualPath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_features_00";
+            sprintf(visualPath, "/home/satwik/VisualWord2Vec/data/vis-genome/train/vis_features_%02d",
+                                                    batchGenome);
     }
 
     // Test and validation sets for the common sense task
@@ -1123,12 +1128,8 @@ void visualGenomeWrapper(){
     tokenizeTrainSentencesGenome();
     
     char* clusterPath = (char*) malloc(sizeof(char) * 100);
-    if(usePCA)
-        sprintf(clusterPath, "/home/satwik/VisualWord2Vec/data/vis-genome/C_pca_cluster_%d.txt",
-                                clusterArg);
-    else
-        sprintf(clusterPath, "/home/satwik/VisualWord2Vec/data/vis-genome/C_cluster_%d.txt",
-                                clusterArg);
+    sprintf(clusterPath, "/home/satwik/VisualWord2Vec/data/vis-genome/train/cluster_C_%02d_10k",
+                                        batchGenome);
 
     // Check if cluster file exists, else cluster
     if( access(clusterPath, F_OK) != -1){
@@ -1232,7 +1233,6 @@ void TrainModel() {
 
     // Visual genome task
     visualGenomeWrapper();
-    return;
 
     //***************************************************************************************
     /***************************************************************************************/

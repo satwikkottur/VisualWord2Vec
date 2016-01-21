@@ -178,6 +178,11 @@ def changeClusterFileFormat(inPath, outPath):
     with open(outPath, 'w') as fileId:
         [fileId.write(str(i) + '\n') for i in ids];
 
+# This script adds appropriate headers to the visual features files, and saves them as is
+#def addHeaders(inPath):
+    # Read and add the 
+    
+
 ###############################################################################
 if __name__ == '__main__':
     # Call appropriate function (equivalent to multiple independent scripts)
