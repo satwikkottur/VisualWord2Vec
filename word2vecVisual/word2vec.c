@@ -40,7 +40,7 @@ extern float *syn0P, *syn0S, *syn0R;
 
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
-int trainMulti = 0; // Train single / multiple models for P,R,S
+int trainMulti = 1; // Train single / multiple models for P,R,S
 int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
 int clusterVQA = 100; // Number of initial clusters to use
@@ -595,8 +595,8 @@ void commonSenseWrapper(){
     int clusterArg = clusterCommonSense;
 
     // Load the word2vec embeddings from Xiao's
-    //char wordPath[] = "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/al_vectors.txt";
-    char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_train.bin";
+    char wordPath[] = "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/al_vectors.txt";
+    //char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_train.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
     loadWord2Vec(wordPath);
@@ -610,10 +610,12 @@ void commonSenseWrapper(){
     char* featurePathICCV = (char*) malloc(sizeof(char) * 100);
     char* featurePathCOCO = (char*) malloc(sizeof(char) * 100);
     char* featurePathVQA = (char*) malloc(sizeof(char) * 100);
+    char* testFile = (char*) malloc(sizeof(char) * 100);
+    char* valFile = (char*) malloc(sizeof(char) * 100);
 
     // Common sense task
     // Reading the file for relation word
-    featurePathVQA = "/home/satwik/VisualWord2Vec/data/vqa/vqa_psr_features.txt";
+    //featurePathVQA = "/home/satwik/VisualWord2Vec/data/vqa/vqa_psr_features.txt";
     //featurePathCOCO = "/home/satwik/VisualWord2Vec/data/coco-cnn/PSR_features_coco.txt";
     featurePathICCV = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
@@ -630,8 +632,8 @@ void commonSenseWrapper(){
                                         trainPhrases, usePCA, trainMulti, clusterArg);
     sprintf(vocabPath, "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/word2vec_vocab_%d_%d_%d_%d.txt",
                                         trainPhrases, usePCA, trainMulti, clusterArg);
-    char testFile[] = "/home/satwik/VisualWord2Vec/data/test_features.txt";
-    char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
+    testFile = "/home/satwik/VisualWord2Vec/data/test_features.txt";
+    valFile = "/home/satwik/VisualWord2Vec/data/val_features.txt";
 
     if(usePCA)
         visualPath = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
@@ -738,10 +740,10 @@ void commonSenseWrapper(){
         }
 
         // Saving the embeddings snapshots
-        /*sprintf(embedDumpPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_wiki_iter_%d.bin",
-                                            iter);
-        saveWord2Vec(embedDumpPath);
-        iter++;*/
+        //sprintf(embedDumpPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_wiki_iter_%d.bin",
+        //                                    iter);
+        //saveWord2Vec(embedDumpPath);
+        //iter++;
         
         if(trainMulti)
             // Performing the multi model common sense task
@@ -761,6 +763,21 @@ void commonSenseWrapper(){
 
     // Find test tuples with best improvement, for further visualization
     //findBestTestTuple(baseTestScores, bestTestScores);
+
+    // Read and perform common sense testing on different sets
+    int fileId = 0;
+    for (fileId = 0; fileId < 20; fileId++){
+        printf("Test case: %d...\n", fileId);
+        testFile = (char*) malloc(100 * sizeof(char));
+        sprintf(testFile, "/home/satwik/VisualWord2Vec/data/common-sense/test_features_subset_%02d.txt",
+                                                            fileId);
+        // Perform the common sense task on the current subset;
+        readTestValFiles(valFile, testFile);
+        if (trainMulti)
+            noOverfit = performMultiCommonSenseTask(bestTestScores);
+        else
+            noOverfit = performCommonSenseTask(bestTestScores);
+    }
 }
 
 // Function for visual paraphrase task
@@ -768,7 +785,7 @@ void visualParaphraseWrapper(){
     int clusterArg = clusterVP;
     // Read the embeddings from the file
     //char embedFile[] = "modelsNdata/word2vec_vp_lemma_50hidden.bin";
-    //char embedFile[] = "modelsNdata/word2vec_vp_lemma_100hidden.bin";
+    //char embedFle[] = "modelsNdata/word2vec_vp_lemma_100hidden.bin";
     //char embedFile[] = "modelsNdata/wiki_vp_before_100.bin";
     //char embedFile[] = "modelsNdata/wiki_vp_before_50.bin";
     char embedFile[] = "modelsNdata/vp/word2vec_coco_vp_lemma.bin";
@@ -1229,10 +1246,11 @@ void TrainModel() {
     //printf("\nChange over!\n");
     
     // Common sense task
-    //commonSenseWrapper();
+    commonSenseWrapper();
 
     // Visual genome task
-    visualGenomeWrapper();
+    //visualGenomeWrapper();
+    return;
 
     //***************************************************************************************
     /***************************************************************************************/

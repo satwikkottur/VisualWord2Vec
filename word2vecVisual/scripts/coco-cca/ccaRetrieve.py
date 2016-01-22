@@ -27,17 +27,18 @@ def computeGroundTruthRank(testFeats, trainFeats, gTruths, workerId):
 
         # Get the rank of the ground truth
      
-    template = 'ranks/mscoco/ranks_%02d_before.txt';
+    template = 'ranks/mscoco/ranks_%02d_after.txt';
+    #template = 'ranks/mscoco/ranks_%02d_before.txt';
     # Write it to a file
     with open(template % workerId, 'w') as fileId:
-        [fileId.write(i + '\n') for i in rankList];
+        [fileId.write(str(i) + '\n') for i in rankList];
 
 # Function to compute the ranks using multiprocessing
 def getRanks():
-    dataPath = '/home/satwik/VisualWord2Vec/data/coco-cca/inter/';
+    dataPath = '/home/satwik/VisualWord2Vec/data/coco-cca/mscoco/';
 
-    train = np.loadtxt(dataPath + 'train_captions_coco_after_cca.txt');
-    test = np.loadtxt(dataPath + 'test_captions_coco_after_cca.txt');
+    train = np.loadtxt(dataPath + 'train_caption_embeds_after.txt', skiprows=1);
+    test = np.loadtxt(dataPath + 'test_caption_embeds_after.txt', skiprows=1);
     truth = np.loadtxt(dataPath + 'test_caption_maps.txt', int)
 
     # Normalize all the vectors (test and train)
@@ -49,9 +50,9 @@ def getRanks():
     print 'Done reading test and train files...'
 
     # Setting up multiple workers
-    noWorkers = 32;
+    noWorkers = 30;
     jobs = [];
-    for i in range(noWorkers):
+    for i in xrange(noWorkers):
         p = multiprocessing.Process(target=computeGroundTruthRank, \
                         args=(test[i::noWorkers], train, truth[i::noWorkers], i));
         jobs.append(p)
@@ -59,8 +60,8 @@ def getRanks():
 
 # Function to compute the recall and other stats 
 def getStats():
-    saveFormat = 'ranks/mscoco/ranks_%02d_before.txt';
-    noFiles = 32;
+    saveFormat = 'ranks/mscoco/ranks_%02d_after.txt';
+    noFiles = 48;
 
     # Obtain all the ranks 
     ranks = [];
@@ -83,3 +84,7 @@ def getStats():
     return stats;
 ###############################################################
 if __name__ == '__main__':
+    getRanks();
+
+    #getStats();
+    

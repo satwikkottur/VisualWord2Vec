@@ -207,7 +207,7 @@ if __name__ == '__main__':
     #    changeVisualFeatureFormat(inPath % i, outPath % i);
 
     # Change the format of the cluster file
-    for i in xrange(10, 11):
+    for i in xrange(11):
         print 'Current file : %d' % i
         inPath = dataPath + 'train/cluster_assignment_%02d_10k';
         outPath = dataPath + 'train/cluster_C_%02d_10k';
