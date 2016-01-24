@@ -19,7 +19,7 @@ float* valScores = NULL;
 
 // A flag to indicate the first run
 int firstRun = 0;
-int countRun = 0;
+int countRun = 0; // Counting the number of runs
 
 struct problem* curProblem = NULL; // Current probem to solve using svm
 struct parameter* curParam = NULL; // Current parameters for traing svm

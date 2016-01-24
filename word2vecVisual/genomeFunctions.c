@@ -35,9 +35,9 @@ void readTrainSentencesGenome(char* trainPath){
     exit(1);*/
     // Debug, re write the sentences back to cross check
     // Write the sentences back to check debug
-    /*char* writePath = (char*) malloc(sizeof(char) * 100);
+    char* writePath = (char*) malloc(sizeof(char) * 100);
     writePath = "/home/satwik/VisualWord2Vec/data/vis-genome/train/re-written.txt";
-    saveSentences(trainSents, noTrain, writePath);*/
+    saveSentences(trainSents, noTrain, writePath);
 }
 
 // Reading the cluster ids

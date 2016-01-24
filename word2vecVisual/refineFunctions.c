@@ -280,10 +280,13 @@ void computeSentenceEmbeddings(struct Sentence* collection, long noSents){
     printf("\nComputing the sentence embeddings!\n");
     float* mean = (float*) calloc(layer1_size, sizeof(float));
     long i, w, d, offset;
+    float mag;
 
     for( i = 0; i < noSents; i++){
         // reset the mean to zero
         memset(mean, 0, layer1_size);
+        // Reset the magnitude to zero
+        mag = 0.0;
 
         // For each sentence, loop over word        
         for( w = 0; w < collection[i].count; w++){
@@ -298,11 +301,18 @@ void computeSentenceEmbeddings(struct Sentence* collection, long noSents){
         // Normalize the mean, if count > 0
         if(collection[i].actCount > 0)
             for (d = 0; d < layer1_size; d++)
+                //mean[d] /= collection[i].actCount;
                 mean[d] /= sqrt(collection[i].actCount);
+
+        // Compute the magnitude
+        for(d = 0; d < layer1_size; d++)
+            mag += mean[d] * mean[d];
         
         // If not allocated, allocate memory to embed
         if(collection[i].embed == NULL)
             collection[i].embed = (float*) malloc(sizeof(float) * layer1_size);
+
+        collection[i].magnitude = sqrt(mag);
         
         // Store the mean 
         memcpy(collection[i].embed, mean, layer1_size * sizeof(float));

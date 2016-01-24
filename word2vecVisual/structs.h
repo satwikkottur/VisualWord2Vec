@@ -60,6 +60,8 @@ struct Sentence{
 
     // Embeddings for the sentence
     float* embed;
+    // Magnitude for the embedding
+    float magnitude;
 
     // Other visual features
     float* otherFeats;

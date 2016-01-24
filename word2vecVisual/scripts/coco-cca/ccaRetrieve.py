@@ -27,7 +27,7 @@ def computeGroundTruthRank(testFeats, trainFeats, gTruths, workerId):
 
         # Get the rank of the ground truth
      
-    template = 'ranks/mscoco/ranks_%02d_after.txt';
+    template = 'ranks/vis-genome/mscoco/ranks_%02d_after.txt';
     #template = 'ranks/mscoco/ranks_%02d_before.txt';
     # Write it to a file
     with open(template % workerId, 'w') as fileId:
@@ -35,10 +35,10 @@ def computeGroundTruthRank(testFeats, trainFeats, gTruths, workerId):
 
 # Function to compute the ranks using multiprocessing
 def getRanks():
-    dataPath = '/home/satwik/VisualWord2Vec/data/coco-cca/mscoco/';
+    dataPath = '/home/satwik/VisualWord2Vec/data/vis-genome/coco/';
 
-    train = np.loadtxt(dataPath + 'train_caption_embeds_after.txt', skiprows=1);
-    test = np.loadtxt(dataPath + 'test_caption_embeds_after.txt', skiprows=1);
+    train = np.loadtxt(dataPath + 'train_caption_embeds_after_01.txt', skiprows=1);
+    test = np.loadtxt(dataPath + 'test_caption_embeds_after_01.txt', skiprows=1);
     truth = np.loadtxt(dataPath + 'test_caption_maps.txt', int)
 
     # Normalize all the vectors (test and train)
@@ -60,8 +60,9 @@ def getRanks():
 
 # Function to compute the recall and other stats 
 def getStats():
-    saveFormat = 'ranks/mscoco/ranks_%02d_after.txt';
-    noFiles = 48;
+    saveFormat = 'ranks/vis-genome/mscoco/ranks_%02d_after.txt';
+    #saveFormat = 'ranks/vis-genome/mscoco/ranks_%02d_before_00.txt';
+    noFiles = 30;
 
     # Obtain all the ranks 
     ranks = [];
@@ -84,7 +85,14 @@ def getStats():
     return stats;
 ###############################################################
 if __name__ == '__main__':
-    getRanks();
+    #getRanks();
 
-    #getStats();
-    
+    getStats();
+
+################################################################
+# Additional information
+#dataPath = '/home/satwik/VisualWord2Vec/data/coco-cca/mscoco/';
+#
+#train = np.loadtxt(dataPath + 'train_caption_embeds_after.txt', skiprows=1);
+#test = np.loadtxt(dataPath + 'test_caption_embeds_after.txt', skiprows=1);
+#truth = np.loadtxt(dataPath + 'test_caption_maps.txt', int)

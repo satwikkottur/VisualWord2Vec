@@ -31,6 +31,7 @@
 # include "cocoFunctions.h"
 # include "vqaFunctions.h"
 # include "genomeFunctions.h"
+# include "retriever.h"
 /***********************************************************************************/
 // Extern variables
 extern float prevTestAcc, prevValAcc;
@@ -40,13 +41,13 @@ extern float *syn0P, *syn0S, *syn0R;
 
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
-int trainMulti = 1; // Train single / multiple models for P,R,S
+int trainMulti = 0; // Train single / multiple models for P,R,S
 int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
 int clusterVQA = 100; // Number of initial clusters to use
 int clusterVP = 100; // Number of initial clusters to use
 int clusterGenome = 10000; // Number of initial clusters to use for genome
-int batchGenome = 5; // Use the curent batch for visual genome
+int batchGenome = 0; // Use the curent batch for visual genome
 int usePCA = 0;  // Reduce the dimensions through PCA
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
 int debugModeVP = 0; // Debug mode for VP task
@@ -595,10 +596,11 @@ void commonSenseWrapper(){
     int clusterArg = clusterCommonSense;
 
     // Load the word2vec embeddings from Xiao's
-    char wordPath[] = "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/al_vectors.txt";
+    //char wordPath[] = "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/al_vectors.txt";
     //char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_train.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
-    //char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
+    char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
+    //char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_02.bin";
     loadWord2Vec(wordPath);
 
     // [S] added
@@ -765,7 +767,7 @@ void commonSenseWrapper(){
     //findBestTestTuple(baseTestScores, bestTestScores);
 
     // Read and perform common sense testing on different sets
-    int fileId = 0;
+    /*int fileId = 0;
     for (fileId = 0; fileId < 20; fileId++){
         printf("Test case: %d...\n", fileId);
         testFile = (char*) malloc(100 * sizeof(char));
@@ -777,7 +779,219 @@ void commonSenseWrapper(){
             noOverfit = performMultiCommonSenseTask(bestTestScores);
         else
             noOverfit = performCommonSenseTask(bestTestScores);
+    }*/
+}
+
+// Function for text retriever task
+void retrieverWrapper(){
+    // Rename clusterArg in current function
+    int clusterArg = clusterCommonSense;
+
+    // Load the word2vec embeddings from Xiao's
+    //char wordPath[] = "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/al_vectors.txt";
+    //char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_train.bin";
+    //char wordPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
+    char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
+    //char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_02.bin";
+    loadWord2Vec(wordPath);
+
+    // [S] added
+    char* visualPath = (char*) malloc(sizeof(char) * 100);
+    char* postPath = (char*) malloc(sizeof(char) * 100);
+    char* prePath = (char*) malloc(sizeof(char) * 100);
+    char* vocabPath = (char*) malloc(sizeof(char) * 100);
+    char* embedDumpPath = (char*) malloc(sizeof(char) * 100);
+    char* featurePathICCV = (char*) malloc(sizeof(char) * 100);
+    char* featurePathCOCO = (char*) malloc(sizeof(char) * 100);
+    char* featurePathVQA = (char*) malloc(sizeof(char) * 100);
+    char* testFile = (char*) malloc(sizeof(char) * 100);
+    char* valFile = (char*) malloc(sizeof(char) * 100);
+
+    // Common sense task
+    // Reading the file for relation word
+    //featurePathVQA = "/home/satwik/VisualWord2Vec/data/vqa/vqa_psr_features.txt";
+    //featurePathCOCO = "/home/satwik/VisualWord2Vec/data/coco-cnn/PSR_features_coco.txt";
+    featurePathICCV = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_lemma.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_18.txt";
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_R_120.txt";
+
+    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_sentences_lemma.txt";
+
+    //char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
+    sprintf(postPath, "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/word2vec_wiki_post_%d_%d_%d_%d.txt", 
+                                        trainPhrases, usePCA, trainMulti, clusterArg);
+    sprintf(prePath, "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/word2vec_wiki_pre_%d_%d_%d_%d.txt", 
+                                        trainPhrases, usePCA, trainMulti, clusterArg);
+    sprintf(vocabPath, "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/word2vec_vocab_%d_%d_%d_%d.txt",
+                                        trainPhrases, usePCA, trainMulti, clusterArg);
+    testFile = "/home/satwik/VisualWord2Vec/data/test_features.txt";
+    valFile = "/home/satwik/VisualWord2Vec/data/val_features.txt";
+
+    if(usePCA)
+        visualPath = "/home/satwik/VisualWord2Vec/data/pca_features.txt";
+    else{
+        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_18.txt";
+        //visualPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/float_features_coco.txt";
+        //visualPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_float_features.txt";
+        visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_R_120.txt";
     }
+
+    // Writing word2vec from file
+    //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_save.txt";
+    //saveWord2Vec(wordPath);
+
+    // Initializing the hash
+    initFeatureHash();
+    // Reading for the word features, cluster ids and visual features
+    // clusterid reading will be avoided when clustering is ported to c
+    readRefineTrainFeatureFiles(featurePathICCV, NULL);
+    
+    // reading cluster files from matlab
+    //char clusterpath[] = "/home/satwik/visualword2vec/data/coco-cnn/cluster_100_coco_train.txt";
+    //readclusteridfile(clusterpath);
+    // Clustering in C
+    noClusters = 0;
+    readVisualFeatureFile(visualPath);
+    char clusterSavePath[] = "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/cluster_id_save.txt";
+    // To save clusterId / distance, provide save path; else NULL
+    clusterVisualFeatures(clusterArg, NULL);
+    //gmmVisualFeatures(clusterArg, NULL);
+    //return;
+    
+    // Read the validation and test sets    
+    if(noTest == 0)
+        // Clean the strings for test and validation sets, store features
+        readTestValFiles(valFile, testFile);
+
+    // Saving the feature word vocabulary(split simply means the corresponding components)
+    //saveFeatureWordVocab(vocabPath);
+    //char splitPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/split_vocab.txt";  
+    //saveFeatureWordVocabSplit(splitPath);
+    // Saving the feature vocabulary
+    //saveFeatureWordVocab(vocabPath);
+    
+    // Store the basemodel test tuple scores and best model test tuple scores
+    float* baseTestScores = (float*) malloc(sizeof(float) * noTest);
+    float* bestTestScores = (float*) malloc(sizeof(float) * noTest);
+
+    if(trainMulti){
+        // Initializing the refining network
+        initMultiRefining();
+        // Performing the multi model common sense task
+        performMultiCommonSenseTask(baseTestScores);
+    }
+    else{
+        // Initializing the refining network
+        //initRefiningRegress();
+        initRefining();
+        // Perform common sense task
+        performCommonSenseTask(baseTestScores);
+    }
+
+    // Saving the embeddings, before refining
+    /*if(trainMulti)
+        saveMultiEmbeddings(prePath);
+    else
+        saveEmbeddings(prePath);*/
+
+    // Reset valAccuracy as the first run doesnt count
+    prevValAcc = 0; 
+    prevTestAcc = 0;
+
+    printf("\n\n (PCA, phrases, multi, noClusters) = (%d, %d, %d, %d)\n\n", 
+                                        usePCA, trainPhrases, trainMulti, clusterArg);
+    
+    int noOverfit = 1;
+    int iter = 0;
+
+    // Debugging for regressing visual features
+    /*while(noOverfit){
+        // Refine the network
+        refineNetwork();
+        //refineNetworkRegress();
+    
+        // Perform the common sense task 
+        noOverfit = performCommonSenseTask(bestTestScores);
+    }*/
+    // Read the train and test retriever
+    char rValPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_val_nomaps.txt";
+    char rTrainPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_dataset_nomaps.txt";
+    char rGtPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_val_gtruth.txt";
+    // Read all the training, validation sentences and map
+    readTestValRetriever(rTrainPath, rValPath, rGtPath);
+
+    // Perform the retrieval task
+    performRetrieval();
+
+    int i, noIters = 10;
+    for(i = 0; i < noIters; i++){
+        printf("Refining : %d / %d\n", i, noIters);
+
+        // Refining the embeddings
+        refineNetwork();
+        
+        // Perform the retrieval task
+        performRetrieval();
+    }
+
+    /*while(noOverfit){
+        // Refine the network for multi model
+        if(trainMulti){
+            if(trainPhrases)
+                refineMultiNetworkPhrase();
+            else
+                refineMultiNetwork();
+        }
+        // Refine the network
+        else{
+            if(trainPhrases)
+                refineNetworkPhrase();
+            else
+                refineNetwork();
+        }
+
+        // Saving the embeddings snapshots
+        //sprintf(embedDumpPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_wiki_iter_%d.bin",
+        //                                    iter);
+        //saveWord2Vec(embedDumpPath);
+        //iter++;
+        
+        if(trainMulti)
+            // Performing the multi model common sense task
+            //noOverfit = performMultiCommonSenseTask(NULL);
+            noOverfit = performMultiCommonSenseTask(bestTestScores);
+        else
+            // Perform common sense task
+            //noOverfit = performCommonSenseTask(NULL);
+            noOverfit = performCommonSenseTask(bestTestScores);
+    }
+
+    // Saving the embeddings, after refining
+    if(trainMulti)
+        saveMultiEmbeddings(postPath);
+    else
+        saveEmbeddings(postPath);*/
+
+    // Find test tuples with best improvement, for further visualization
+    //findBestTestTuple(baseTestScores, bestTestScores);
+
+    // Read and perform common sense testing on different sets
+    /*int fileId = 0;
+    for (fileId = 0; fileId < 20; fileId++){
+        printf("Test case: %d...\n", fileId);
+        testFile = (char*) malloc(100 * sizeof(char));
+        sprintf(testFile, "/home/satwik/VisualWord2Vec/data/common-sense/test_features_subset_%02d.txt",
+                                                            fileId);
+        // Perform the common sense task on the current subset;
+        readTestValFiles(valFile, testFile);
+        if (trainMulti)
+            noOverfit = performMultiCommonSenseTask(bestTestScores);
+        else
+            noOverfit = performCommonSenseTask(bestTestScores);
+    }*/
 }
 
 // Function for visual paraphrase task
@@ -843,6 +1057,8 @@ void visualParaphraseWrapper(){
         
         // Compute embeddings
         performVPTask();
+
+        // Also compute the results for 
     }
 
     // Save the refined word2vec features for the VP sentences
@@ -1246,7 +1462,10 @@ void TrainModel() {
     //printf("\nChange over!\n");
     
     // Common sense task
-    commonSenseWrapper();
+    //commonSenseWrapper();
+    
+    // Retriever Wrapper
+    retrieverWrapper();
 
     // Visual genome task
     //visualGenomeWrapper();

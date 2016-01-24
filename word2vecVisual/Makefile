@@ -23,7 +23,8 @@ NAMES = word2vec.o	 \
 	liblinearWrapper.o\
 	cocoFunctions.o\
 	vqaFunctions.o\
-	genomeFunctions.o
+	genomeFunctions.o\
+	retriever.o
 
 OBJ=$(NAMES:%=$(BIN)%)
 SRCS=$(NAMES:%.o=%.c)
@@ -44,7 +45,7 @@ vp:
 
 coco:
 	make
-	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma.txt -output modelsNdata/word2vec_coco_word2vec.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
+	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma.txt -output modelsNdata/word2vec_coco_word2vec.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 30 -binary 0 -min-count 0
 
 wikiplain:
 	make
@@ -65,7 +66,7 @@ newvqa:
 
 genome:
 	make
-	./$(BIN)word2vec -train modelsNdata/vis-genome/coco_train_captions_genome.txt -output modelsNdata/vis-genome/word2vec_genome_05.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 -load-vocab modelsNdata/vis-genome/genome_train_vocab.txt
+	./$(BIN)word2vec -train modelsNdata/vis-genome/coco_train_captions_genome.txt -output modelsNdata/vis-genome/word2vec_genome_00.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 48 -binary 0 -min-count 0 -load-vocab modelsNdata/vis-genome/genome_train_vocab.txt
 	
 
 clean:

@@ -9,13 +9,18 @@ from Word2Vec import *
 
 # Read embeddings
 dataPath = '/home/satwik/VisualWord2Vec/data/';
+genomePath = '/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/vis-genome/';
 
 # MSCOCO before
 #embedPath = dataPath + 'al_vectors.txt';
 # MSCOCO after
 #embedPath = dataPath + 'word2vec_output_bestmodel_single.bin';
 # Wiki before
-embedPath = dataPath + 'word2vec_wiki_iter_before.bin';
+#embedPath = dataPath + 'word2vec_wiki_iter_before.bin';
+# Genome after
+embedPath = genomePath + 'word2vec_genome_01_commonsense.bin';
+# Genome before
+#embedPath = genomePath + 'word2vec_genome_train.bin';
 # Wiki after
 #embedPath = dataPath + 'word2vec_wiki_iter_after.bin';
 (embeds, embedDim, vocabSize) = loadWord2Vec(embedPath);
@@ -29,9 +34,9 @@ with open(cocoPath, 'r') as fileId:
 # features = [computeEmbedding(line[1], embeds, embedDim) for line in lines];
 
 # Opening the files to save the embeddings
-trainPath = dataPath + 'coco-cca/wiki/train_caption_embeds_before.txt';
-testPath = dataPath + 'coco-cca/wiki/test_caption_embeds_before.txt';
-mapPath = dataPath + 'coco-cca/wiki/test_caption_maps.txt';
+trainPath = dataPath + 'vis-genome/coco/train_caption_embeds_after_01.txt';
+testPath = dataPath + 'vis-genome/coco/test_caption_embeds_after_01.txt';
+mapPath = dataPath + 'vis-genome/coco/test_caption_maps.txt';
 
 testFeats = [];
 trainFeats = [];

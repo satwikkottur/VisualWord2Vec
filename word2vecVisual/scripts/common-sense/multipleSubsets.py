@@ -3,9 +3,9 @@ import re
 import pdb
 import numpy as np
 
-dataPath = '/home/satwik/VisualWord2Vec/word2vecVisual/';
+dataPath = '/home/satwik/VisualWord2Vec/word2vecVisual/dumps/';
 
-with open(dataPath + 'out_multi_subset', 'r') as fileId:
+with open(dataPath + 'out_single_subset', 'r') as fileId:
 #with open(dataPath + 'out_single_subset', 'r') as fileId:
     lines = [i.strip('\n') for i in fileId.readlines() if i[0:9] == 'Precision'];
 

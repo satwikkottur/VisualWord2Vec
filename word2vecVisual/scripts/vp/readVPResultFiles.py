@@ -1,10 +1,12 @@
 # This is a script to read the output files from the vp task
 import re
+import numpy as np
+import pdb
     
 def printResults(dumpPath):
     #dumpPath = '../modelsNdata/backup/out_val_sents';
     #rootPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/';
-    rootPath = '/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/vp/';
+    rootPath = '/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/vp/';
     fileId = open(rootPath + dumpPath, 'rb');
     if(fileId == None):
         print 'File not found!'
@@ -15,12 +17,15 @@ def printResults(dumpPath):
     regExp = 'mAP: Test \(([\d.]*)\) Val\(([\d.]*)\)';
     splitLines = [re.search(regExp, i) for i in lines];
 
-    valScores = [i.group(2) for i in splitLines if i is not None];
-    testScores = [i.group(1) for i in splitLines if i is not None];
+    valScores = [float(i.group(2)) for i in splitLines if i is not None];
+    testScores = [float(i.group(1)) for i in splitLines if i is not None];
 
     print dumpPath
     print 'Baseline: %s\nBest VP: %s\n' % \
                 (testScores[0], testScores[valScores.index(max(valScores[0:100]))])
+    # Also print the std over the last 40 runs
+    print 'Std over iterations: %f' % np.std(np.array(testScores))
+    pdb.set_trace();
     fileId.close();
 
 ###########################################################################
@@ -100,5 +105,7 @@ dumpPaths.extend(['out_vp_wiki_100_descs_pca', \
                     'out_wiki_words_pca', \
                     'out_wiki_winds', \
                     'out_wiki_winds_pca']);'''
+
+dumpPaths = ['out_vp_100_sents_pca'];
 for i in dumpPaths:
     printResults(i);
