@@ -918,10 +918,12 @@ void retrieverWrapper(){
     }*/
     // Read the train and test retriever
     char rValPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_val_nomaps.txt";
+    char rGtValPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_val_gtruth.txt";
+    char rTestPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_test_nomaps.txt";
+    char rGtTestPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_test_gtruth.txt";
     char rTrainPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_dataset_nomaps.txt";
-    char rGtPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_val_gtruth.txt";
     // Read all the training, validation sentences and map
-    readTestValRetriever(rTrainPath, rValPath, rGtPath);
+    readTestValRetriever(rTrainPath, rValPath, rGtValPath, rTestPath, rGtTestPath);
 
     // Perform the retrieval task
     performRetrieval();

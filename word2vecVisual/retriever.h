@@ -22,9 +22,11 @@ extern int visualFeatSize;
 extern int num_threads;
 
 // Reading the  training sentences
-void readTestValRetriever(char*, char*, char*);
+void readTestValRetriever(char*, char*, char*, char*, char*);
 // Perform retrieval
 void performRetrieval();
+// Retrieval on one particular set - either val or test
+void performSetRetrieval(struct Sentence*, long);
 // Perform retrieval thread
 void* performRetrievalThread(void*);
 #endif

@@ -37,7 +37,7 @@ $(BIN)%.o : %.c
 
 vqa:
 	make
-	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/vqa/vqa_train_captions_lemma.txt -output modelsNdata/word2vec_coco_word2vec.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0
+	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/vqa/vqa_train_captions_lemma.txt -output modelsNdata/word2vec_coco_word2vec.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 30 -binary 0 -min-count 0
 
 vp:
 	make

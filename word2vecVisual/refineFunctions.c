@@ -301,8 +301,8 @@ void computeSentenceEmbeddings(struct Sentence* collection, long noSents){
         // Normalize the mean, if count > 0
         if(collection[i].actCount > 0)
             for (d = 0; d < layer1_size; d++)
-                //mean[d] /= collection[i].actCount;
-                mean[d] /= sqrt(collection[i].actCount);
+                mean[d] /= collection[i].actCount;
+                //mean[d] /= sqrt(collection[i].actCount);
 
         // Compute the magnitude
         for(d = 0; d < layer1_size; d++)

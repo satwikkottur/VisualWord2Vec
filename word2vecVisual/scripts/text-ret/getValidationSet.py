@@ -18,12 +18,16 @@ with open(cocoPath, 'r') as fileId:
 
 # Opening the files to save the embeddings
 valPath = dataPath + 'coco-cnn/captions_coco_val_nomaps.txt';
+testPath = dataPath + 'coco-cnn/captions_coco_test_nomaps.txt';
 gtPath = dataPath + 'coco-cnn/captions_coco_val_gtruth.txt';
+gtPathTest = dataPath + 'coco-cnn/captions_coco_test_gtruth.txt';
 trainPath = dataPath + 'coco-cnn/captions_coco_dataset_nomaps.txt'
 
 valId = open(valPath, 'w');
 gtId = open(gtPath, 'w');
 trainId = open(trainPath, 'w');
+testId = open(testPath, 'w');
+gtIdTest = open(gtPathTest, 'w');
 
 seenImgs = set([]);
 lineId = 0;
@@ -32,9 +36,12 @@ for line in lines:
     imgId = int(line[0]);
     if imgId in seenImgs:
         # Select the image to be in validation set based on some random number
-        if random.random() < 0.03:
+        if random.random() < 0.05:
             valId.write(line[1] + '\n');
             gtId.write(line[0] + '\n');
+        else:
+            testId.write(line[1] + '\n');
+            gtIdTest.write(line[0] + '\n');
     
     # First time, write in train and add to seenImgs
     else:
@@ -49,3 +56,5 @@ for line in lines:
 valId.close();
 gtId.close();
 trainId.close();
+testId.close();
+gtIdTest.close();

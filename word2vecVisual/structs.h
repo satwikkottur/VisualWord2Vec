@@ -132,4 +132,18 @@ struct RefineParameter{
     // Id for the thread
     int threadId;
 };
+
+// Parameters to retrieve images using multiple threads
+struct RetrieveParameter{
+    // Training sentence
+    struct Sentence* sents;
+    // Number of training sentences
+    long noSents;
+    // Start and end indices
+    long startIndex, endIndex;
+    // The pointer to store ranks
+    long* ranks;
+    // Id for the thread
+    int threadId;
+};
 #endif
