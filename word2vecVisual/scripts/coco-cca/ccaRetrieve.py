@@ -60,7 +60,7 @@ def getRanks():
 
 # Function to compute the recall and other stats 
 def getStats():
-    saveFormat = 'ranks/vis-genome/mscoco/ranks_%02d_after.txt';
+    saveFormat = 'ranks/vp/ranks_%02d_after.txt';
     #saveFormat = 'ranks/vis-genome/mscoco/ranks_%02d_before_00.txt';
     noFiles = 30;
 
@@ -85,9 +85,9 @@ def getStats():
     return stats;
 ###############################################################
 if __name__ == '__main__':
-    getRanks();
+    #getRanks();
 
-    #getStats();
+    getStats();
 
 ################################################################
 # Additional information
