@@ -12,6 +12,7 @@ err*
 models/*
 word2vecVisual/modelsNdata/*
 word2vecVisual/test/*
+libs/wordvec_image/data/*
 
 # Ignore the vp-fitb code
 word2vecVisual/vp-fitb/

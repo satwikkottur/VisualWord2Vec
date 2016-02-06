@@ -1,0 +1,4003 @@
+{
+    "baseDirectory": "HumanDeformable",
+    "attributeTypeList": ["Expression"],
+    "sexes": ["female", "male"],
+    "races": ["Asian", "Black", "White"],
+    "ages": ["toddler", "child", "teenager", "adult", "elder"],
+    "type": [
+        {
+            "name": "Doll01",
+            "sex": "male",
+            "race": "Black",
+            "age": "adult",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 57,
+                    "childY": 128,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 54,
+                    "parentY": 12,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 43,
+                    "parentY": 17,
+                    "childX": 59,
+                    "childY": 45,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 34,
+                    "parentY": 213,
+                    "childX": 33,
+                    "childY": 24,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 28,
+                    "parentY": 160,
+                    "childX": 19,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 20,
+                    "parentY": 147,
+                    "childX": 42,
+                    "childY": 21,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 80,
+                    "parentY": 213,
+                    "childX": 34,
+                    "childY": 24,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 39,
+                    "parentY": 165,
+                    "childX": 22,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 19,
+                    "parentY": 149,
+                    "childX": 42,
+                    "childY": 21,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 16,
+                    "parentY": 46,
+                    "childX": 26,
+                    "childY": 19,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 24,
+                    "parentY": 128,
+                    "childX": 14,
+                    "childY": 10,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 19,
+                    "parentY": 98,
+                    "childX": 16,
+                    "childY": 12,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 96,
+                    "parentY": 44,
+                    "childX": 13,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 16,
+                    "parentY": 128,
+                    "childX": 14,
+                    "childY": 9,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 21,
+                    "parentY": 99,
+                    "childX": 26,
+                    "childY": 12,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll02",
+            "sex": "female",
+            "race": "Black",
+            "age": "adult",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 56,
+                    "childY": 118,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 58,
+                    "parentY": 9,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 38,
+                    "parentY": 23,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 26,
+                    "parentY": 195,
+                    "childX": 25,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 27,
+                    "parentY": 158,
+                    "childX": 16,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 21,
+                    "parentY": 130,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 82,
+                    "parentY": 195,
+                    "childX": 23,
+                    "childY": 18,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 23,
+                    "parentY": 158,
+                    "childX": 15,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 20,
+                    "parentY": 133,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 16,
+                    "parentY": 46,
+                    "childX": 21,
+                    "childY": 17,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 18,
+                    "parentY": 113,
+                    "childX": 12,
+                    "childY": 17,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 94,
+                    "parentY": 46,
+                    "childX": 18,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 111,
+                    "childX": 10,
+                    "childY": 16,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 84,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll03",
+            "sex": "male",
+            "race": "White",
+            "age": "adult",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 57,
+                    "childY": 128,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 54,
+                    "parentY": 12,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 43,
+                    "parentY": 17,
+                    "childX": 59,
+                    "childY": 45,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 45,
+                    "parentY": 235,
+                    "childX": 33,
+                    "childY": 24,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 24,
+                    "parentY": 160,
+                    "childX": 19,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 20,
+                    "parentY": 147,
+                    "childX": 42,
+                    "childY": 21,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 95,
+                    "parentY": 235,
+                    "childX": 34,
+                    "childY": 24,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 35,
+                    "parentY": 165,
+                    "childX": 22,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 19,
+                    "parentY": 149,
+                    "childX": 42,
+                    "childY": 21,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 55,
+                    "childX": 26,
+                    "childY": 19,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 22,
+                    "parentY": 128,
+                    "childX": 14,
+                    "childY": 10,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 19,
+                    "parentY": 98,
+                    "childX": 16,
+                    "childY": 12,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 116,
+                    "parentY": 44,
+                    "childX": 13,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 16,
+                    "parentY": 128,
+                    "childX": 14,
+                    "childY": 9,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 21,
+                    "parentY": 99,
+                    "childX": 26,
+                    "childY": 12,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll04",
+            "sex": "female",
+            "race": "White",
+            "age": "adult",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 56,
+                    "childY": 118,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 58,
+                    "parentY": 9,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 38,
+                    "parentY": 23,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 26,
+                    "parentY": 195,
+                    "childX": 25,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 27,
+                    "parentY": 158,
+                    "childX": 16,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 21,
+                    "parentY": 130,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 82,
+                    "parentY": 195,
+                    "childX": 23,
+                    "childY": 18,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 23,
+                    "parentY": 158,
+                    "childX": 15,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 20,
+                    "parentY": 133,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 16,
+                    "parentY": 46,
+                    "childX": 21,
+                    "childY": 17,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 18,
+                    "parentY": 113,
+                    "childX": 12,
+                    "childY": 17,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 94,
+                    "parentY": 46,
+                    "childX": 18,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 111,
+                    "childX": 10,
+                    "childY": 16,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 84,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll05",
+            "sex": "male",
+            "race": "Asian",
+            "age": "adult",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 57,
+                    "childY": 128,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 54,
+                    "parentY": 12,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 43,
+                    "parentY": 17,
+                    "childX": 59,
+                    "childY": 45,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 45,
+                    "parentY": 235,
+                    "childX": 33,
+                    "childY": 24,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 24,
+                    "parentY": 160,
+                    "childX": 19,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 20,
+                    "parentY": 147,
+                    "childX": 42,
+                    "childY": 21,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 95,
+                    "parentY": 235,
+                    "childX": 34,
+                    "childY": 24,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 35,
+                    "parentY": 165,
+                    "childX": 22,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 19,
+                    "parentY": 149,
+                    "childX": 42,
+                    "childY": 21,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 55,
+                    "childX": 26,
+                    "childY": 19,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 22,
+                    "parentY": 128,
+                    "childX": 14,
+                    "childY": 10,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 19,
+                    "parentY": 98,
+                    "childX": 16,
+                    "childY": 12,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 116,
+                    "parentY": 44,
+                    "childX": 13,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 16,
+                    "parentY": 128,
+                    "childX": 14,
+                    "childY": 9,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 21,
+                    "parentY": 99,
+                    "childX": 26,
+                    "childY": 12,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll06",
+            "sex": "female",
+            "race": "Asian",
+            "age": "adult",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 56,
+                    "childY": 118,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 58,
+                    "parentY": 9,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 38,
+                    "parentY": 23,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 26,
+                    "parentY": 195,
+                    "childX": 25,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 27,
+                    "parentY": 158,
+                    "childX": 16,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 21,
+                    "parentY": 130,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 82,
+                    "parentY": 195,
+                    "childX": 23,
+                    "childY": 18,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 23,
+                    "parentY": 158,
+                    "childX": 15,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 20,
+                    "parentY": 133,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 16,
+                    "parentY": 46,
+                    "childX": 21,
+                    "childY": 17,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 18,
+                    "parentY": 113,
+                    "childX": 12,
+                    "childY": 17,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 94,
+                    "parentY": 46,
+                    "childX": 18,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 111,
+                    "childX": 10,
+                    "childY": 16,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 84,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll07",
+            "sex": "male",
+            "race": "White",
+            "age": "elder",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 56,
+                    "childY": 118,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 52,
+                    "parentY": 11,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 53,
+                    "parentY": 29,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 36,
+                    "parentY": 195,
+                    "childX": 30,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 21,
+                    "parentY": 158,
+                    "childX": 16,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 13,
+                    "parentY": 130,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 92,
+                    "parentY": 195,
+                    "childX": 28,
+                    "childY": 18,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 17,
+                    "parentY": 158,
+                    "childX": 15,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 12,
+                    "parentY": 133,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 21,
+                    "parentY": 32,
+                    "childX": 21,
+                    "childY": 17,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 18,
+                    "parentY": 113,
+                    "childX": 12,
+                    "childY": 17,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 94,
+                    "parentY": 23,
+                    "childX": 18,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 111,
+                    "childX": 10,
+                    "childY": 16,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 84,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll08",
+            "sex": "female",
+            "race": "White",
+            "age": "elder",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 56,
+                    "childY": 118,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 77,
+                    "parentY": 9,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 38,
+                    "parentY": 5,
+                    "childX": 62,
+                    "childY": 56,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 32,
+                    "parentY": 200,
+                    "childX": 35,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 24,
+                    "parentY": 158,
+                    "childX": 16,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 24,
+                    "parentY": 134,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 122,
+                    "parentY": 185,
+                    "childX": 50,
+                    "childY": 10,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 33,
+                    "parentY": 162,
+                    "childX": 25,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 20,
+                    "parentY": 133,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 28,
+                    "parentY": 40,
+                    "childX": 25,
+                    "childY": 17,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 22,
+                    "parentY": 113,
+                    "childX": 16,
+                    "childY": 17,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 93,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 119,
+                    "parentY": 38,
+                    "childX": 23,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 26,
+                    "parentY": 111,
+                    "childX": 18,
+                    "childY": 16,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 24,
+                    "parentY": 92,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll09",
+            "sex": "male",
+            "race": "Asian",
+            "age": "elder",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 56,
+                    "childY": 118,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 50,
+                    "parentY": 9,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 57,
+                    "parentY": 32,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 36,
+                    "parentY": 195,
+                    "childX": 30,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 21,
+                    "parentY": 158,
+                    "childX": 16,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 13,
+                    "parentY": 130,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 92,
+                    "parentY": 195,
+                    "childX": 28,
+                    "childY": 18,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 17,
+                    "parentY": 158,
+                    "childX": 15,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 12,
+                    "parentY": 133,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 21,
+                    "parentY": 32,
+                    "childX": 21,
+                    "childY": 17,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 18,
+                    "parentY": 113,
+                    "childX": 12,
+                    "childY": 17,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 94,
+                    "parentY": 23,
+                    "childX": 18,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 111,
+                    "childX": 10,
+                    "childY": 16,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 84,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll10",
+            "sex": "female",
+            "race": "Asian",
+            "age": "elder",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 56,
+                    "childY": 118,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 77,
+                    "parentY": 9,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 43,
+                    "parentY": 26,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 32,
+                    "parentY": 200,
+                    "childX": 35,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 24,
+                    "parentY": 158,
+                    "childX": 16,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 24,
+                    "parentY": 134,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 122,
+                    "parentY": 185,
+                    "childX": 50,
+                    "childY": 10,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 33,
+                    "parentY": 162,
+                    "childX": 25,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 20,
+                    "parentY": 133,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 35,
+                    "parentY": 40,
+                    "childX": 25,
+                    "childY": 17,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 22,
+                    "parentY": 113,
+                    "childX": 16,
+                    "childY": 17,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 93,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 119,
+                    "parentY": 38,
+                    "childX": 23,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 26,
+                    "parentY": 111,
+                    "childX": 18,
+                    "childY": 16,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 24,
+                    "parentY": 92,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll11",
+            "sex": "male",
+            "race": "White",
+            "age": "teenager",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 56,
+                    "childY": 118,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 58,
+                    "parentY": 9,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 45,
+                    "parentY": 18,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 36,
+                    "parentY": 185,
+                    "childX": 30,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 23,
+                    "parentY": 158,
+                    "childX": 16,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 14,
+                    "parentY": 130,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 82,
+                    "parentY": 185,
+                    "childX": 28,
+                    "childY": 18,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 27,
+                    "parentY": 158,
+                    "childX": 15,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 8,
+                    "parentY": 133,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 12,
+                    "parentY": 38,
+                    "childX": 21,
+                    "childY": 17,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 18,
+                    "parentY": 113,
+                    "childX": 12,
+                    "childY": 17,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 94,
+                    "parentY": 40,
+                    "childX": 18,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 111,
+                    "childX": 10,
+                    "childY": 16,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 84,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll12",
+            "sex": "female",
+            "race": "White",
+            "age": "teenager",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 56,
+                    "childY": 118,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 58,
+                    "parentY": 13,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 64,
+                    "parentY": 25,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 41,
+                    "parentY": 171,
+                    "childX": 30,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 28,
+                    "parentY": 158,
+                    "childX": 16,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 14,
+                    "parentY": 130,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 89,
+                    "parentY": 171,
+                    "childX": 28,
+                    "childY": 18,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 22,
+                    "parentY": 158,
+                    "childX": 15,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 8,
+                    "parentY": 133,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 15,
+                    "parentY": 38,
+                    "childX": 21,
+                    "childY": 17,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 23,
+                    "parentY": 113,
+                    "childX": 12,
+                    "childY": 17,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 89,
+                    "parentY": 46,
+                    "childX": 18,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 111,
+                    "childX": 10,
+                    "childY": 16,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 84,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll13",
+            "sex": "male",
+            "race": "Asian",
+            "age": "teenager",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 56,
+                    "childY": 118,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 58,
+                    "parentY": 9,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 45,
+                    "parentY": 18,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 36,
+                    "parentY": 185,
+                    "childX": 30,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 23,
+                    "parentY": 158,
+                    "childX": 16,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 14,
+                    "parentY": 130,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 82,
+                    "parentY": 185,
+                    "childX": 28,
+                    "childY": 18,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 27,
+                    "parentY": 158,
+                    "childX": 15,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 8,
+                    "parentY": 133,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 12,
+                    "parentY": 38,
+                    "childX": 21,
+                    "childY": 17,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 18,
+                    "parentY": 113,
+                    "childX": 12,
+                    "childY": 17,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 94,
+                    "parentY": 40,
+                    "childX": 18,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 111,
+                    "childX": 10,
+                    "childY": 16,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 84,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll14",
+            "sex": "female",
+            "race": "Asian",
+            "age": "teenager",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 56,
+                    "childY": 118,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 58,
+                    "parentY": 9,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 64,
+                    "parentY": 25,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 41,
+                    "parentY": 171,
+                    "childX": 30,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 28,
+                    "parentY": 158,
+                    "childX": 16,
+                    "childY": 20,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 14,
+                    "parentY": 130,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 89,
+                    "parentY": 171,
+                    "childX": 28,
+                    "childY": 18,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 22,
+                    "parentY": 158,
+                    "childX": 15,
+                    "childY": 20,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 8,
+                    "parentY": 133,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 15,
+                    "parentY": 38,
+                    "childX": 21,
+                    "childY": 17,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 23,
+                    "parentY": 113,
+                    "childX": 12,
+                    "childY": 17,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 92,
+                    "parentY": 42,
+                    "childX": 18,
+                    "childY": 17,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 111,
+                    "childX": 10,
+                    "childY": 16,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 84,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll15",
+            "sex": "male",
+            "race": "White",
+            "age": "child",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 54,
+                    "childY": 87,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 51,
+                    "parentY": 18,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 44,
+                    "parentY": 18,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 36,
+                    "parentY": 153,
+                    "childX": 21,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 16,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 75,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 80,
+                    "parentY": 153,
+                    "childX": 21,
+                    "childY": 18,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 21,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 16,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 14,
+                    "parentY": 75,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 12,
+                    "parentY": 38,
+                    "childX": 18,
+                    "childY": 15,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 14,
+                    "parentY": 75,
+                    "childX": 17,
+                    "childY": 14,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 55,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 91,
+                    "parentY": 31,
+                    "childX": 18,
+                    "childY": 15,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 15,
+                    "parentY": 75,
+                    "childX": 17,
+                    "childY": 14,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 54,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll16",
+            "sex": "female",
+            "race": "White",
+            "age": "child",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 54,
+                    "childY": 87,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 50,
+                    "parentY": 20,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 25,
+                    "parentY": 33,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 25,
+                    "parentY": 153,
+                    "childX": 21,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 16,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 78,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 76,
+                    "parentY": 153,
+                    "childX": 21,
+                    "childY": 18,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 21,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 16,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 18,
+                    "parentY": 78,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 12,
+                    "parentY": 38,
+                    "childX": 18,
+                    "childY": 15,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 75,
+                    "childX": 17,
+                    "childY": 14,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 55,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 80,
+                    "parentY": 34,
+                    "childX": 18,
+                    "childY": 15,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 17,
+                    "parentY": 75,
+                    "childX": 17,
+                    "childY": 14,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 54,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll17",
+            "sex": "male",
+            "race": "Asian",
+            "age": "child",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 54,
+                    "childY": 87,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 51,
+                    "parentY": 18,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 44,
+                    "parentY": 18,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 36,
+                    "parentY": 153,
+                    "childX": 21,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 16,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 75,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 80,
+                    "parentY": 153,
+                    "childX": 21,
+                    "childY": 18,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 21,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 16,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 14,
+                    "parentY": 75,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 12,
+                    "parentY": 38,
+                    "childX": 18,
+                    "childY": 15,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 14,
+                    "parentY": 75,
+                    "childX": 17,
+                    "childY": 14,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 55,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 91,
+                    "parentY": 31,
+                    "childX": 18,
+                    "childY": 15,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 15,
+                    "parentY": 75,
+                    "childX": 17,
+                    "childY": 14,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 54,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll18",
+            "sex": "female",
+            "race": "Asian",
+            "age": "child",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.5,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 30,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 54,
+                    "childY": 87,
+                    "initPose": [0, 0, 0, 0, 0, -0.44, 0.12, 0.12, 0.015]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 20,
+                    "parentX": 50,
+                    "parentY": 20,
+                    "childX": 48,
+                    "childY": 102,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "Hair",
+                    "parent": "Head",
+                    "clickTransfer": "Head",
+                    "handleRadius": 0,
+                    "parentX": 25,
+                    "parentY": 33,
+                    "childX": 62,
+                    "childY": 51,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 25,
+                    "parentY": 153,
+                    "childX": 21,
+                    "childY": 18,
+                    "initPose": [0.09, 0.09, 0.09, 0.09, 0.69, 0.22, 1.05, 1.81, 0.33]
+                },
+                {
+                    "part": "RightLegBottom",
+                    "parent": "RightLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 16,
+                    "initPose": [-0.27, -0.43, -0.22, -0.22, -1.83, -0.25, -1.3, -1.3, -1.07]
+                },
+                {
+                    "part": "RightFoot",
+                    "parent": "RightLegBottom",
+                    "clickTransfer": "RightLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 78,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftLegTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 76,
+                    "parentY": 153,
+                    "childX": 21,
+                    "childY": 18,
+                    "initPose": [0.074, 1.01, 0.01, 0.01, 0.63, 1.11, 1.19, 1.85, 0.34]
+                },
+                {
+                    "part": "LeftLegBottom",
+                    "parent": "LeftLegTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 21,
+                    "parentY": 85,
+                    "childX": 14,
+                    "childY": 16,
+                    "initPose": [-0.22, -0.52, -0.24, -0.24, -1.77, -1.97, -1.39, -1.39, -0.32]
+                },
+                {
+                    "part": "LeftFoot",
+                    "parent": "LeftLegBottom",
+                    "clickTransfer": "LeftLegBottom",
+                    "handleRadius": 0,
+                    "parentX": 18,
+                    "parentY": 78,
+                    "childX": 28,
+                    "childY": 17,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "RightArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 12,
+                    "parentY": 38,
+                    "childX": 18,
+                    "childY": 15,
+                    "initPose": [-0.02, -0.02, -0.02, -0.02, 0.92, 0.72, -0.14, 0.15, 0.09]
+                },
+                {
+                    "part": "RightArmBottom",
+                    "parent": "RightArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 20,
+                    "parentY": 75,
+                    "childX": 17,
+                    "childY": 14,
+                    "initPose": [1.82, 0.33, 0.16, 0.16, -0.15, 2.22, 0.69, -0.03, 0.33]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArmBottom",
+                    "clickTransfer": "RightArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 17,
+                    "parentY": 55,
+                    "childX": 14,
+                    "childY": 11,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArmTop",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 80,
+                    "parentY": 34,
+                    "childX": 18,
+                    "childY": 15,
+                    "initPose": [-0.07, -0.07, 2.0, -0.33, -0.68, -0.63, -0.12, -0.1, -0.23]
+                },
+                {
+                    "part": "LeftArmBottom",
+                    "parent": "LeftArmTop",
+                    "clickTransfer": "null",
+                    "handleRadius": 15,
+                    "parentX": 17,
+                    "parentY": 75,
+                    "childX": 17,
+                    "childY": 14,
+                    "initPose": [1.79, 0.37, -0.34, -2.7, 0.29, 1.55, 0.4, 0.054, 0.47]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArmBottom",
+                    "clickTransfer": "LeftArmBottom",
+                    "handleRadius": 0,
+                    "parentX": 16,
+                    "parentY": 54,
+                    "childX": 18,
+                    "childY": 10,
+                    "initPose": [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "Hair": 2,
+                "RightLegTop": 3,
+                "RightLegBottom": 4,
+                "RightFoot": 5,
+                "LeftLegTop": 6,
+                "LeftLegBottom": 7,
+                "LeftFoot": 8,
+                "RightArmTop": 9,
+                "RightArmBottom": 10,
+                "RightHand": 11,
+                "LeftArmTop": 12,
+                "LeftArmBottom": 13,
+                "LeftHand": 14
+            }
+        },
+        {
+            "name": "Doll19",
+            "sex": "male",
+            "race": "White",
+            "age": "toddler",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.75,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 10,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 28,
+                    "childY": 48,
+                    "initPose": [0, 0, 0, -1.57]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 7,
+                    "parentX": 22,
+                    "parentY": 6,
+                    "childX": 27,
+                    "childY": 43,
+                    "initPose": [0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLeg",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 5,
+                    "parentX": 6,
+                    "parentY": 63,
+                    "childX": 13,
+                    "childY": 10,
+                    "initPose": [1.71, 1.71, 1.71, 0.57]
+                },
+                {
+                    "part": "LeftLeg",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 5,
+                    "parentX": 30,
+                    "parentY": 70,
+                    "childX": 13,
+                    "childY": 10,
+                    "initPose": [1.52, 1.52, 1.52, 0.61]
+                },
+                {
+                    "part": "RightArm",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 5,
+                    "parentX": 17,
+                    "parentY": 18,
+                    "childX": 10,
+                    "childY": 10,
+                    "initPose": [1.85, 0.76, 1.28, 2.57]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArm",
+                    "clickTransfer": "RightArm",
+                    "handleRadius": 0,
+                    "parentX": 26,
+                    "parentY": 36,
+                    "childX": 8,
+                    "childY": 3,
+                    "initPose": [0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArm",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 5,
+                    "parentX": 38,
+                    "parentY": 18,
+                    "childX": 10,
+                    "childY": 10,
+                    "initPose": [1.27, 2.55, -3.04, 1.73]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArm",
+                    "clickTransfer": "LeftArm",
+                    "handleRadius": 0,
+                    "parentX": 26,
+                    "parentY": 36,
+                    "childX": 8,
+                    "childY": 3,
+                    "initPose": [0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "RightLeg": 2,
+                "LeftLeg": 3,
+                "RightArm": 4,
+                "RightHand": 5,
+                "LeftArm": 6,
+                "LeftHand": 7
+            }
+        },
+        {
+            "name": "Doll20",
+            "sex": "male",
+            "race": "Asian",
+            "age": "toddler",
+            "availableScene": [
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Park",
+                    "depth1": 5
+                },
+                {
+                    "numInstance": 5,
+                    "depth0": 0,
+                    "scene": "Living",
+                    "depth1": 5
+                }
+            ],
+            "deformable": true,
+            "numExpression": 9,
+            "numPose": 0,
+            "globalScale": 0.75,
+            "body": [
+                {
+                    "part": "Torso",
+                    "parent": "null",
+                    "clickTransfer": "null",
+                    "handleRadius": 10,
+                    "parentX": -1,
+                    "parentY": -1,
+                    "childX": 28,
+                    "childY": 48,
+                    "initPose": [0, 0, 0, -1.57]
+                },
+                {
+                    "part": "Head",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 7,
+                    "parentX": 22,
+                    "parentY": 6,
+                    "childX": 27,
+                    "childY": 43,
+                    "initPose": [0, 0, 0, 0]
+                },
+                {
+                    "part": "RightLeg",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 5,
+                    "parentX": 6,
+                    "parentY": 63,
+                    "childX": 13,
+                    "childY": 10,
+                    "initPose": [1.71, 1.71, 1.71, 0.57]
+                },
+                {
+                    "part": "LeftLeg",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 5,
+                    "parentX": 30,
+                    "parentY": 70,
+                    "childX": 13,
+                    "childY": 10,
+                    "initPose": [1.52, 1.52, 1.52, 0.61]
+                },
+                {
+                    "part": "RightArm",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 5,
+                    "parentX": 17,
+                    "parentY": 18,
+                    "childX": 10,
+                    "childY": 10,
+                    "initPose": [1.85, 0.76, 1.28, 2.57]
+                },
+                {
+                    "part": "RightHand",
+                    "parent": "RightArm",
+                    "clickTransfer": "RightArm",
+                    "handleRadius": 0,
+                    "parentX": 26,
+                    "parentY": 36,
+                    "childX": 8,
+                    "childY": 3,
+                    "initPose": [0, 0, 0, 0]
+                },
+                {
+                    "part": "LeftArm",
+                    "parent": "Torso",
+                    "clickTransfer": "null",
+                    "handleRadius": 5,
+                    "parentX": 38,
+                    "parentY": 18,
+                    "childX": 10,
+                    "childY": 10,
+                    "initPose": [1.27, 2.55, -3.04, 1.73]
+                },
+                {
+                    "part": "LeftHand",
+                    "parent": "LeftArm",
+                    "clickTransfer": "LeftArm",
+                    "handleRadius": 0,
+                    "parentX": 26,
+                    "parentY": 36,
+                    "childX": 8,
+                    "childY": 3,
+                    "initPose": [0, 0, 0, 0]
+                }
+            ],
+            "partIdxList": {
+                "Torso": 0,
+                "Head": 1,
+                "RightLeg": 2,
+                "LeftLeg": 3,
+                "RightArm": 4,
+                "RightHand": 5,
+                "LeftArm": 6,
+                "LeftHand": 7
+            }
+        }
+    ],
+    "objectType": "human",
+    "dataType": "clipartObject"
+}

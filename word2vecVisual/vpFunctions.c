@@ -89,12 +89,12 @@ void tokenizeTrainSentences(){
 // Saving word2vec embeddings for all VP sentences
 void writeVPSentenceEmbeddings(){
     // Path to the sentences_1
-    char readSent1[] = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma.txt";
-    char writeSent1[] = "/home/satwik/VisualWord2Vec/data/vp_30_features_1.txt";
+    char readSent1[] = "/home/satwik/VisualWord2Vec/data/vp/vp_sentences1_lemma.txt";
+    char writeSent1[] = "/home/satwik/VisualWord2Vec/data/vp/vp_30_features_1.txt";
     //char writeSent1[] = "/home/satwik/VisualWord2Vec/data/vp_orig_features_1.txt";
     // Path to the sentences_2
-    char readSent2[] = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma.txt";
-    char writeSent2[] = "/home/satwik/VisualWord2Vec/data/vp_30_features_2.txt";
+    char readSent2[] = "/home/satwik/VisualWord2Vec/data/vp/vp_sentences2_lemma.txt";
+    char writeSent2[] = "/home/satwik/VisualWord2Vec/data/vp/vp_30_features_2.txt";
     //char writeSent2[] = "/home/satwik/VisualWord2Vec/data/vp_orig_features_2.txt";
     
     struct Sentence* sentences1, *sentences2;
@@ -125,13 +125,13 @@ void readVPSentences(){
 
     // Path to the sentences_1
     if(debugModeVP){
-        readSent1 = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma_debug.txt";
-        readSent2 = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma_debug.txt";
+        readSent1 = "/home/satwik/VisualWord2Vec/data/vp/vp_sentences1_lemma_debug.txt";
+        readSent2 = "/home/satwik/VisualWord2Vec/data/vp/vp_sentences2_lemma_debug.txt";
     }
     // Path to the sentences_2
     else{
-        readSent1 = "/home/satwik/VisualWord2Vec/data/vp_sentences1_lemma.txt";
-        readSent2 = "/home/satwik/VisualWord2Vec/data/vp_sentences2_lemma.txt";
+        readSent1 = "/home/satwik/VisualWord2Vec/data/vp/vp_sentences1_lemma.txt";
+        readSent2 = "/home/satwik/VisualWord2Vec/data/vp/vp_sentences2_lemma.txt";
     }
     
     // read sentences
@@ -166,31 +166,31 @@ void readVPSentenceFeatures(){
 
     if(debugModeVP){
         // Files for co-occurance features
-        cocFeat1 = "/home/satwik/VisualWord2Vec/data/vp_features_coc_1_debug.txt";
-        cocFeat2 = "/home/satwik/VisualWord2Vec/data/vp_features_coc_2_debug.txt";
+        cocFeat1 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_coc_1_debug.txt";
+        cocFeat2 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_coc_2_debug.txt";
 
         // Files for total frequency features
-        tfFeat1 = "/home/satwik/VisualWord2Vec/data/vp_features_tf_1_debug.txt";
-        tfFeat2 = "/home/satwik/VisualWord2Vec/data/vp_features_tf_2_debug.txt";
+        tfFeat1 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_tf_1_debug.txt";
+        tfFeat2 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_tf_2_debug.txt";
 
         // Also read the ground truth file, test/train split, validation set
-        gtPath = "/home/satwik/VisualWord2Vec/data/vp_ground_truth_debug.txt";
-        splitPath = "/home/satwik/VisualWord2Vec/data/vp_split_debug.txt";
-        validPath = "/home/satwik/VisualWord2Vec/data/vp_val_inds_debug.txt";
+        gtPath = "/home/satwik/VisualWord2Vec/data/vp/vp_ground_truth_debug.txt";
+        splitPath = "/home/satwik/VisualWord2Vec/data/vp/vp_split_debug.txt";
+        validPath = "/home/satwik/VisualWord2Vec/data/vp/vp_val_inds_debug.txt";
     }
     else{
         // Files for co-occurance features
-        cocFeat1 = "/home/satwik/VisualWord2Vec/data/vp_features_coc_1.txt";
-        cocFeat2 = "/home/satwik/VisualWord2Vec/data/vp_features_coc_2.txt";
+        cocFeat1 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_coc_1.txt";
+        cocFeat2 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_coc_2.txt";
 
         // Files for total frequency features
-        tfFeat1 = "/home/satwik/VisualWord2Vec/data/vp_features_tf_1.txt";
-        tfFeat2 = "/home/satwik/VisualWord2Vec/data/vp_features_tf_2.txt";
+        tfFeat1 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_tf_1.txt";
+        tfFeat2 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_tf_2.txt";
 
         // Also read the ground truth file, test/train split, validation set
-        gtPath = "/home/satwik/VisualWord2Vec/data/vp_ground_truth.txt";
-        splitPath = "/home/satwik/VisualWord2Vec/data/vp_split.txt";
-        validPath = "/home/satwik/VisualWord2Vec/data/vp_val_inds_1k.txt";
+        gtPath = "/home/satwik/VisualWord2Vec/data/vp/vp_ground_truth.txt";
+        splitPath = "/home/satwik/VisualWord2Vec/data/vp/vp_split.txt";
+        validPath = "/home/satwik/VisualWord2Vec/data/vp/vp_val_inds_1k.txt";
         //validPath = "/home/satwik/VisualWord2Vec/data/vp_val_inds.txt";
     }
 

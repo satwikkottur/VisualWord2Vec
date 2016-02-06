@@ -9,7 +9,8 @@ from Word2Vec import *
 
 # Read embeddings
 dataPath = '/home/satwik/VisualWord2Vec/data/';
-genomePath = '/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/vis-genome/';
+modelPath = '/home/satwik/VisualWord2Vec/models/';
+#genomePath = '/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/vis-genome/';
 
 # MSCOCO before
 #embedPath = dataPath + 'al_vectors.txt';
@@ -18,11 +19,16 @@ genomePath = '/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/vis-genome/
 # Wiki before
 #embedPath = dataPath + 'word2vec_wiki_iter_before.bin';
 # Genome after
-embedPath = genomePath + 'word2vec_genome_01_commonsense.bin';
+#embedPath = genomePath + 'word2vec_genome_01_commonsense.bin';
 # Genome before
 #embedPath = genomePath + 'word2vec_genome_train.bin';
 # Wiki after
 #embedPath = dataPath + 'word2vec_wiki_iter_after.bin';
+#(embeds, embedDim, vocabSize) = loadWord2Vec(embedPath);
+# VP before
+#embedPath = modelPath + 'word2vec_coco_vp_lemma.bin';
+# VP after
+embedPath = modelPath + 'word2vec_vp_17.bin';
 (embeds, embedDim, vocabSize) = loadWord2Vec(embedPath);
 
 # Read all the coco captions and write training and testing separately
@@ -34,9 +40,9 @@ with open(cocoPath, 'r') as fileId:
 # features = [computeEmbedding(line[1], embeds, embedDim) for line in lines];
 
 # Opening the files to save the embeddings
-trainPath = dataPath + 'vis-genome/coco/train_caption_embeds_after_01.txt';
-testPath = dataPath + 'vis-genome/coco/test_caption_embeds_after_01.txt';
-mapPath = dataPath + 'vis-genome/coco/test_caption_maps.txt';
+trainPath = dataPath + 'vp/coco/train_caption_embeds_after.txt';
+testPath = dataPath + 'vp/coco/test_caption_embeds_after.txt';
+mapPath = dataPath + 'vp/coco/test_caption_map.txt';
 
 testFeats = [];
 trainFeats = [];

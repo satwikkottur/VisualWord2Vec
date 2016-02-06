@@ -58,13 +58,13 @@ void readTestValRetriever(char* trainPath, char* valPath, char* mapPath, char* t
 void performRetrieval(){
     // Compute the embeddings
     computeSentenceEmbeddings(valSents, noVal);
-    //computeSentenceEmbeddings(testSents, noTest);
+    computeSentenceEmbeddings(testSents, noTest);
     computeSentenceEmbeddings(trainSents, noTrain);
     
     // Perform the retrieval for validation set
     performSetRetrieval(valSents, noVal);
     // Perform the retrieval for test set
-    //performSetRetrieval(testSents, noTest);
+    performSetRetrieval(testSents, noTest);
 }
 
 // Perform retrieval on each of validation and test datasets
@@ -135,9 +135,11 @@ void* performRetrievalThread(void* retParams){
 
     long i, j, d, gtRank = 0;
     for (i = params->startIndex; i < params->endIndex; i++){
-        if (i % 200 == 0) 
+        if (i % 200 == 0){
             printf("Current instance (%d) : %ld (%ld) ...\n", params->threadId,
                                                 i, params->endIndex);
+            fflush(stdout);
+        }
 
         for (j = 0; j < noTrain; j++){
             // Compute the dot product for the current train and validation sentence

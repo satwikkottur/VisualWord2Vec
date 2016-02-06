@@ -301,8 +301,8 @@ void computeSentenceEmbeddings(struct Sentence* collection, long noSents){
         // Normalize the mean, if count > 0
         if(collection[i].actCount > 0)
             for (d = 0; d < layer1_size; d++)
-                mean[d] /= collection[i].actCount;
-                //mean[d] /= sqrt(collection[i].actCount);
+                //mean[d] /= collection[i].actCount;
+                mean[d] /= sqrt(collection[i].actCount);
 
         // Compute the magnitude
         for(d = 0; d < layer1_size; d++)
@@ -392,9 +392,11 @@ void* refineNetworkThread(void* refineParams){
     // Read each of the training sentences
     for(i = params->startIndex; i < params->endIndex; i++){
         // Print status
-        if (i%1000 == 0)
+        if (i%1000 == 0){
             printf("Training (%d) : %ld (%ld - %ld)....\n", params->threadId, i,
                                         params->startIndex, params->endIndex);
+            fflush(stdout);
+        }
         
         // Checking possible fields to avoid segmentation error
         if(trainSents[i].cId < 1 || trainSents[i].cId > noClusters) {

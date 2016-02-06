@@ -27,7 +27,7 @@ def computeGroundTruthRank(testFeats, trainFeats, gTruths, workerId):
 
         # Get the rank of the ground truth
      
-    template = 'ranks/vis-genome/mscoco/ranks_%02d_after.txt';
+    template = 'ranks/vp/ranks_%02d_before.txt';
     #template = 'ranks/mscoco/ranks_%02d_before.txt';
     # Write it to a file
     with open(template % workerId, 'w') as fileId:
@@ -35,10 +35,10 @@ def computeGroundTruthRank(testFeats, trainFeats, gTruths, workerId):
 
 # Function to compute the ranks using multiprocessing
 def getRanks():
-    dataPath = '/home/satwik/VisualWord2Vec/data/vis-genome/coco/';
+    dataPath = '/home/satwik/VisualWord2Vec/data/vp/coco/';
 
-    train = np.loadtxt(dataPath + 'train_caption_embeds_after_01.txt', skiprows=1);
-    test = np.loadtxt(dataPath + 'test_caption_embeds_after_01.txt', skiprows=1);
+    train = np.loadtxt(dataPath + 'train_caption_embeds_before.txt', skiprows=1);
+    test = np.loadtxt(dataPath + 'test_caption_embeds_before.txt', skiprows=1);
     truth = np.loadtxt(dataPath + 'test_caption_maps.txt', int)
 
     # Normalize all the vectors (test and train)
@@ -85,9 +85,9 @@ def getStats():
     return stats;
 ###############################################################
 if __name__ == '__main__':
-    #getRanks();
+    getRanks();
 
-    getStats();
+    #getStats();
 
 ################################################################
 # Additional information

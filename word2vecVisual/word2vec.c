@@ -41,7 +41,7 @@ extern float *syn0P, *syn0S, *syn0R;
 
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
-int trainMulti = 0; // Train single / multiple models for P,R,S
+int trainMulti = 1; // Train single / multiple models for P,R,S
 int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
 int clusterVQA = 100; // Number of initial clusters to use
@@ -599,8 +599,9 @@ void commonSenseWrapper(){
     //char wordPath[] = "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/al_vectors.txt";
     //char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_train.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
-    char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
+    //char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
     //char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_02.bin";
+    char wordPath[] = "/home/satwik/VisualWord2Vec/libs/wordvec_image/jiasen.bin";
     loadWord2Vec(wordPath);
 
     // [S] added
@@ -1012,17 +1013,17 @@ void visualParaphraseWrapper(){
     char* featurePath = (char*) malloc(sizeof(char) * 100);
 
     if(debugModeVP)
-        featurePath = "/home/satwik/VisualWord2Vec/data/vp_train_debug.txt";
+        featurePath = "/home/satwik/VisualWord2Vec/data/vp/vp_train_debug.txt";
     else
-        featurePath = "/home/satwik/VisualWord2Vec/data/vp_train_full.txt";
+        featurePath = "/home/satwik/VisualWord2Vec/data/vp/vp_train_full.txt";
 
     if(usePCA)
-        visualPath = "/home/satwik/VisualWord2Vec/data/abstract_features_train_pca.txt";
+        visualPath = "/home/satwik/VisualWord2Vec/data/vp/abstract_features_train_pca.txt";
     else{
         if(debugModeVP)
-            visualPath = "/home/satwik/VisualWord2Vec/data/abstract_features_debug.txt";
+            visualPath = "/home/satwik/VisualWord2Vec/data/vp/abstract_features_debug.txt";
         else
-            visualPath = "/home/satwik/VisualWord2Vec/data/abstract_features_train.txt";
+            visualPath = "/home/satwik/VisualWord2Vec/data/vp/abstract_features_train.txt";
     }
 
     // Reading for the word features and visual features
@@ -1033,7 +1034,7 @@ void visualParaphraseWrapper(){
     tokenizeTrainSentences();
     
     // Compute embeddings
-    performVPTask();
+    //performVPTask();
 
     // Clustering the visual features
     if(debugModeVP)
@@ -1051,6 +1052,8 @@ void visualParaphraseWrapper(){
     // Initializing the refining network
     initRefining();
 
+    // Save path for the word2vec
+    char* savePath;
     for(i = 0; i < noIters; i++){
         printf("Refining : %d / %d\n", i, noIters);
 
@@ -1060,7 +1063,10 @@ void visualParaphraseWrapper(){
         // Compute embeddings
         performVPTask();
 
-        // Also compute the results for 
+        savePath = (char*) malloc(sizeof(char) * 200);
+        // Also save the embeddings
+        sprintf(savePath, "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/vp/word2vec_vp_%d.bin", i);
+        saveWord2Vec(savePath);
     }
 
     // Save the refined word2vec features for the VP sentences
@@ -1441,7 +1447,7 @@ void TrainModel() {
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings_100.bin";
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings_50.bin";
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings_pre_refine.bin";
-    //char beforeEmbedPath[] = "modelsNdata/word2vec_vp_lemma.bin";
+    char beforeEmbedPath[] = "modelsNdata/word2vec_vp_lemma.bin";
     //char beforeEmbedPath[] = "modelsNdata/mscoco_before.bin";
 
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
@@ -1452,7 +1458,7 @@ void TrainModel() {
     //***************************************************************************************
     
     // Visual paraphrase task
-    //visualParaphraseWrapper();
+    visualParaphraseWrapper();
 
     // Training from MS COCO
     //mscocoWrapper();
@@ -1467,7 +1473,7 @@ void TrainModel() {
     //commonSenseWrapper();
     
     // Retriever Wrapper
-    retrieverWrapper();
+    //retrieverWrapper();
 
     // Visual genome task
     //visualGenomeWrapper();

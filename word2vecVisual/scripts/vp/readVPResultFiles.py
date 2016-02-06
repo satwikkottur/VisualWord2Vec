@@ -21,11 +21,10 @@ def printResults(dumpPath):
     testScores = [float(i.group(1)) for i in splitLines if i is not None];
 
     print dumpPath
-    print 'Baseline: %s\nBest VP: %s\n' % \
-                (testScores[0], testScores[valScores.index(max(valScores[0:100]))])
+    maxIndex = valScores.index(max(valScores[0:100]));
+    print 'Baseline: %s\nBest VP: %s\n' % (testScores[0], testScores[maxIndex]);
     # Also print the std over the last 40 runs
     print 'Std over iterations: %f' % np.std(np.array(testScores))
-    pdb.set_trace();
     fileId.close();
 
 ###########################################################################
@@ -52,7 +51,7 @@ dumpPaths.extend(['out_enum_test_sents', \
                     'out_enum_wiki_winds_pca']);'''
 
 dumpPaths = [];
-dumpPaths.extend(['out_vp_50_descs_pca', \
+'''dumpPaths.extend(['out_vp_50_descs_pca', \
                 'out_vp_50_sents', \
                 'out_vp_50_sents_pca', \
                 'out_vp_50_descs', \
@@ -68,7 +67,7 @@ dumpPaths.extend(['out_vp_100_descs_pca', \
                 'out_vp_100_winds', \
                 'out_vp_100_winds_pca', \
                 'out_vp_100_words', \
-                'out_vp_100_words_pca']);
+                'out_vp_100_words_pca']);'''
 
 '''dumpPaths.extend(['out_vp_wiki_50_descs_pca', \
                 'out_vp_wiki_50_sents', \
@@ -106,6 +105,6 @@ dumpPaths.extend(['out_vp_wiki_100_descs_pca', \
                     'out_wiki_winds', \
                     'out_wiki_winds_pca']);'''
 
-dumpPaths = ['out_vp_100_sents_pca'];
+dumpPaths = ['out_saving_vp_embeddings'];
 for i in dumpPaths:
     printResults(i);

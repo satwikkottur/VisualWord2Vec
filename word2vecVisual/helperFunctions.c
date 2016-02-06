@@ -1,7 +1,12 @@
 # include "helperFunctions.h"
 // Saving the word2vec vectors for further use
 void saveWord2Vec(char* fileName){
-    FILE* filePt = fopen(fileName, "wb");
+    FILE* filePt = fopen(fileName, "w");
+
+    if(filePt == NULL){
+        printf("Directory doesn't exist at %s\n", fileName);
+        exit(1);
+    }
 
     // Write the vocab size and embedding dimension on the first line
     fprintf(filePt, "%lld %lld\n", vocab_size, layer1_size);
@@ -83,7 +88,7 @@ struct Sentence** readSentences(char* featurePath, long* noSents){
     FILE* filePtr = fopen(featurePath, "rb");
 
     if(filePtr == NULL){
-        printf("File not found !\n");
+        printf("File not found at %s!\n", featurePath);
         exit(1);
     }
 
