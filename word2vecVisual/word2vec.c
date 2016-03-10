@@ -41,7 +41,7 @@ extern float *syn0P, *syn0S, *syn0R;
 
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
-int trainMulti = 1; // Train single / multiple models for P,R,S
+int trainMulti = 0; // Train single / multiple models for P,R,S
 int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
 int clusterVQA = 100; // Number of initial clusters to use
@@ -601,7 +601,8 @@ void commonSenseWrapper(){
     //char wordPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
     //char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_02.bin";
-    char wordPath[] = "/home/satwik/VisualWord2Vec/libs/wordvec_image/jiasen.bin";
+    char wordPath[] = "modelsNdata/word2vec_coco_word2vec_300.bin";
+    //char wordPath[] = "/home/satwik/VisualWord2Vec/libs/wordvec_image/jiasen.bin";
     loadWord2Vec(wordPath);
 
     // [S] added
@@ -1447,7 +1448,7 @@ void TrainModel() {
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings_100.bin";
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings_50.bin";
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings_pre_refine.bin";
-    char beforeEmbedPath[] = "modelsNdata/word2vec_vp_lemma.bin";
+    //char beforeEmbedPath[] = "modelsNdata/word2vec_vp_lemma.bin";
     //char beforeEmbedPath[] = "modelsNdata/mscoco_before.bin";
 
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
@@ -1458,7 +1459,7 @@ void TrainModel() {
     //***************************************************************************************
     
     // Visual paraphrase task
-    visualParaphraseWrapper();
+    //visualParaphraseWrapper();
 
     // Training from MS COCO
     //mscocoWrapper();
@@ -1470,14 +1471,14 @@ void TrainModel() {
     //printf("\nChange over!\n");
     
     // Common sense task
-    //commonSenseWrapper();
+    commonSenseWrapper();
     
     // Retriever Wrapper
     //retrieverWrapper();
 
     // Visual genome task
     //visualGenomeWrapper();
-    return;
+    //return;
 
     //***************************************************************************************
     /***************************************************************************************/

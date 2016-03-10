@@ -35,7 +35,7 @@ class Aligner:
         with open(captionPath, 'r') as fileId:
             self.captions = [l.strip('\n') for l in fileId.readlines()];
             self.capWords = [l.split(' ') for l in self.captions];
-            
+
     # Collecting unique clipart objects and tuples, getting counts
     def computeCounts(self):
         # Count (co)-occurance for each caption and clipart (based on scene)
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     #with open(savePath, 'w') as fileId:
     #    pickle.dump(align, fileId);
     #print 'Saved at : %s' % savePath
-        
+
     # Load the pickle for align
     with open(savePath, 'r') as fileId:
         align = pickle.load(fileId);

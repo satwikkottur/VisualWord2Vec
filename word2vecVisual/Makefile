@@ -45,7 +45,7 @@ vp:
 
 coco:
 	make
-	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma.txt -output modelsNdata/word2vec_coco_word2vec.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 30 -binary 0 -min-count 0
+	./$(BIN)word2vec -train /home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_lemma.txt -output modelsNdata/word2vec_coco_after_300.bin -cbow 0 -size 300 -window 5 -negative 0 -hs 1 -threads 30 -binary 0 -min-count 0
 
 wikiplain:
 	make

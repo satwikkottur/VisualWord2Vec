@@ -24,7 +24,7 @@ def convertSceneJSON(origPath, alignment, sceneClipart, savePath):
     #      - primaryObject, primaryName, 
     #      - secondaryObject, secondaryName, 
     #      - relationName, init (not relevant ?)
-    new['primarName'] = alignment['tuple'][0];
+    new['primaryName'] = alignment['tuple'][0];
     new['secondaryName'] = alignment['tuple'][2];
     new['relationName'] = alignment['tuple'][1];
     new['init'] = origPath.split('/')[-1];
@@ -83,10 +83,11 @@ if __name__ == '__main__':
                 convertSceneJSON(scenePath % sceneId, tup, \
                         alignment[sceneId]['clipart'], savePath % tupleId);
                 # Register the tuple in the dictionary
-                dictId.write('<%s:%s:%s>%d\n' % (tup['tuple'][0], \
+                dictId.write('<%s:%s:%s>(%d,%d)\n' % (tup['tuple'][0], \
                                                     tup['tuple'][1], \
                                                     tup['tuple'][2], \
-                                                    tupleId));
+                                                    tupleId, sceneId));
                 tupleId += 1;
+
 
     dictId.close();
