@@ -17,7 +17,7 @@ def convertSceneJSON(origPath, alignment, sceneClipart, savePath):
     # Open the JSON file
     with open(origPath, 'r') as fileId:
         orig = json.load(fileId);
-    
+
     # Make necessary changes
     new = orig['scene'];
     # Add few additional fields
@@ -36,13 +36,14 @@ def convertSceneJSON(origPath, alignment, sceneClipart, savePath):
                                         for i in new['availableObject'] \
                                         for j in i['instance'] \
                                         if j['present']];
-    
+
     # Get the aligned cliparts for P, S
-    pAlign = [alignment['P'] in i['name'] for (i, _, _) in present];
-    sAlign = [alignment['S'] in i['name'] for (i, _, _) in present];
+    pAlign = [i['name'] in alignment['P'] for (i, _, _) in present];
+    sAlign = [i['name'] in alignment['S'] for (i, _, _) in present];
 
     if True not in pAlign or True not in sAlign:
         # Something is wrong!
+        print 'Something is wrong! No match found!'
         sys.exit(0);
     else:
         pClipart = present[pAlign.index(True)];
@@ -88,6 +89,5 @@ if __name__ == '__main__':
                                                     tup['tuple'][2], \
                                                     tupleId, sceneId));
                 tupleId += 1;
-
 
     dictId.close();

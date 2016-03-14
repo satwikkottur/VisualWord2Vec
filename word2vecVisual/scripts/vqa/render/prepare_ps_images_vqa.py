@@ -7,6 +7,7 @@ import os
 import sys
 import re
 import pdb
+import multiprocessing as mp
 
 # Author: Satwik Kottur
 # Adapted from code from Ramakrishna Vedantam
@@ -32,8 +33,27 @@ def prepareRenderer():
     return render;
 
 #######################################################################
+def renderWorker(tuples, render, imgFormat, jsonFormat, workerId):
+    for iterId, tup in enumerate(tuples):
+        if iterId % 5 == 0:
+            # Print progress
+            print 'Rendering (%d) %s / %s scene ..'%(workerId, iterId, len(tuples))
+
+        # Read the json
+        tupleId = int(tup.group(4));
+
+        data = json.load(open(jsonFormat % tupleId, 'r'));
+
+        # Render each scene, one by one
+        render.render_one_scene({'imgName': imgFormat % tupleId, 'scene' : data},
+                                data['primaryObject']['idx'],
+                                data['primaryObject']['ins'],
+                                data['secondaryObject']['idx'],
+                                data['secondaryObject']['ins'])
+
+#######################################################################
 # Main function
-def main():
+def main(numWorkers):
     # Get the renderer
     print 'Obtaining renderer'
     render = prepareRenderer();
@@ -51,22 +71,24 @@ def main():
     imgFormat = dataPath + 'tuple_images/%012d.png';
     jsonFormat = dataPath + 'iccv_json/%d.json';
 
-    for iterId, tup in enumerate(tuples):
-        # Print progress
-        print 'Rendering %s / %s scene ..' % (iterId, len(tuples))
+    # Create the workers
+    jobs = [];
 
-        # Read the json
-        tupleId = int(tup.group(4));
+    print 'Starting workers..'
+    for i in xrange(numWorkers):
+        p = mp.Process(target = renderWorker, \
+            args = (tuples[i::numWorkers], render, imgFormat, jsonFormat, i));
 
-        data = json.load(open(jsonFormat % tupleId, 'r'));
+        # Start the job
+        jobs.append(p);
+        p.start();
 
-        # Render each scene, one by one
-        render.render_one_scene({'imgName': imgFormat % tupleId, 'scene' : data},
-                                data['primaryObject']['idx'], data['primaryObject']['ins'],
-                                data['secondaryObject']['idx'], data['secondaryObject']['ins'])
-
+    # Wait for the jobs to get done
+    for job in jobs:
+        job.join();
 
 if __name__ == '__main__':
-    main();
+    numWorkers = 60;
+    main(numWorkers);
 
 #######################################################################

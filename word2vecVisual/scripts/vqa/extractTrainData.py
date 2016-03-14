@@ -4,16 +4,17 @@ import re
 import random
 import numpy as np
 import os
+import pdb
 
 # Setting up the paths
 dataPath = '/home/satwik/VisualWord2Vec/data/vqa/';
-featPath = dataPath + 'iccv_feature_parallel/';
+featPath = dataPath + 'iccv_features/';
 
 # Read the tuple dictionary
 with open(dataPath + 'vqa_tuples_train_dict.txt', 'r') as fileId:
-    tuples = [re.search('<([^<>:]*):([^<>:]*):([^<>:]*)>(\d*)', i.strip('\n'))\
+    tuples = [re.search('<([^<>:]*):([^<>:]*):([^<>:]*)>\((\d*),(\d*)\)', i.strip('\n'))\
                             for i in fileId.readlines()];
-    
+
 # Shuffle the tuples
 random.shuffle(tuples);
 
@@ -40,9 +41,9 @@ for tup in tuples:
     noTuples += 1;
     print 'Saving tuple: ' + str(noTuples)
 
-tupleId.close();    
+tupleId.close();
 
 # Save the features
 featSavePath = dataPath + 'vqa_float_features.txt';
-np.savetxt(featSavePath, np.array(features), fmt='%0.6f', delimiter=' ', 
+np.savetxt(featSavePath, np.array(features), fmt='%0.6f', delimiter=' ',
                     header=str(len(features[0])), comments='');

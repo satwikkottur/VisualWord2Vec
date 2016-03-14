@@ -162,11 +162,11 @@ class Aligner:
             return counter[keyList]
 #**********************************************************************
 # Main function showing the usage of the class Aligner
-if __name__ == '__main__':
+def main():
     # Add data path
     dataPath = '/home/satwik/VisualWord2Vec/data/vqa/';
-    sceneTypePath = dataPath + 'scene_type.cPickle';
-    clipartPath = dataPath + 'clipart_occurance.cPickle';
+    sceneTypePath = dataPath + 'scene_type.pickle';
+    clipartPath = dataPath + 'clipart_occurance.pickle';
     captionPath = dataPath + 'vqa_train_captions_lemma_order.txt';
 
     #align = Aligner(sceneTypePath, clipartPath, captionPath);
@@ -201,6 +201,9 @@ if __name__ == '__main__':
     # For a given word and set of cliparts, get the alignment
     #align.alignClipart(word, cliparts, sceneType);
 
+###################################################################################
+if __name__ == '__main__':
+    main();
 ###################################################################################
 # Collection Bin (for extra code)
 # Code for counting from tuples
