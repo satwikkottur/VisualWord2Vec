@@ -63,6 +63,7 @@ enum TrainMode trainMode = SENTENCES;
 const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
 
 char train_file[MAX_STRING], output_file[MAX_STRING];
+char embed_file[MAX_STRING];
 char save_vocab_file[MAX_STRING], read_vocab_file[MAX_STRING];
 struct vocab_word *vocab;
 int binary = 0, cbow = 1, debug_mode = 2, window = 5, min_count = 5, num_threads = 12, min_reduce = 1;
@@ -356,14 +357,14 @@ void ReadVocab() {
     printf("Vocab size: %lld\n", vocab_size);
     printf("Words in train file: %lld\n", train_words);
   }
-  fin = fopen(train_file, "rb");
+  /*fin = fopen(train_file, "rb");
   if (fin == NULL) {
     printf("ERROR: training data file not found!\n");
     exit(1);
   }
   fseek(fin, 0, SEEK_END);
   file_size = ftell(fin);
-  fclose(fin);
+  fclose(fin);*/
 }
 
 void InitNet() {
@@ -1426,24 +1427,91 @@ void visualGenomeWrapper(){
     }
 }
 
-///////////////////////////////////////////////////////////////////////////
-void TrainModel() {
-    long a, b, c, d;
-    FILE *fo;
-    pthread_t *pt = (pthread_t *)malloc(num_threads * sizeof(pthread_t));
-    printf("Starting training using file %s\n", train_file);
+//=====================================================================
+// Initializing the network and read the embeddings
+void initializeNetwork(char* embedPath){
+    FILE* filePt = fopen(embedPath, "rb");
+    
+    long long i, j, offset;
+    long dims;
+    float value;
+    char word[MAX_STRING];
+    unsigned int hash, length;
+
+    //------------------------------------------------------------
+    // Read vocab size and number of hidden layers
+    if (!fscanf(filePt, "%lld %ld\n", &vocab_size, &dims)){
+        printf("Error reading the embed file!");
+        exit(1);
+    }
+
+    if(layer1_size != dims){
+        printf("Number of dimensions not consistent with embedding file!\n");
+        exit(1);
+    }
+    //------------------------------------------------------------
+    // Allocate memory for the intput-to-hidden parameters
+    printf("(vocab size, hidden dims): %lld %lld\n", vocab_size, layer1_size);
+    int flag = posix_memalign((void **)&syn0, 128, (long long)vocab_size * layer1_size * sizeof(real));
+    if (syn0 == NULL || flag){
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    //------------------------------------------------------------
+    // Allocating memory for reading vocab, initialize hash
+    vocab = (struct vocab_word*) malloc(vocab_size * sizeof(struct vocab_word));
+    vocab_hash = (int*) malloc(sizeof(int) * vocab_hash_size);
+    for (i = 0; i < vocab_hash_size; i++) vocab_hash[i] = -1;
+
+    // Reading the words and feature and store them sequentially
+    for (i = 0; i < vocab_size; i++){
+        // Store the word
+        if (!fscanf(filePt, "%s", word)){
+            printf("Error reading the embed file!");
+            exit(1);
+        }
+        //printf("%lld, %lld, %s\n", i, vocab_size, word);
+        
+        length = strlen(word) + 1;
+        // Truncate if needed
+        if (length > MAX_STRING) length = MAX_STRING;
+
+        vocab[i].word = (char*) calloc(length, sizeof(char));
+        strcpy(vocab[i].word, word);
+        vocab[i].cn = 0;
+
+        hash = GetWordHash(word);
+        while (vocab_hash[hash] != -1) hash = (hash + 1) % vocab_hash_size;
+        vocab_hash[hash] = vocab_size - 1;
+
+        // Store feature
+        offset = layer1_size * i;
+        for (j = 0; j < layer1_size; j++){
+            if (!fscanf(filePt, "%f", &value)){
+                printf("Error reading the embed file!");
+                exit(1);
+            }
+
+            // Storing the value
+            syn0[offset + j] = value;
+        }
+    }
+
+    // Close the file and exit
+    fclose(filePt);
+    printf("Done reading and initializing embeddings...\n");
+}
+
+//=====================================================================
+void trainModel() {
+    printf("Reading embedding initializations from %s\n", embed_file);
     starting_alpha = alpha;
-    if (read_vocab_file[0] != 0) ReadVocab(); else LearnVocabFromTrainFile();
-    if (save_vocab_file[0] != 0) SaveVocab();
+
+    // Read the embeddings and initializing the network
+    initializeNetwork(embed_file);
+    
+    // Ensure output file is not empty (write something out after done)
     if (output_file[0] == 0) return;
-    InitNet();
-    // [S] : Create a unigram distribution table for negative sampling
-    if (negative > 0) InitUnigramTable();
-    start = clock();
-    // [S] : Creates the threads for execution
-    //for (a = 0; a < num_threads; a++) pthread_create(&pt[a], NULL, TrainModelThread, (void *)a);
-    // [S] : Waits for the completion of execution of the threads
-    //for (a = 0; a < num_threads; a++) pthread_join(pt[a], NULL);
 
     // Save the embeddings before refining 
     //char beforeEmbedPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
@@ -1473,7 +1541,7 @@ void TrainModel() {
     //printf("\nChange over!\n");
     
     // Common sense task
-    commonSenseWrapper();
+    //commonSenseWrapper();
     return;
     
     // Retriever Wrapper
@@ -1530,7 +1598,7 @@ void TrainModel() {
     }
     fclose(fo);
     return;*/
-    /***************************************************************************************/
+    /**************************************************************************************
     
     fo = fopen(output_file, "wb");
     if (classes == 0) {
@@ -1586,94 +1654,61 @@ void TrainModel() {
     free(cent);
     free(cl);
     }
-    fclose(fo);
+    fclose(fo);*/
 }
 
+// Obtain the position of an argument in the list
 int ArgPos(char *str, int argc, char **argv) {
-  int a;
-  for (a = 1; a < argc; a++) if (!strcmp(str, argv[a])) {
-    if (a == argc - 1) {
-      printf("Argument missing for %s\n", str);
-      exit(1);
+    int a;
+    for (a = 1; a < argc; a++) if (!strcmp(str, argv[a])) {
+        if (a == argc - 1) {
+            printf("Argument missing for %s\n", str);
+            exit(1);
+        }
+        return a;
     }
-    return a;
-  }
-  return -1;
+    return -1;
 }
 
+// Read the arguments and setup corrresponding flags / variables
 int main(int argc, char **argv) {
-  int i;
-  if (argc == 1) {
-    printf("WORD VECTOR estimation toolkit v 0.1c\n\n");
-    printf("Options:\n");
-    printf("Parameters for training:\n");
-    printf("\t-train <file>\n");
-    printf("\t\tUse text data from <file> to train the model\n");
-    printf("\t-output <file>\n");
-    printf("\t\tUse <file> to save the resulting word vectors / word clusters\n");
-    printf("\t-size <int>\n");
-    printf("\t\tSet size of word vectors; default is 100\n");
-    printf("\t-window <int>\n");
-    printf("\t\tSet max skip length between words; default is 5\n");
-    printf("\t-sample <float>\n");
-    printf("\t\tSet threshold for occurrence of words. Those that appear with higher frequency in the training data\n");
-    printf("\t\twill be randomly down-sampled; default is 1e-3, useful range is (0, 1e-5)\n");
-    printf("\t-hs <int>\n");
-    printf("\t\tUse Hierarchical Softmax; default is 0 (not used)\n");
-    printf("\t-negative <int>\n");
-    printf("\t\tNumber of negative examples; default is 5, common values are 3 - 10 (0 = not used)\n");
-    printf("\t-threads <int>\n");
-    printf("\t\tUse <int> threads (default 12)\n");
-    printf("\t-iter <int>\n");
-    printf("\t\tRun more training iterations (default 5)\n");
-    printf("\t-min-count <int>\n");
-    printf("\t\tThis will discard words that appear less than <int> times; default is 5\n");
-    printf("\t-alpha <float>\n");
-    printf("\t\tSet the starting learning rate; default is 0.025 for skip-gram and 0.05 for CBOW\n");
-    printf("\t-classes <int>\n");
-    printf("\t\tOutput word classes rather than word vectors; default number of classes is 0 (vectors are written)\n");
-    printf("\t-debug <int>\n");
-    printf("\t\tSet the debug mode (default = 2 = more info during training)\n");
-    printf("\t-binary <int>\n");
-    printf("\t\tSave the resulting vectors in binary moded; default is 0 (off)\n");
-    printf("\t-save-vocab <file>\n");
-    printf("\t\tThe vocabulary will be saved to <file>\n");
-    printf("\t-read-vocab <file>\n");
-    printf("\t\tThe vocabulary will be read from <file>, not constructed from the training data\n");
-    printf("\t-cbow <int>\n");
-    printf("\t\tUse the continuous bag of words model; default is 1 (use 0 for skip-gram model)\n");
-    printf("\nExamples:\n");
-    printf("./word2vec -train data.txt -output vec.txt -size 200 -window 5 -sample 1e-4 -negative 5 -hs 0 -binary 0 -cbow 1 -iter 3\n\n");
+    int i;
+    if (argc == 1) {
+        printf("Visual Word2Vec:\n\n");
+        printf("Options:\n");
+        printf("Parameters for training:\n");
+        printf("\t-embed-path <file>\n");
+        printf("\t\tPath to pre-trained embeddings to use for refining\n");
+        printf("\t-train <file>\n");
+        printf("\t\tUse text data from <file> to train the model\n");
+        printf("\t-output <file>\n");
+        printf("\t\tUse <file> to save the resulting word vectors\n");
+        printf("\t-size <int>\n");
+        printf("\t\tSet size of word vectors; default is 100\n");
+        printf("\t-threads <int>\n");
+        printf("\t\tUse <int> threads (default 12)\n");
+        printf("\t-iter <int>\n");
+        printf("\t\tRun more training iterations (default 5)\n");
+        printf("\t-alpha <float>\n");
+        printf("\t\tSet the starting learning rate; default is 0.025 for skip-gram and 0.05 for CBOW\n");
+        printf("\nExamples:\n");
+        printf("./word2vec -train data.txt -output vec.txt -size 200 -window 5 -sample 1e-4 -negative 5 -hs 0 -binary 0 -cbow 1 -iter 3\n\n");
+        return 0;
+    }
+
+    output_file[0] = 0;
+
+    if ((i = ArgPos((char *)"-size", argc, argv)) > 0) layer1_size = atoi(argv[i + 1]);
+    if ((i = ArgPos((char *)"-train", argc, argv)) > 0) strcpy(train_file, argv[i + 1]);
+    if ((i = ArgPos((char *)"-embed-path", argc, argv)) > 0) strcpy(embed_file, argv[i + 1]);
+    if ((i = ArgPos((char *)"-alpha", argc, argv)) > 0) alpha = atof(argv[i + 1]);
+    if ((i = ArgPos((char *)"-output", argc, argv)) > 0) strcpy(output_file, argv[i + 1]);
+    if ((i = ArgPos((char *)"-threads", argc, argv)) > 0) num_threads = atoi(argv[i + 1]);
+    if ((i = ArgPos((char *)"-iter", argc, argv)) > 0) iter = atoi(argv[i + 1]);
+
+    vocab = (struct vocab_word *)calloc(vocab_max_size, sizeof(struct vocab_word));
+    vocab_hash = (int *)calloc(vocab_hash_size, sizeof(int));
+
+    trainModel();
     return 0;
-  }
-  output_file[0] = 0;
-  save_vocab_file[0] = 0;
-  read_vocab_file[0] = 0;
-  if ((i = ArgPos((char *)"-size", argc, argv)) > 0) layer1_size = atoi(argv[i + 1]);
-  if ((i = ArgPos((char *)"-train", argc, argv)) > 0) strcpy(train_file, argv[i + 1]);
-  if ((i = ArgPos((char *)"-save-vocab", argc, argv)) > 0) strcpy(save_vocab_file, argv[i + 1]);
-  if ((i = ArgPos((char *)"-read-vocab", argc, argv)) > 0) strcpy(read_vocab_file, argv[i + 1]);
-  if ((i = ArgPos((char *)"-debug", argc, argv)) > 0) debug_mode = atoi(argv[i + 1]);
-  if ((i = ArgPos((char *)"-binary", argc, argv)) > 0) binary = atoi(argv[i + 1]);
-  if ((i = ArgPos((char *)"-cbow", argc, argv)) > 0) cbow = atoi(argv[i + 1]);
-  if (cbow) alpha = 0.05;
-  if ((i = ArgPos((char *)"-alpha", argc, argv)) > 0) alpha = atof(argv[i + 1]);
-  if ((i = ArgPos((char *)"-output", argc, argv)) > 0) strcpy(output_file, argv[i + 1]);
-  if ((i = ArgPos((char *)"-window", argc, argv)) > 0) window = atoi(argv[i + 1]);
-  if ((i = ArgPos((char *)"-sample", argc, argv)) > 0) sample = atof(argv[i + 1]);
-  if ((i = ArgPos((char *)"-hs", argc, argv)) > 0) hs = atoi(argv[i + 1]);
-  if ((i = ArgPos((char *)"-negative", argc, argv)) > 0) negative = atoi(argv[i + 1]);
-  if ((i = ArgPos((char *)"-threads", argc, argv)) > 0) num_threads = atoi(argv[i + 1]);
-  if ((i = ArgPos((char *)"-iter", argc, argv)) > 0) iter = atoi(argv[i + 1]);
-  if ((i = ArgPos((char *)"-min-count", argc, argv)) > 0) min_count = atoi(argv[i + 1]);
-  if ((i = ArgPos((char *)"-classes", argc, argv)) > 0) classes = atoi(argv[i + 1]);
-  vocab = (struct vocab_word *)calloc(vocab_max_size, sizeof(struct vocab_word));
-  vocab_hash = (int *)calloc(vocab_hash_size, sizeof(int));
-  expTable = (real *)malloc((EXP_TABLE_SIZE + 1) * sizeof(real));
-  for (i = 0; i < EXP_TABLE_SIZE; i++) {
-    expTable[i] = exp((i / (real)EXP_TABLE_SIZE * 2 - 1) * MAX_EXP); // Precompute the exp() table
-    expTable[i] = expTable[i] / (expTable[i] + 1);                   // Precompute f(x) = x / (x + 1)
-  }
-  TrainModel();
-  return 0;
 }
