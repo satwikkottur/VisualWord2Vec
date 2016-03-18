@@ -601,8 +601,9 @@ void commonSenseWrapper(){
     //char wordPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
     //char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_02.bin";
-    char wordPath[] = "modelsNdata/word2vec_coco_word2vec_300.bin";
+    //char wordPath[] = "modelsNdata/word2vec_coco_word2vec_300.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/libs/wordvec_image/jiasen.bin";
+    char wordPath[] = "/home/satwik/VisualWord2Vec/data/vqa/word2vec_vqa_before.bin";
     loadWord2Vec(wordPath);
 
     // [S] added
@@ -619,7 +620,7 @@ void commonSenseWrapper(){
 
     // Common sense task
     // Reading the file for relation word
-    //featurePathVQA = "/home/satwik/VisualWord2Vec/data/vqa/vqa_psr_features.txt";
+    featurePathVQA = "/home/satwik/VisualWord2Vec/data/vqa/vqa_psr_features.txt";
     //featurePathCOCO = "/home/satwik/VisualWord2Vec/data/coco-cnn/PSR_features_coco.txt";
     featurePathICCV = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
@@ -644,8 +645,8 @@ void commonSenseWrapper(){
     else{
         //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_18.txt";
         //visualPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/float_features_coco.txt";
-        //visualPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_float_features.txt";
-        visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+        visualPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_float_features.txt";
+        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
         //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_R_120.txt";
     }
 
@@ -657,7 +658,8 @@ void commonSenseWrapper(){
     initFeatureHash();
     // Reading for the word features, cluster ids and visual features
     // clusterid reading will be avoided when clustering is ported to c
-    readRefineTrainFeatureFiles(featurePathICCV, NULL);
+    readRefineTrainFeatureFiles(featurePathVQA, featurePathICCV);
+    //readRefineTrainFeatureFiles(featurePathICCV, NULL);
     
     // reading cluster files from matlab
     //char clusterpath[] = "/home/satwik/visualword2vec/data/coco-cnn/cluster_100_coco_train.txt";
@@ -1472,6 +1474,7 @@ void TrainModel() {
     
     // Common sense task
     commonSenseWrapper();
+    return;
     
     // Retriever Wrapper
     //retrieverWrapper();

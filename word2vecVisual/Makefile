@@ -9,7 +9,8 @@ BLAS=$(LINEARPATH)blas/blas.a
 
 YAEL = -I /home/satwik/VisualWord2Vec/libs/yael -L /home/satwik/VisualWord2Vec/libs/yael/yael -lyael
 
-CFLAGS = -lm -pthread -O3 -march=native -Wall -lstdc++ -funroll-loops -Wno-unused-value $(YAEL) 
+CFLAGS = -lm -pthread -O3 -march=native -Wall -lstdc++ -funroll-loops $(YAEL) 
+#CFLAGS = -lm -pthread -O3 -march=native -Wall -lstdc++ -funroll-loops -Wno-unused-value $(YAEL) 
 
 MOVE=mv *.o $(BIN)
 BIN = bin/

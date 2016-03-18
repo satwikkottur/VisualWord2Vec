@@ -33,7 +33,7 @@ for tup in tuples:
         continue
 
     # Else write the tuple and feature
-    tupleId.write(tupleSaveFmt % (tup.group(1), tup.group(2), tup.group(3)));
+    tupleId.write(tupleSaveFmt % (tup.group(1), tup.group(3), tup.group(2)));
     matData = loadmat(path);
 
     features.append(matData['feat'][0]);

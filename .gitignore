@@ -31,6 +31,7 @@ word2vecVisual/bin
 libs/relationshipModeling/myTupleExtractor/SimpleSentences/
 libs/relationshipModeling/myTupleExtractor/data/
 
+# Ignoring Occurances
 # Ignoring dumps in the code folder
 code/src/dumps/*
 
