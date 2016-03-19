@@ -70,6 +70,7 @@ struct prsTuple** readPSRFeatureFile(char* filePath, long* tupleCount){
         }
     }
     else noTrain = noTuples;*/
+
     fclose(filePt);
     printf("File read with %ld tuples\n\n", noTuples);
     return tuplesPtr;
@@ -1061,7 +1062,7 @@ int addFeatureWord(char* word){
         if(featVocabSize + 2 > featVocabMaxSize){
             featVocabMaxSize += 1000;
             featHashWords = (struct featureWord *) realloc(featHashWords, 
-                                        featVocabMaxSize * sizeof(struct featureWord));
+                            featVocabMaxSize * sizeof(struct featureWord));
         }
 
         return featHashInd[hash];

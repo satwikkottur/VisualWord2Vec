@@ -21,7 +21,7 @@
 
 // Declaring the extern variables allowing separation of code
 extern long long vocab_size, layer1_size;
-extern float *syn0, *syn1, *expTable, *syn0raw;
+extern float *syn0, *syn1, *syn0raw;
 extern int* refineVocab;
 extern struct vocab_word* vocab;
 extern int permuteMAP;

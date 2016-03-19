@@ -94,7 +94,7 @@ void updateWeights(float* y, int wordId, int trueId){
     // compute gradient for outer layer weights, gradient g
     float* e = (float*) malloc(noClusters * sizeof(float));
     long long a, b, c, offset1, offset2;
-    float learningRateInner = 0.001, learningRateOuter = 0.05;
+    float learningRateInner = 0.01, learningRateOuter = 0.01;
 
     // Computing error
     for(b = 0; b < noClusters; b++){

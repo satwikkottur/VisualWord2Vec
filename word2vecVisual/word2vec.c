@@ -41,7 +41,7 @@ extern float *syn0P, *syn0S, *syn0R;
 
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
-int trainMulti = 0; // Train single / multiple models for P,R,S
+int trainMulti = 1; // Train single / multiple models for P,R,S
 int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterCOCO = 5000; // Number of initial clusters to use
 int clusterVQA = 100; // Number of initial clusters to use
@@ -80,24 +80,6 @@ int *table;
 
 int* refineVocab; // Keep track of words that are being refined
 float* syn0raw; // Backup for raw word2vec, without refining
-
-void InitUnigramTable() {
-  int a, i;
-  double train_words_pow = 0;
-  double d1, power = 0.75;
-  table = (int *)malloc(table_size * sizeof(int));
-  for (a = 0; a < vocab_size; a++) train_words_pow += pow(vocab[a].cn, power);
-  i = 0;
-  d1 = pow(vocab[i].cn, power) / train_words_pow;
-  for (a = 0; a < table_size; a++) {
-    table[a] = i;
-    if (a / (double)table_size > d1) {
-      i++;
-      d1 += pow(vocab[i].cn, power) / train_words_pow;
-    }
-    if (i >= vocab_size) i = vocab_size - 1;
-  }
-}
 
 // Reads a single word from a file, assuming space + tab + EOL to be word boundaries
 void ReadWord(char *word, FILE *fin) {
@@ -604,8 +586,8 @@ void commonSenseWrapper(){
     //char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_02.bin";
     //char wordPath[] = "modelsNdata/word2vec_coco_word2vec_300.bin";
     //char wordPath[] = "/home/satwik/VisualWord2Vec/libs/wordvec_image/jiasen.bin";
-    char wordPath[] = "/home/satwik/VisualWord2Vec/data/vqa/word2vec_vqa_before.bin";
-    loadWord2Vec(wordPath);
+    //char wordPath[] = "/home/satwik/VisualWord2Vec/data/vqa/word2vec_vqa_before.bin";
+    //loadWord2Vec(wordPath);
 
     // [S] added
     char* visualPath = (char*) malloc(sizeof(char) * 100);
@@ -621,7 +603,7 @@ void commonSenseWrapper(){
 
     // Common sense task
     // Reading the file for relation word
-    featurePathVQA = "/home/satwik/VisualWord2Vec/data/vqa/vqa_psr_features.txt";
+    //featurePathVQA = "/home/satwik/VisualWord2Vec/data/vqa/vqa_psr_features.txt";
     //featurePathCOCO = "/home/satwik/VisualWord2Vec/data/coco-cnn/PSR_features_coco.txt";
     featurePathICCV = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
@@ -646,8 +628,8 @@ void commonSenseWrapper(){
     else{
         //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_18.txt";
         //visualPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/float_features_coco.txt";
-        visualPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_float_features.txt";
-        //visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
+        //visualPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_float_features.txt";
+        visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
         //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_R_120.txt";
     }
 
@@ -657,10 +639,13 @@ void commonSenseWrapper(){
 
     // Initializing the hash
     initFeatureHash();
+    //printf("%ld %ld %ld\n", vocab_size, layer1_size);
+    //printf("Exiting!\n");
     // Reading for the word features, cluster ids and visual features
     // clusterid reading will be avoided when clustering is ported to c
-    readRefineTrainFeatureFiles(featurePathVQA, featurePathICCV);
+    //readRefineTrainFeatureFiles(featurePathVQA, featurePathICCV);
     //readRefineTrainFeatureFiles(featurePathICCV, NULL);
+    readRefineTrainFeatureFiles(featurePathICCV, featurePathICCV);
     
     // reading cluster files from matlab
     //char clusterpath[] = "/home/satwik/visualword2vec/data/coco-cnn/cluster_100_coco_train.txt";
@@ -1482,7 +1467,7 @@ void initializeNetwork(char* embedPath){
 
         hash = GetWordHash(word);
         while (vocab_hash[hash] != -1) hash = (hash + 1) % vocab_hash_size;
-        vocab_hash[hash] = vocab_size - 1;
+        vocab_hash[hash] = i;
 
         // Store feature
         offset = layer1_size * i;
@@ -1541,15 +1526,15 @@ void trainModel() {
     //printf("\nChange over!\n");
     
     // Common sense task
-    //commonSenseWrapper();
-    return;
+    commonSenseWrapper();
+    //return;
     
     // Retriever Wrapper
     //retrieverWrapper();
 
     // Visual genome task
     //visualGenomeWrapper();
-    //return;
+    return;
 
     //***************************************************************************************
     /***************************************************************************************/
@@ -1598,10 +1583,10 @@ void trainModel() {
     }
     fclose(fo);
     return;*/
-    /**************************************************************************************
+    //===================================================================================
     
-    fo = fopen(output_file, "wb");
-    if (classes == 0) {
+    /*long long a, b;
+    FILE* fo = fopen(output_file, "wb");
     // Save the word vectors
     fprintf(fo, "%lld %lld\n", vocab_size, layer1_size);
     for (a = 0; a < vocab_size; a++) {
@@ -1609,50 +1594,6 @@ void trainModel() {
       if (binary) for (b = 0; b < layer1_size; b++) fwrite(&syn0[a * layer1_size + b], sizeof(real), 1, fo);
       else for (b = 0; b < layer1_size; b++) fprintf(fo, "%lf ", syn0[a * layer1_size + b]);
       fprintf(fo, "\n");
-    }
-    } else {
-    // Run K-means on the word vectors
-    int clcn = classes, iter = 10, closeid;
-    int *centcn = (int *)malloc(classes * sizeof(int));
-    int *cl = (int *)calloc(vocab_size, sizeof(int));
-    real closev, x;
-    real *cent = (real *)calloc(classes * layer1_size, sizeof(real));
-    for (a = 0; a < vocab_size; a++) cl[a] = a % clcn;
-    for (a = 0; a < iter; a++) {
-      for (b = 0; b < clcn * layer1_size; b++) cent[b] = 0;
-      for (b = 0; b < clcn; b++) centcn[b] = 1;
-      for (c = 0; c < vocab_size; c++) {
-        for (d = 0; d < layer1_size; d++) cent[layer1_size * cl[c] + d] += syn0[c * layer1_size + d];
-        centcn[cl[c]]++;
-      }
-      for (b = 0; b < clcn; b++) {
-        closev = 0;
-        for (c = 0; c < layer1_size; c++) {
-          cent[layer1_size * b + c] /= centcn[b];
-          closev += cent[layer1_size * b + c] * cent[layer1_size * b + c];
-        }
-        closev = sqrt(closev);
-        for (c = 0; c < layer1_size; c++) cent[layer1_size * b + c] /= closev;
-      }
-      for (c = 0; c < vocab_size; c++) {
-        closev = -10;
-        closeid = 0;
-        for (d = 0; d < clcn; d++) {
-          x = 0;
-          for (b = 0; b < layer1_size; b++) x += cent[layer1_size * d + b] * syn0[c * layer1_size + b];
-          if (x > closev) {
-            closev = x;
-            closeid = d;
-          }
-        }
-        cl[c] = closeid;
-      }
-    }
-    // Save the K-means classes
-    for (a = 0; a < vocab_size; a++) fprintf(fo, "%s %d\n", vocab[a].word, cl[a]);
-    free(centcn);
-    free(cent);
-    free(cl);
     }
     fclose(fo);*/
 }
@@ -1679,8 +1620,8 @@ int main(int argc, char **argv) {
         printf("Parameters for training:\n");
         printf("\t-embed-path <file>\n");
         printf("\t\tPath to pre-trained embeddings to use for refining\n");
-        printf("\t-train <file>\n");
-        printf("\t\tUse text data from <file> to train the model\n");
+        //printf("\t-train <file>\n");
+        //printf("\t\tUse text data from <file> to train the model\n");
         printf("\t-output <file>\n");
         printf("\t\tUse <file> to save the resulting word vectors\n");
         printf("\t-size <int>\n");
@@ -1699,7 +1640,7 @@ int main(int argc, char **argv) {
     output_file[0] = 0;
 
     if ((i = ArgPos((char *)"-size", argc, argv)) > 0) layer1_size = atoi(argv[i + 1]);
-    if ((i = ArgPos((char *)"-train", argc, argv)) > 0) strcpy(train_file, argv[i + 1]);
+    //if ((i = ArgPos((char *)"-train", argc, argv)) > 0) strcpy(train_file, argv[i + 1]);
     if ((i = ArgPos((char *)"-embed-path", argc, argv)) > 0) strcpy(embed_file, argv[i + 1]);
     if ((i = ArgPos((char *)"-alpha", argc, argv)) > 0) alpha = atof(argv[i + 1]);
     if ((i = ArgPos((char *)"-output", argc, argv)) > 0) strcpy(output_file, argv[i + 1]);

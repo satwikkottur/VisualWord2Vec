@@ -38,7 +38,7 @@ $(BIN)%.o : %.c
 
 debug:
 	make
-	./$(BIN)word2vec -embed-path modelsNdata/al_vectors.txt -train modelsNdata/coco_train_minus_cs_test.txt -output modelsNdata/word2vec_output_bestmodel_single.bin -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -threads 12 -binary 0 -min-count 0 
+	./$(BIN)word2vec -embed-path modelsNdata/al_vectors.txt -output modelsNdata/al_vectors_debug.bin -size 200 -threads 12
 
 vqa:
 	make
