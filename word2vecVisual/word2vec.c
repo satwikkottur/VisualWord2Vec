@@ -384,79 +384,40 @@ void retrieverWrapper(){
 }
 
 // Function for visual paraphrase task
-void visualParaphraseWrapper(){
-    int clusterArg = clusterVP;
-    // Read the embeddings from the file
-    //char embedFile[] = "modelsNdata/word2vec_vp_lemma_50hidden.bin";
-    //char embedFle[] = "modelsNdata/word2vec_vp_lemma_100hidden.bin";
-    //char embedFile[] = "modelsNdata/wiki_vp_before_100.bin";
-    //char embedFile[] = "modelsNdata/wiki_vp_before_50.bin";
-    char embedFile[] = "modelsNdata/vp/word2vec_coco_vp_lemma.bin";
-    loadWord2Vec(embedFile);
-
+void visualParaphraseWrapper(int clusterArg){
     // Reading the file for training
     char* visualPath = (char*) malloc(sizeof(char) * 100);
     char* featurePath = (char*) malloc(sizeof(char) * 100);
 
-    if(debugModeVP)
-        featurePath = "/home/satwik/VisualWord2Vec/data/vp/vp_train_debug.txt";
-    else
-        featurePath = "/home/satwik/VisualWord2Vec/data/vp/vp_train_full.txt";
-
-    if(usePCA)
-        visualPath = "/home/satwik/VisualWord2Vec/data/vp/abstract_features_train_pca.txt";
-    else{
-        if(debugModeVP)
-            visualPath = "/home/satwik/VisualWord2Vec/data/vp/abstract_features_debug.txt";
-        else
-            visualPath = "/home/satwik/VisualWord2Vec/data/vp/abstract_features_train.txt";
-    }
-
     // Reading for the word features and visual features
-    readVPTrainSentences(featurePath);
-    readVPAbstractVisualFeatures(visualPath);
+    readVPTrainSentences(VP_TRAIN_CAPTION_FILE);
+    readVPAbstractVisualFeatures(VP_VISUAL_FEATURE_FILE);
     
     // Tokenizing the training sentences
     tokenizeTrainSentences();
     
-    // Compute embeddings
+    // Perform the VP task (text only)
     //performVPTask();
 
     // Clustering the visual features
-    if(debugModeVP)
-        clusterVPAbstractVisualFeatures(2, NULL);
-    else
-        clusterVPAbstractVisualFeatures(clusterArg, NULL);
+    clusterVPAbstractVisualFeatures(clusterArg, NULL);
 
-    // Begin the refining
-    int i, noIters = 100;
-    if(debugModeVP)
-        noIters = 1;
-    else
-        noIters = 100;
-    
+    // Begin the refining (run for 100 iterations and choose the best based on 
+    // val performance)
     // Initializing the refining network
     initRefining();
 
     // Save path for the word2vec
-    char* savePath;
+    int i, noIters = 100;
     for(i = 0; i < noIters; i++){
         printf("Refining : %d / %d\n", i, noIters);
 
         // Refining the embeddings
         refineNetworkVP();
         
-        // Compute embeddings
+        // Compute the vp task
         performVPTask();
-
-        savePath = (char*) malloc(sizeof(char) * 200);
-        // Also save the embeddings
-        sprintf(savePath, "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/vp/word2vec_vp_%d.bin", i);
-        saveWord2Vec(savePath);
     }
-
-    // Save the refined word2vec features for the VP sentences
-    //writeVPSentenceEmbeddings(); 
 }
 
 // Function for training from ms coco dataset
@@ -789,7 +750,7 @@ void trainModel() {
     if (output_file[0] == 0) return;
 
     // Visual paraphrase task
-    //visualParaphraseWrapper();
+    //visualParaphraseWrapper(clusterVP);
 
     // Training from MS COCO
     //mscocoWrapper();
@@ -797,9 +758,6 @@ void trainModel() {
     // Training from VQA abstract 
     //vqaWrapper();
 
-    // Marking the change
-    //printf("\nChange over!\n");
-    
     // Common sense task
     // Pass in the number of clusters to use for refining
     commonSenseWrapper(clusterCommonSense);

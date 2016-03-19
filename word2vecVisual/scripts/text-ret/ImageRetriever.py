@@ -61,7 +61,7 @@ class ImageRetriever:
             embeds[word] = np.fromstring(iSplit[1], dtype = float, sep = ' ');
 
         return (embeds, embedDim, vocabSize);
-        
+
     # Read word2vec
     def loadWord2Vec(self, embedPaths, mode = 'refine'):
         # Reading the raw embeddings (used for word2vec only)
@@ -111,7 +111,7 @@ class ImageRetriever:
         # Read the words that were refined and use raw/refined embeddings accordingly
         with open(vocabPath, 'rb') as dataFile:
             self.refineVocab = {i.strip('\n') for i in dataFile.readlines()};
-        
+
     #Reading the ground truth tuples
     def readGroundTuples(self, gtPath):
         # Read the file
@@ -172,7 +172,7 @@ class ImageRetriever:
         if self.useRaw:
             embedRaw = [self.__computeEmbedding(i, self.embedsRaw) for i in tup];
             # Check if all the words are in the refineVocab
-            
+
         return (embed, embedRaw);
         #return (embed, embedRaw);
 
@@ -185,7 +185,7 @@ class ImageRetriever:
         # Compute for each ground tuple
         for tup in self.tupleIdMap:
             self.gtEmbed[tup] = self.__computeTupleEmbedding(tup);
-            if self.useRaw: 
+            if self.useRaw:
                 self.gtRefined[tup] = [self.__isRefined(i) for i in tup];
 
     # Lemmatizing tuples
@@ -243,7 +243,7 @@ class ImageRetriever:
 
                 # Append the score
                 score.append(sim);
-                        
+
         # Get the ground truth tuple
         gtTuple = self.tagTupleMap[qTag];
         gtInd = self.tupleIdMap[gtTuple];
@@ -276,7 +276,7 @@ class ImageRetriever:
             print 'Starting task in %s mode' % 'SINGLE'
         else:
             print 'Starting task in %s mode' % 'MULTI'
-        
+
         # Required Top@ recalls
         recInds = [1, 5, 10, 50, 100];
         recalls = dict.fromkeys(recInds, 0);
@@ -295,12 +295,12 @@ class ImageRetriever:
                 gtRank = self.__scoreQueryTuple(j, i[0]);
                 ranks.append(gtRank);
                 count += 1;
-                
+
                 # Iteratively count towards recall
                 for recId in recInds:
                     if gtRank < recId:
                         recalls[recId] += 1;
-            
+
         # Print the results
         print '*********************'
         for i in recInds:
@@ -375,14 +375,14 @@ class ImageRetriever:
             # Print progress:
             print 'Caption (%d) : %d / %d' % (threadId, iterCount, len(testCaps))
             iterCount += 1;
-                
+
             # For each query in the image
             for j in testCaps[i]:
                 gtRank = self.__scoreQueryCaption(j, i);
-                
+
                 ranks.append(gtRank);
                 count += 1;
-                
+
                 # Iteratively count towards recall
                 for recId in recInds:
                     if gtRank < recId:
@@ -415,19 +415,19 @@ class ImageRetriever:
             # Print progress:
             print 'Caption: %d / %d' % (iterCount, len(self.testCaps))
             iterCount += 1;
-                
+
             # For each query in the image
             for j in self.testCaps[i]:
                 gtRank = self.__scoreQueryCaption(j, i);
-                
+
                 ranks.append(gtRank);
                 count += 1;
-                
+
                 # Iteratively count towards recall
                 for recId in recInds:
                     if gtRank < recId:
                         recalls[recId] += 1;
-            
+
         # Print the results
         print '*********************'
         for i in recInds:

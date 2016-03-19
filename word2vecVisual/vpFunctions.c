@@ -110,24 +110,9 @@ void writeVPSentenceEmbeddings(){
 // Read all sentences along with features
 void readVPSentences(){
     // First read the sentences
-    char* readSent1 = (char*) malloc(100 * sizeof(char));
-    char* readSent2 = (char*) malloc(100 * sizeof(char));
-
-    // Path to the sentences_1
-    if(debugModeVP){
-        readSent1 = "/home/satwik/VisualWord2Vec/data/vp/vp_sentences1_lemma_debug.txt";
-        readSent2 = "/home/satwik/VisualWord2Vec/data/vp/vp_sentences2_lemma_debug.txt";
-    }
-    // Path to the sentences_2
-    else{
-        readSent1 = "/home/satwik/VisualWord2Vec/data/vp/vp_sentences1_lemma.txt";
-        readSent2 = "/home/satwik/VisualWord2Vec/data/vp/vp_sentences2_lemma.txt";
-    }
-    
-    // read sentences
     long noSents1, noSents2;
-    sentences1 = *readSentences(readSent1, &noSents1);
-    sentences2 = *readSentences(readSent2, &noSents2);
+    sentences1 = *readSentences(VP_TASK_SENTENCES_1, &noSents1);
+    sentences2 = *readSentences(VP_TASK_SENTENCES_2, &noSents2);
     printf("\nSentences for VP read!\n");
     if(noSents1 != noSents2){
         printf("Number of sentences dont match!\n");
@@ -146,53 +131,16 @@ void readVPSentences(){
 // Reading the features
 void readVPSentenceFeatures(){
     printf("\nReading other features for the sentences!\n");
-    char* cocFeat1 = (char*) malloc(sizeof(char) * 100);
-    char* cocFeat2 = (char*) malloc(sizeof(char) * 100);
-    char* tfFeat1 = (char*) malloc(sizeof(char) * 100);
-    char* tfFeat2 = (char*) malloc(sizeof(char) * 100);
-    char* gtPath = (char*) malloc(sizeof(char) * 100);
-    char* splitPath = (char*) malloc(sizeof(char) * 100);
-    char* validPath = (char*) malloc(sizeof(char) * 100);
 
-    if(debugModeVP){
-        // Files for co-occurance features
-        cocFeat1 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_coc_1_debug.txt";
-        cocFeat2 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_coc_2_debug.txt";
-
-        // Files for total frequency features
-        tfFeat1 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_tf_1_debug.txt";
-        tfFeat2 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_tf_2_debug.txt";
-
-        // Also read the ground truth file, test/train split, validation set
-        gtPath = "/home/satwik/VisualWord2Vec/data/vp/vp_ground_truth_debug.txt";
-        splitPath = "/home/satwik/VisualWord2Vec/data/vp/vp_split_debug.txt";
-        validPath = "/home/satwik/VisualWord2Vec/data/vp/vp_val_inds_debug.txt";
-    }
-    else{
-        // Files for co-occurance features
-        cocFeat1 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_coc_1.txt";
-        cocFeat2 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_coc_2.txt";
-
-        // Files for total frequency features
-        tfFeat1 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_tf_1.txt";
-        tfFeat2 = "/home/satwik/VisualWord2Vec/data/vp/vp_features_tf_2.txt";
-
-        // Also read the ground truth file, test/train split, validation set
-        gtPath = "/home/satwik/VisualWord2Vec/data/vp/vp_ground_truth.txt";
-        splitPath = "/home/satwik/VisualWord2Vec/data/vp/vp_split.txt";
-        validPath = "/home/satwik/VisualWord2Vec/data/vp/vp_val_inds_1k.txt";
-        //validPath = "/home/satwik/VisualWord2Vec/data/vp_val_inds.txt";
-    }
-
-    FILE* gtFile = fopen(gtPath, "rb");
-    FILE* splitFile = fopen(splitPath, "rb");
-    FILE* valFile = fopen(validPath, "rb");
+    FILE* gtFile = fopen(VP_GROUND_TRUTH_FILE, "rb");
+    FILE* splitFile = fopen(VP_TEST_TRAIN_SPLIT, "rb");
+    FILE* valFile = fopen(VP_VAL_SPLIT, "rb");
 
     // Read the dimensions and check for match in both the cases
-    FILE* cocFile1 = fopen(cocFeat1, "rb");
-    FILE* cocFile2 = fopen(cocFeat2, "rb");
-    FILE* tfFile1 = fopen(tfFeat1, "rb");
-    FILE* tfFile2 = fopen(tfFeat2, "rb");
+    FILE* cocFile1 = fopen(VP_CO_OCCUR_1, "rb");
+    FILE* cocFile2 = fopen(VP_CO_OCCUR_2, "rb");
+    FILE* tfFile1 = fopen(VP_TOTAL_FREQ_1, "rb");
+    FILE* tfFile2 = fopen(VP_TOTAL_FREQ_2, "rb");
 
     // Checking for sanity
     if(cocFile1 == NULL || cocFile2 == NULL || 
