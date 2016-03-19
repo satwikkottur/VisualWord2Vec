@@ -18,10 +18,11 @@
 # include "macros.h"
 # include "helperFunctions.h"
 # include "refineFunctions.h"
+# include "filepaths.h"
 
 // Declaring the extern variables allowing separation of code
 extern long long vocab_size, layer1_size;
-extern float *syn0, *syn1, *syn0raw;
+extern float *syn0, *syn1;
 extern int* refineVocab;
 extern struct vocab_word* vocab;
 extern int permuteMAP;
@@ -63,8 +64,6 @@ void refineMultiNetwork();
 // Function to refine the network for multi models using phrases
 void refineMultiNetworkPhrase();
 
-// Function refine the network for regression the visual features
-void refineNetworkRegress();
 //------------------------------------------------------------
 // Compute the embeddings for all the words
 void computeEmbeddings();
@@ -73,8 +72,6 @@ void computeMultiEmbeddings();
 
 // Computing the embedding for the feature word 
 void computeFeatureEmbedding(struct featureWord*);
-// Computing the embedding for the feature word, using raw word2vec
-void computeRawFeatureEmbedding(struct featureWord*);
 // Computing the embedding for feature word in case of multi model
 void computeMultiFeatureEmbedding(struct featureWord*);
 //------------------------------------------------------------
@@ -111,8 +108,6 @@ void readVisualFeatureFile(char*);
 
 // Wrapper for kmeans
 void clusterVisualFeatures(int, char*);
-// Wrapper for gmm
-void gmmVisualFeatures(int, char*);
 /*****************************************/
 // Common sense task
 int performCommonSenseTask(float*);

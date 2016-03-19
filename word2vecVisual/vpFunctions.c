@@ -74,16 +74,6 @@ void readVPAbstractVisualFeatures(char* visualPath){
 void tokenizeTrainSentences(){
     // Use tokenizeSentences
     tokenizeSentences(trainSents, noTrainVP);
-
-    // Debug
-    /*long i, j;
-    for (i = 0; i < noTrainVP; i++){
-        printf("%s\n", train[i].sent);
-        for (j = 0; j < train[i].count; j++){
-            printf("%ld ", trainSents[i].index[j]);
-        }
-        printf("\n");
-    }*/
 }
 
 // Saving word2vec embeddings for all VP sentences

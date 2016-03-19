@@ -12,7 +12,6 @@ static long noRefine = 0; // Number of refining training instances
 static long noTrain = 0, noVal = 0; // Number of test and validation variables
 long noTest = 0;
 float* cosDist = NULL; // Storing the cosine distances between all the feature vocabulary
-float* cosDistRaw = NULL; // Storing the cosine distances between all the feature vocabulary (raw)
 float* valScore, *testScore; // Storing the scores for test and val
 // Storing the cosine distances between all the feature vocabulary (multimodel)
 float *cosDistP = NULL, *cosDistR = NULL, *cosDistS = NULL;
@@ -81,9 +80,6 @@ void readRefineTrainFeatureFiles(char* refinePath, char* trainPath){
     // Read the refine tuples first
     refineTuples = *readPSRFeatureFile(refinePath, &noRefine);
     
-    // Immediately record the refine vocab, if needed
-    if(useAlternate) recordRefineVocab();
-    
     if(trainPath == NULL){
         // If the second option is null, we take them to be equal
         trainTuples = refineTuples;
@@ -137,7 +133,10 @@ void readVisualFeatureFile(char* fileName){
     int i, noLines = 0;
 
     // Read the first line and get the feature size
-    fscanf(filePt, "%d", &visualFeatSize);
+    if(!fscanf(filePt, "%d", &visualFeatSize)){
+        printf("Error reading the file at %s!", fileName);
+        exit(1); 
+    }
     printf("Visual features are of size : %d...\n", visualFeatSize);
 
     // Reading till EOF
@@ -147,8 +146,10 @@ void readVisualFeatureFile(char* fileName){
         refineTuples[noLines].feat[0] = feature;
 
         for(i = 1; i < visualFeatSize; i++){
-            //printf("%f ", feature);
-            fscanf(filePt, "%f", &feature);
+            if(!fscanf(filePt, "%f", &feature)){
+                printf("Error reading the file at %s!", fileName);
+                exit(1); 
+            }
             refineTuples[noLines].feat[i] = feature;
         }
         //printf("%f\n", feature);
@@ -340,63 +341,6 @@ void refineNetwork(){
             computeMultinomial(y, r.index[c]);
             // Propage the error to the PRS features
             updateWeights(y, r.index[c], refineTuples[i].cId);
-        }
-    }
-}
-
-// Refine the network through clusters
-void refineNetworkRegress(){
-    long long c, i;
-    float* y = (float*) malloc(sizeof(float) * visualFeatSize);
-    struct featureWord p, s, r;
-
-    // Checking if training examples are present
-    if(noRefine == 0){
-        printf("Refining examples not loaded!\n");   
-        exit(1);
-    }
-
-    // Read each of the training instance
-    for(i = 0; i < noRefine; i++){
-        //printf("Training %lld instance ....\n", i);
-        
-        // Updating the weights for P
-        p = featHashWords[refineTuples[i].p];
-        for(c = 0; c < p.count; c++){
-            // If not in vocab, continue
-            if(p.index[c] == -1) continue;
-            //printf("p: %d %d\n", p.index[c], p.count);
-
-            // Regress the features
-            computeOutputRegress(y, p.index[c]);
-            // Propage the error to the PRS features
-            updateWeightsRegress(y, p.index[c], refineTuples[i].feat);
-        }
-        
-        // Updating the weights for S
-        s = featHashWords[refineTuples[i].s];
-        for(c = 0; c < s.count; c++){
-            // If not in vocab, continue
-            if(s.index[c] == -1) continue;
-            //printf("s: %d %d\n", s.index[c], s.count);
-
-            // Regress the features
-            computeOutputRegress(y, s.index[c]);
-            // Propage the error to the PRS features
-            updateWeightsRegress(y, s.index[c], refineTuples[i].feat);
-        }
-
-        // Updating the weights for R
-        r = featHashWords[refineTuples[i].r];
-        for(c = 0; c < r.count; c++){
-            // If not in vocab, continue
-            if(r.index[c] == -1) continue;
-            //printf("r: %d %d\n", r.index[c], r.count);
-
-            // Regress the features
-            computeOutputRegress(y, r.index[c]);
-            // Propage the error to the PRS features
-            updateWeightsRegress(y, r.index[c], refineTuples[i].feat);
         }
     }
 }
@@ -829,21 +773,6 @@ void computeEmbeddings(){
         // Computing the feature embedding
         computeFeatureEmbedding(&featHashWords[i]);
     }
-
-    // If raw embeddings are also needed, only for the first time
-    if(useAlternate && cosDistRaw == NULL){
-        for(i = 0; i < featVocabSize; i++){
-            if(featHashWords[i].embedRaw == NULL)
-                // Allocate space
-                featHashWords[i].embedRaw = (float*) malloc(layer1_size * sizeof(float));
-        
-            // Computing the feature embedding
-            computeRawFeatureEmbedding(&featHashWords[i]);
-        }
-
-        // Only for the first time (also compute the cosineSimilarity for raw embeddings
-        evaluateRawCosDistance();
-    }
 }
 
 // Compute embeddings for multi models
@@ -905,49 +834,6 @@ void computeFeatureEmbedding(struct featureWord* feature){
         
     //feature->magnitude = (float*) malloc(sizeof(float));
     feature->magnitude = sqrt(magnitude);
-
-    free(mean);
-}
-
-// Compute raw embedding for a feature word if needed
-void computeRawFeatureEmbedding(struct featureWord* feature){
-    // Go through the current feature and get the mean of components
-    int i, c, actualCount = 0;
-    long long offset;
-    float* mean;
-    mean = (float*) calloc(layer1_size, sizeof(float));
-
-    // Get the mean feature for the word
-    for(c = 0; c < feature->count; c++){
-        // If not in vocab, continue
-        if(feature->index[c] == -1) continue;
-
-        // Write the vector
-        offset = feature->index[c] * layer1_size;
-        for (i = 0; i < layer1_size; i++){
-            mean[i] += syn0raw[offset + i];
-        }
-
-        // Increase the count
-        actualCount++;
-    }
-
-    // Normalizing if non-zero count
-    if(actualCount)
-        for (i = 0; i < layer1_size; i++)
-            mean[i] = mean[i]/actualCount;
-
-    // Saving the embedding in the featureWord
-    for(i = 0; i < layer1_size; i++)
-        feature->embedRaw[i] = mean[i];
-
-    // Compute the magnitude of mean
-    float magnitude = 0;
-    for(i = 0; i < layer1_size; i++)
-        magnitude += mean[i] * mean[i];
-        
-    //feature->magnitude = (float*) malloc(sizeof(float));
-    feature->magnitudeRaw = sqrt(magnitude);
 
     free(mean);
 }
@@ -1147,90 +1033,16 @@ void clusterVisualFeatures(int clusters, char* savePath){
     free(v); free(centroids); free(dis); free(assign); free(nassign);
 }
 
-// Wrapper for GMM
-void gmmVisualFeatures(int clusters, char* savePath){
-    int k = clusters;                           /* number of cluster to create */
-    int d = visualFeatSize;                           /* dimensionality of the vectors */
-    int n = noRefine;                         /* number of vectors */
-    //int nt = 1;                           /* number of threads to use */
-    int niter = 1000;                        /* number of iterations (0 for convergence)*/
-    int redo = 1;                         /* number of redo */
-    
-    // Populate the features
-    float * v = fvec_new (d * n);    /* random set of vectors */
-    long i, j, offset;
-    for (i = 0; i < n; i++){
-        offset = i * d;
-        for(j = 0; j < d; j++)
-            v[offset + j] = (float) refineTuples[i].feat[j];
-    }
-    
-    /* variables are allocated externaly */
-    float * centroids = fvec_new (d * k); /* output: centroids */
-    float * dis = fvec_new (n);           /* point-to-cluster distance */
-    int * assign = ivec_new (n);          /* quantization index of each point */
-    int * nassign = ivec_new (k);         /* output: number of vectors assigned to each centroid */
-    
-    double t1 = getmillisecs();
-    // Cluster the features
-    kmeans (d, n, k, niter, v, 1, 1, redo, centroids, dis, assign, nassign);
-    // Compute GMM model
-    gmm_t* gmm = gmm_learn(d, n, 25, niter, v, 24, 1, redo, 25);
-    double t2 = getmillisecs();
-    
-    printf ("kmeans performed in %.3fs\n\n", (t2 - t1)  / 1000);
-    //ivec_print (nassign, k);
-    
-    // Write the cluster ids to the prsTuple structure
-    for (i = 0; i < n; i++)
-        refineTuples[i].cId = assign[i] + 1;
-    
-    // Debugging the cId for the train tuples
-    /*for (i = 0; i < n; i++)
-     printf("%i\n", train[i].cId);*/
-
-     // Write the clusters to a file, if non-empty
-    if(savePath != NULL){
-        // Open the file
-        FILE* filePtr = fopen(savePath, "wb");
-
-        if(noRefine == 0){
-            printf("ClusterIds not available to save!\n");
-            exit(1);
-        }
-
-        // Save the cluster ids
-        int i;
-        for (i = 0; i < noRefine; i++)
-            fprintf(filePtr, "%d %f\n", refineTuples[i].cId, dis[i]);
-
-        // Close the file
-        fclose(filePtr); 
-    }
-    
-    // Assigning the number of clusters
-    if(noClusters == 0){
-        noClusters = clusters;
-    }
-    
-    // Free memory
-    free(v); free(centroids); free(dis); free(assign); free(nassign);
-}
-
 // Common sense evaluation
 int performCommonSenseTask(float* testTupleScores){
     printf("Common sense task\n\n");
-    // Read the validation and test sets    
-    char testFile[] = "/home/satwik/VisualWord2Vec/data/test_features.txt";
-    char valFile[] = "/home/satwik/VisualWord2Vec/data/val_features.txt";
-
     // Keep a local copy of the test scores for the best model based on threshold
     float* bestTestScore = (float*) malloc(sizeof(float) * noTest);
 
     //printf("Reading test and value files..\n");
     if(noTest == 0 || noVal == 0)
         // Clean the strings for test and validation sets, store features
-        readTestValFiles(valFile, testFile);
+        readTestValFiles(CS_PRS_VAL_FILE, CS_PRS_TEST_FILE);
 
     // Get the features for test and validation sets
     // Re-evaluate the features for the entire vocab
@@ -1499,9 +1311,6 @@ void readTestValFiles(char* valName, char* testName){
     printf("Found %ld tuples in %s...\n", noTuples, testName);
     // Close the file
     fclose(filePt);
-
-    // Mark the featureWords is raw word2vec are to be used
-    if(useAlternate) markFeatureWords();
 }
 
 // Cosine distance evaluation
@@ -1584,42 +1393,6 @@ void* evaluateCosDistanceThread(void* rangeParams){
         }
     }
     return NULL;
-}
-
-// Cosine distance evaluation (raw embeddings)
-void evaluateRawCosDistance(){
-    if (verbose) printf("Evaluating pairwise dotproducts..\n\n");
-    // Allocate memory for cosDist variable, if not alloted
-    if(cosDistRaw == NULL)
-        cosDistRaw = (float*) malloc(featVocabSize * featVocabSize * sizeof(float));
-    
-    // For each pair, we evaluate the dot product along with normalization
-    long a, b, i, offset;
-    float magProd = 0, dotProduct;
-    for(a = 0; a < featVocabSize; a++){
-        offset = featVocabSize * a;
-        for(b = a; b < featVocabSize; b++){
-            if(featHashWords[a].embedRaw == NULL || featHashWords[b].embedRaw == NULL)
-                printf("NULL pointers : %ld %ld\n", a, b);
-
-            dotProduct = 0;
-            for(i = 0; i < layer1_size; i++){
-                dotProduct += 
-                    featHashWords[a].embedRaw[i] * featHashWords[b].embedRaw[i];
-            }
-            
-            // Save the dotproduct
-            magProd = (featHashWords[a].magnitudeRaw) * (featHashWords[b].magnitudeRaw);
-            if(magProd){
-                cosDistRaw[offset + b] = dotProduct / magProd;
-                cosDistRaw[a + b * featVocabSize] = dotProduct / magProd;
-            }
-             else{
-                cosDistRaw[offset + b] = 0.0;
-                cosDistRaw[a + b * featVocabSize] = 0.0;
-            }
-        }
-    }
 }
 
 // Cosine distance evaluation for multi model
@@ -1766,56 +1539,23 @@ void* computeTestValScoresThread(void* csParams){
     float meanScore, pScore, rScore, sScore, curScore; 
     for(a = params->startIndex; a < params->endIndex; a++){
         meanScore = 0.0;
-        if(!useAlternate){
-            // For each training instance, find score, ReLU and max
-            for(b = 0; b < noTrain; b++){
-                // Get P score
-                pScore = cosDist[featVocabSize * trainTuples[b].p + holder[a].p];
-                
-                // Get R score
-                rScore = cosDist[featVocabSize * trainTuples[b].r + holder[a].r];
-                
-                // Get S score
-                sScore = cosDist[featVocabSize * trainTuples[b].s + holder[a].s];
-               
-                // ReLU
-                curScore = pScore + rScore + sScore - threshold;
-                if(curScore < 0) curScore = 0;
-                
-                // Add it to the meanScore
-                meanScore += curScore;
-            }
-        }
-        else{
-            // Do things differently, check for flag if current tuple p,r,s is 
-            // refined or not
-            // For each training instance, find score, ReLU and max
-            for(b = 0; b < noTrain; b++){
-                // Get P score
-                if(featHashWords[holder[a].p].useRaw)
-                    pScore = cosDistRaw[featVocabSize * trainTuples[b].p + holder[a].p];
-                else
-                    pScore = cosDist[featVocabSize * trainTuples[b].p + holder[a].p];
-                
-                // Get R score
-                if(featHashWords[holder[a].r].useRaw)
-                    rScore = cosDistRaw[featVocabSize * trainTuples[b].r + holder[a].r];
-                else
-                    rScore = cosDist[featVocabSize * trainTuples[b].r + holder[a].r];
-                
-                // Get S score
-                if(featHashWords[holder[a].s].useRaw)
-                    sScore = cosDistRaw[featVocabSize * trainTuples[b].s + holder[a].s];
-                else
-                    sScore = cosDist[featVocabSize * trainTuples[b].s + holder[a].s];
-               
-                // ReLU
-                curScore = pScore + rScore + sScore - threshold;
-                if(curScore < 0) curScore = 0;
-                
-                // Add it to the meanScore
-                meanScore += curScore;
-            }
+        // For each training instance, find score, ReLU and max
+        for(b = 0; b < noTrain; b++){
+            // Get P score
+            pScore = cosDist[featVocabSize * trainTuples[b].p + holder[a].p];
+            
+            // Get R score
+            rScore = cosDist[featVocabSize * trainTuples[b].r + holder[a].r];
+            
+            // Get S score
+            sScore = cosDist[featVocabSize * trainTuples[b].s + holder[a].s];
+           
+            // ReLU
+            curScore = pScore + rScore + sScore - threshold;
+            if(curScore < 0) curScore = 0;
+            
+            // Add it to the meanScore
+            meanScore += curScore;
         }
 
         // Save the mean score for the current instance
@@ -2030,29 +1770,6 @@ void recordRefineVocab(){
 
     // Just exit the program after this :p
     exit(1);*/
-}
-
-// Mark the features words for raw/refined
-void markFeatureWords(){
-    struct featureWord word;
-    long i, c; 
-    int useRaw;
-    for(i = 0; i < featVocabSize; i++){
-        word = featHashWords[i];
-        useRaw = 0;
-
-        for(c = 0; c < word.count; c++){
-            // If not in vocab, continue
-            if(word.index[c] == -1) continue;
-            // Check if refined
-            if(refineVocab[word.index[c]] == 0){
-                useRaw = 1;
-                break;
-            }
-        }
-
-        featHashWords[i].useRaw = useRaw;
-    }
 }
 
 // Save refine Vocabulary for other interface uses
