@@ -31,15 +31,15 @@
 // Co-occurance features, total frequency features along with ground truth, test/train split
 // and validation set
 // Files for total frequency features
-# define VP_CO_OCCUR_1 "/home/satwik/VisualWord2Vec/data/vp/vp_features_coc_1.txt";
-# define VP_CO_OCCUR_2 "/home/satwik/VisualWord2Vec/data/vp/vp_features_coc_2.txt";
+# define VP_CO_OCCUR_1 "/home/satwik/VisualWord2Vec/data/vp/vp_features_coc_1.txt"
+# define VP_CO_OCCUR_2 "/home/satwik/VisualWord2Vec/data/vp/vp_features_coc_2.txt"
 
 // Files for total frequency features
-# define VP_TOTAL_FREQ_1 "/home/satwik/VisualWord2Vec/data/vp/vp_features_tf_1.txt";
-# define VP_TOTAL_FREQ_2 "/home/satwik/VisualWord2Vec/data/vp/vp_features_tf_2.txt";
+# define VP_TOTAL_FREQ_1 "/home/satwik/VisualWord2Vec/data/vp/vp_features_tf_1.txt"
+# define VP_TOTAL_FREQ_2 "/home/satwik/VisualWord2Vec/data/vp/vp_features_tf_2.txt"
 
 // Ground truth, test/train split, val/train split
-# define VP_GROUND_TRUTH_FILE "/home/satwik/VisualWord2Vec/data/vp/vp_ground_truth.txt";
-# define VP_TEST_TRAIN_SPLIT "/home/satwik/VisualWord2Vec/data/vp/vp_split.txt";
-# define VP_VAL_SPLIT "/home/satwik/VisualWord2Vec/data/vp/vp_val_inds_1k.txt";
+# define VP_GROUND_TRUTH_FILE "/home/satwik/VisualWord2Vec/data/vp/vp_ground_truth.txt"
+# define VP_TEST_TRAIN_SPLIT "/home/satwik/VisualWord2Vec/data/vp/vp_split.txt"
+# define VP_VAL_SPLIT "/home/satwik/VisualWord2Vec/data/vp/vp_val_inds_1k.txt"
 #endif

@@ -15,6 +15,7 @@
 # include "helperFunctions.h"
 # include "refineFunctions.h"
 # include "liblinearWrapper.h" 
+# include "filepaths.h"
 //*********************************************//
 //// Functions from original word2vec
 int SearchVocab(char* word);

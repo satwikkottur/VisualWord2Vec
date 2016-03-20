@@ -44,6 +44,8 @@ void readVPAbstractVisualFeatures(char* visualPath){
     long noLines = 0, i;
     float feature;
     while(fscanf(filePt, "%f", &feature) != EOF){
+        // Print output occasionally
+        if (noLines % 1000 == 0) printf("Reading features:  %d\n", noLines);
         // Allocate memory
         trainSents[noLines].vFeat = (float*) malloc(sizeof(float) * featDim);
        
