@@ -19,8 +19,8 @@ Other files can be ignored for now.
 
 Program accepts following as inline arguments:
 1. embed-path: Initialization for the embeddings (pre-trained using word2vec usually)  
-    Format: Header should have <vocabsize> <dimensions>  
-    Each following should first have the word, and feature vectors delimited by space  
+    Format: Header should have `vocabsize` `dimensions`  
+    Each following row should first have the word, and embeddings delimited by space  
 
 1. output : Path to where to store the output embeddings
 1. size : Size of the hidden layer (should match with the pre-loaded embeddings)
