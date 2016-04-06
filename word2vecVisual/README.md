@@ -40,6 +40,9 @@ uncommenting code in `trainModel()`.
     * Make sure all the paths are accessible and correctly set
     * Any change to this file, should be followed by re-compiling the code
 
+1. `liblinearWrapper.h`:
+    * Additionally, you also need to link the correct path to liblibear
+
 To run either cs or vp, comment or uncomment corresponding wrapper calls in 
 `trainModel()` function of visword2vec. And then `make cs` or `make vp` for the
 two tasks correspondingly to compile and run. `make` simply compiles while 
