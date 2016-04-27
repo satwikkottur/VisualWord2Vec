@@ -286,7 +286,6 @@ void* refineNetworkThread(void* refineParams){
     float* y = (float*) malloc(sizeof(float) * noClusters);
     // The starting and ending index for the current sentence in a description
     int startInd, endInd; 
-    int wordCount;
 
     // Checking if training examples are present
     if(noTrain == 0){
@@ -309,9 +308,6 @@ void* refineNetworkThread(void* refineParams){
             exit(1);
         }
 
-        // Now collecting words for training
-        wordCount = 0;
-        
         switch(mode){
             // Training each word separately
             case WORDS:

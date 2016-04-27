@@ -1,17 +1,11 @@
-//  Copyright 2013 Google Inc. All Rights Reserved.
-//
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
-
+/* 
+ *  Code to train visual word2vec
+ *  Link: https://github.com/satwikkottur/VisualWord2Vec
+ *  Author: Satwik Kottur
+ *  Email: skottur@andrew.cmu.edu
+ *
+ *  Code inspired from: Google word2vec C code
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,7 +15,6 @@
 #include <unistd.h>
 
 /**********************************************************************************/
-// [S] added
 # include "macros.h"
 # include "structs.h"
 # include "visualFeatures.h"
@@ -37,14 +30,9 @@ extern long noTest;
 extern float *syn0P, *syn0S, *syn0R;
 
 // Variations 
-int usePCA = 0; // Using PCA
 int trainPhrases = 0; // Handle phrases as a unit / separately
 int trainMulti = 0; // Train single / multiple models for P,R,S
-int clusterCommonSense = 25; // Number of initial clusters to use
-int clusterVP = 100; // Number of initial clusters to use
-int permuteMAP = 0; // Permute the data and compute mAP multiple times
-int debugModeVP = 0; // Debug mode for VP task
-int debugModeVQA = 0; // Debug mode for VQA task
+int numClusters = 25; // Number of initial clusters to use
 int windowVP = 5; // window size for training on sentences
 // Training the sentences in one of the modes
 // Could be one of DESCRIPTIONS, SENTENCES, WORDS, WINDOWS;
@@ -174,212 +162,8 @@ void commonSenseWrapper(int clusterArg){
     }
 }
 
-// Function for text retriever task
-void retrieverWrapper(){
-    // Rename clusterArg in current function
-    int clusterArg = clusterCommonSense;
-
-    // Load the word2vec embeddings from Xiao's
-    //char wordPath[] = "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/al_vectors.txt";
-    //char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_train.bin";
-    //char wordPath[] = "/home/satwik/VisualWord2Vec/models/wiki_embeddings.bin";
-    char wordPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/word2vec_coco_caption_before.bin";
-    //char wordPath[] = "modelsNdata/vis-genome/word2vec_genome_02.bin";
-    loadWord2Vec(wordPath);
-
-    // [S] added
-    char* visualPath = (char*) malloc(sizeof(char) * 100);
-    char* postPath = (char*) malloc(sizeof(char) * 100);
-    char* prePath = (char*) malloc(sizeof(char) * 100);
-    char* vocabPath = (char*) malloc(sizeof(char) * 100);
-    char* embedDumpPath = (char*) malloc(sizeof(char) * 100);
-    char* featurePathICCV = (char*) malloc(sizeof(char) * 100);
-    char* featurePathCOCO = (char*) malloc(sizeof(char) * 100);
-    char* featurePathVQA = (char*) malloc(sizeof(char) * 100);
-    char* testFile = (char*) malloc(sizeof(char) * 100);
-    char* valFile = (char*) malloc(sizeof(char) * 100);
-
-    // Common sense task
-    // Reading the file for relation word
-    //featurePathVQA = "/home/satwik/VisualWord2Vec/data/vqa/vqa_psr_features.txt";
-    //featurePathCOCO = "/home/satwik/VisualWord2Vec/data/coco-cnn/PRS_features_coco.txt";
-    featurePathICCV = "/home/satwik/VisualWord2Vec/data/PRS_features.txt";
-    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
-    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_lemma.txt";
-    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_18.txt";
-    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_R_120.txt";
-
-    //char featurePath[] = "/home/satwik/VisualWord2Vec/data/vp_train_sentences_lemma.txt";
-
-    //char clusterPath[] = "/home/satwik/VisualWord2Vec/code/clustering/clusters_10.txt";
-    sprintf(postPath, "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/word2vec_wiki_post_%d_%d_%d_%d.txt", 
-                                        trainPhrases, usePCA, trainMulti, clusterArg);
-    sprintf(prePath, "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/word2vec_wiki_pre_%d_%d_%d_%d.txt", 
-                                        trainPhrases, usePCA, trainMulti, clusterArg);
-    sprintf(vocabPath, "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/word2vec_vocab_%d_%d_%d_%d.txt",
-                                        trainPhrases, usePCA, trainMulti, clusterArg);
-    testFile = "/home/satwik/VisualWord2Vec/data/test_features.txt";
-    valFile = "/home/satwik/VisualWord2Vec/data/val_features.txt";
-
-    //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_18.txt";
-    //visualPath = "/home/satwik/VisualWord2Vec/data/coco-cnn/float_features_coco.txt";
-    //visualPath = "/home/satwik/VisualWord2Vec/data/vqa/vqa_float_features.txt";
-    visualPath = "/home/satwik/VisualWord2Vec/data/float_features.txt";
-    //visualPath = "/home/satwik/VisualWord2Vec/data/float_features_R_120.txt";
-
-    // Writing word2vec from file
-    //char wordPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_save.txt";
-    //saveWord2Vec(wordPath);
-
-    // Initializing the hash
-    initFeatureHash();
-    // Reading for the word features, cluster ids and visual features
-    // clusterid reading will be avoided when clustering is ported to c
-    readRefineTrainFeatureFiles(featurePathICCV, NULL);
-    
-    // reading cluster files from matlab
-    //char clusterpath[] = "/home/satwik/visualword2vec/data/coco-cnn/cluster_100_coco_train.txt";
-    //readclusteridfile(clusterpath);
-    // Clustering in C
-    noClusters = 0;
-    readVisualFeatureFile(visualPath);
-    char clusterSavePath[] = "/home/satwik/VisualWord2Vec/word2vecVisual/modelsNdata/cluster_id_save.txt";
-    // To save clusterId / distance, provide save path; else NULL
-    clusterVisualFeatures(clusterArg, NULL);
-    //gmmVisualFeatures(clusterArg, NULL);
-    //return;
-    
-    // Read the validation and test sets    
-    if(noTest == 0)
-        // Clean the strings for test and validation sets, store features
-        readTestValFiles(valFile, testFile);
-
-    // Saving the feature word vocabulary(split simply means the corresponding components)
-    //saveFeatureWordVocab(vocabPath);
-    //char splitPath[] = "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/split_vocab.txt";  
-    //saveFeatureWordVocabSplit(splitPath);
-    // Saving the feature vocabulary
-    //saveFeatureWordVocab(vocabPath);
-    
-    // Store the basemodel test tuple scores and best model test tuple scores
-    float* baseTestScores = (float*) malloc(sizeof(float) * noTest);
-    float* bestTestScores = (float*) malloc(sizeof(float) * noTest);
-
-    if(trainMulti){
-        // Initializing the refining network
-        initMultiRefining();
-        // Performing the multi model common sense task
-        performMultiCommonSenseTask(baseTestScores);
-    }
-    else{
-        // Initializing the refining network
-        initRefining();
-        // Perform common sense task
-        performCommonSenseTask(baseTestScores);
-    }
-
-    // Saving the embeddings, before refining
-    /*if(trainMulti)
-        saveMultiEmbeddings(prePath);
-    else
-        saveEmbeddings(prePath);*/
-
-    // Reset valAccuracy as the first run doesnt count
-    prevValAcc = 0; 
-    prevTestAcc = 0;
-
-    printf("\n\n (PCA, phrases, multi, noClusters) = (%d, %d, %d, %d)\n\n", 
-                                        usePCA, trainPhrases, trainMulti, clusterArg);
-    
-    int noOverfit = 1;
-    int iter = 0;
-
-    // Read the train and test retriever
-    char rValPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_val_nomaps.txt";
-    char rGtValPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_val_gtruth.txt";
-    char rTestPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_test_nomaps.txt";
-    char rGtTestPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_test_gtruth.txt";
-    char rTrainPath[] = "/home/satwik/VisualWord2Vec/data/coco-cnn/captions_coco_dataset_nomaps.txt";
-    // Read all the training, validation sentences and map
-    readTestValRetriever(rTrainPath, rValPath, rGtValPath, rTestPath, rGtTestPath);
-
-    // Perform the retrieval task
-    performRetrieval();
-
-    int i, noIters = 10;
-    for(i = 0; i < noIters; i++){
-        printf("Refining : %d / %d\n", i, noIters);
-
-        // Refining the embeddings
-        refineNetwork();
-        
-        // Perform the retrieval task
-        performRetrieval();
-    }
-
-    /*while(noOverfit){
-        // Refine the network for multi model
-        if(trainMulti){
-            if(trainPhrases)
-                refineMultiNetworkPhrase();
-            else
-                refineMultiNetwork();
-        }
-        // Refine the network
-        else{
-            if(trainPhrases)
-                refineNetworkPhrase();
-            else
-                refineNetwork();
-        }
-
-        // Saving the embeddings snapshots
-        //sprintf(embedDumpPath, "/home/satwik/VisualWord2Vec/code/word2vecVisual/modelsNdata/word2vec_wiki_iter_%d.bin",
-        //                                    iter);
-        //saveWord2Vec(embedDumpPath);
-        //iter++;
-        
-        if(trainMulti)
-            // Performing the multi model common sense task
-            //noOverfit = performMultiCommonSenseTask(NULL);
-            noOverfit = performMultiCommonSenseTask(bestTestScores);
-        else
-            // Perform common sense task
-            //noOverfit = performCommonSenseTask(NULL);
-            noOverfit = performCommonSenseTask(bestTestScores);
-    }
-
-    // Saving the embeddings, after refining
-    if(trainMulti)
-        saveMultiEmbeddings(postPath);
-    else
-        saveEmbeddings(postPath);*/
-
-    // Find test tuples with best improvement, for further visualization
-    //findBestTestTuple(baseTestScores, bestTestScores);
-
-    // Read and perform common sense testing on different sets
-    /*int fileId = 0;
-    for (fileId = 0; fileId < 20; fileId++){
-        printf("Test case: %d...\n", fileId);
-        testFile = (char*) malloc(100 * sizeof(char));
-        sprintf(testFile, "/home/satwik/VisualWord2Vec/data/common-sense/test_features_subset_%02d.txt",
-                                                            fileId);
-        // Perform the common sense task on the current subset;
-        readTestValFiles(valFile, testFile);
-        if (trainMulti)
-            noOverfit = performMultiCommonSenseTask(bestTestScores);
-        else
-            noOverfit = performCommonSenseTask(bestTestScores);
-    }*/
-}
-
 // Function for visual paraphrase task
 void visualParaphraseWrapper(int clusterArg){
-    // Reading the file for training
-    char* visualPath = (char*) malloc(sizeof(char) * 100);
-    char* featurePath = (char*) malloc(sizeof(char) * 100);
-
     // Reading for the word features and visual features
     readVPTrainSentences(VP_TRAIN_CAPTION_FILE);
     readVPAbstractVisualFeatures(VP_VISUAL_FEATURE_FILE);
@@ -507,7 +291,7 @@ void trainModel() {
 
     // Common sense task
     // Pass in the number of clusters to use for refining
-    commonSenseWrapper(clusterCommonSense);
+    commonSenseWrapper(numClusters);
     //return;
     
     // Retriever Wrapper
@@ -605,12 +389,16 @@ int main(int argc, char **argv) {
         printf("\t\tSet size of word vectors; default is 100\n");
         printf("\t-threads <int>\n");
         printf("\t\tUse <int> threads (default 12)\n");
-        printf("\t-iter <int>\n");
-        printf("\t\tRun more training iterations (default 5)\n");
         printf("\t-alpha <float>\n");
-        printf("\t\tSet the starting learning rate; default is 0.025 for skip-gram and 0.05 for CBOW\n");
+        printf("\t\tSet the learning rate; default is 0.01\n");
+        printf("\t-clusters <int>\n");
+        printf("\t\tNumber of clusters to use; default is 25\n");
+        printf("\t-multi <int>\n");
+        printf("\t\tTo train single (0) or multiple embeddings(1) (only for cs); default is 0\n");
+        printf("\t-phrases <int>\n");
+        printf("\t\tHandling phrases together (1) or as separate words (0); default is 0\n");
         printf("\nExamples:\n");
-        printf("./word2vec -train data.txt -output vec.txt -size 200 -window 5 -sample 1e-4 -negative 5 -hs 0 -binary 0 -cbow 1 -iter 3\n\n");
+        printf("./word2vec -train data.txt -output vec.txt -size 200 -clusters 30\n\n");
         return 0;
     }
 
@@ -622,7 +410,9 @@ int main(int argc, char **argv) {
     if ((i = ArgPos((char *)"-alpha", argc, argv)) > 0) alpha = atof(argv[i + 1]);
     if ((i = ArgPos((char *)"-output", argc, argv)) > 0) strcpy(output_file, argv[i + 1]);
     if ((i = ArgPos((char *)"-threads", argc, argv)) > 0) num_threads = atoi(argv[i + 1]);
-    if ((i = ArgPos((char *)"-iter", argc, argv)) > 0) iter = atoi(argv[i + 1]);
+    if ((i = ArgPos((char *)"-clusters", argc, argv)) > 0) numClusters = atoi(argv[i + 1]);
+    if ((i = ArgPos((char *)"-clusters", argc, argv)) > 0) trainMulti = atoi(argv[i + 1]);
+    if ((i = ArgPos((char *)"-clusters", argc, argv)) > 0) trainPhrases = atoi(argv[i + 1]);
 
     vocab = (struct vocab_word *)calloc(vocab_max_size, sizeof(struct vocab_word));
     vocab_hash = (int *)calloc(vocab_hash_size, sizeof(int));

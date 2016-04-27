@@ -38,14 +38,17 @@ void readVPAbstractVisualFeatures(char* visualPath){
 
     // Read first line the dimension of visual features
     int featDim = 0;
-    fscanf(filePt, "%d\n", &featDim);
+    if(!fscanf(filePt, "%d\n", &featDim)){
+        printf("Error in reading the visual features!\n");
+        exit(1);
+    }
     printf("\nVisual feature size : %d\n", featDim);
     
     long noLines = 0, i;
     float feature;
     while(fscanf(filePt, "%f", &feature) != EOF){
         // Print output occasionally
-        if (noLines % 1000 == 0) printf("Reading features:  %d\n", noLines);
+        if (noLines % 1000 == 0) printf("Reading features:  %ld\n", noLines);
         // Allocate memory
         trainSents[noLines].vFeat = (float*) malloc(sizeof(float) * featDim);
        
@@ -53,7 +56,11 @@ void readVPAbstractVisualFeatures(char* visualPath){
         trainSents[noLines].vFeat[0] = feature;
 
         for (i = 1; i < featDim; i++){
-            fscanf(filePt, "%f", &feature);
+            if(!fscanf(filePt, "%f", &feature)){
+                printf("Error in reading the visual features!\n");
+                exit(1);
+            }
+
             trainSents[noLines].vFeat[i] = feature;
         }
     
@@ -153,10 +160,13 @@ void readVPSentenceFeatures(){
     }
 
     int featDim11 = 1, featDim21 = 2, featDim12 = 3, featDim22 = 4;
-    fscanf(cocFile1, "%d\n", &featDim11);
-    fscanf(cocFile2, "%d\n", &featDim12);
-    fscanf(tfFile1, "%d\n", &featDim21);
-    fscanf(tfFile2, "%d\n", &featDim22);
+    if(!fscanf(cocFile1, "%d\n", &featDim11) ||
+        !fscanf(cocFile2, "%d\n", &featDim12) || 
+        !fscanf(tfFile1, "%d\n", &featDim21) ||
+        !fscanf(tfFile2, "%d\n", &featDim22)){
+        printf("\nError reading other feature files!\n");
+        exit(1);
+    }
 
     // Reading the dimensions
     if(featDim11 != featDim12 || featDim21 != featDim22){
@@ -227,7 +237,10 @@ void readVPSentenceFeatures(){
         }
 
         // Reading the ground truth
-        fscanf(gtFile, "%d\n", &gtruth);
+        if (!fscanf(gtFile, "%d\n", &gtruth)){
+            printf("Error reading ground truth");
+            exit(1);
+        }
         // Check for consistency
         if(!(gtruth == 1 || gtruth == 0)){
             printf("Ground truth unexpected!\n");
@@ -236,7 +249,10 @@ void readVPSentenceFeatures(){
         sentPairs[i].gt = gtruth;
 
         // Reading if its train / test
-        fscanf(splitFile, "%d\n", &isTrain);
+        if(!fscanf(splitFile, "%d\n", &isTrain)){
+            printf("Error reading the split for train!");
+            exit(1);
+        }
         // Check for consistency
         if(!(isTrain == 1 || isTrain == 0)){
             printf("Split unexpected!\n");
@@ -245,7 +261,11 @@ void readVPSentenceFeatures(){
         sentPairs[i].isTrain = isTrain;
         
         // Reading if it is validation set or not
-        fscanf(valFile, "%d\n", &isVal);
+        if(!fscanf(valFile, "%d\n", &isVal)){
+            printf("Error reading val file!\n");
+            exit(1);
+        }
+
         // Check for consistency
         if(!(isVal == 1 || isVal == 0)){
             printf("Val set unexpected!\n");

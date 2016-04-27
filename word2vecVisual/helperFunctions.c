@@ -34,19 +34,25 @@ void loadWord2Vec(char* fileName){
     long noVocab, dims;
     float value;
     char word[MAX_STRING];
-    fscanf(filePt, "%ld %ld\n", &noVocab, &dims);
-    if(vocab_size != noVocab && layer1_size != dims){
+    if(!fscanf(filePt, "%ld %ld\n", &noVocab, &dims) || 
+            (vocab_size != noVocab && layer1_size != dims)){
         printf("Word2Vec reading incompatible! \n");
         exit(1);
     }
 
     // Reading the dimensions
     for (i = 0; i < vocab_size; i++){
-        fscanf(filePt, "%s", word);
+        if(!fscanf(filePt, "%s", word)){
+            printf("Error in reading!\n");
+            exit(1);
+        }
         // Allocate memory and store the word
         offset = layer1_size * i;
         for(j = 0; j < layer1_size; j++){
-            fscanf(filePt, "%f", &value);
+            if (!fscanf(filePt, "%f", &value)){
+                printf("Error in reading!\n");
+                exit(1);
+            }
 
             // Storing the value
             syn0[offset + j] = value;
@@ -280,7 +286,10 @@ float*** readVisualFeatures(char* featPath, long* noFeats, int* visualFeatSize){
     int visualFeatureSize = 0; // local variable for visualFeatSize
 
     // Read the first line and get the feature size
-    fscanf(filePt, "%ld %d\n", &noFeatures, &visualFeatureSize);
+    if(!fscanf(filePt, "%ld %d\n", &noFeatures, &visualFeatureSize)){
+        printf("Error in reading the visual features\n");
+        exit(1);
+    }
     printf("\nVisual features are of size: %d...\nNumber of features: %ld ...\n", 
                                 visualFeatureSize, noFeatures);
     // Get the initial offset and size of each line
@@ -377,7 +386,10 @@ void* readVisualFeaturesThread(void* readParams){
     while(noLines < params->noLines){
         // Read the features
         for(i = 0; i < visualFeatureSize; i++){
-            fscanf(filePt, "%f", &feature);
+            if(!fscanf(filePt, "%f", &feature)){
+                printf("Error in reading the features\n");
+                exit(1);
+            }
             features[0][curFeatId][i] = feature;
         }
 

@@ -5,7 +5,6 @@ static struct Sentence* trainSents;
 static struct Sentence* valSents;
 static struct Sentence* testSents;
 
-static int* featClusterId = NULL;
 static long noTrain = 0;
 static long noVal = 0;
 static long noTest = 0;
