@@ -48,7 +48,7 @@ void initFeatureHash();
 void initMultiRefining(); // Training multiple models
 
 // Reading the feature file PRS
-struct prsTuple** readPSRFeatureFile(char*, long*);
+struct prsTuple** readPRSFeatureFile(char*, long*);
 // Reading the refining and training file
 void readRefineTrainFeatureFiles(char*, char*);
 

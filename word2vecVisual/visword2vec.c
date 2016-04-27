@@ -39,7 +39,7 @@ extern float *syn0P, *syn0S, *syn0R;
 // Variations 
 int usePCA = 0; // Using PCA
 int trainPhrases = 0; // Handle phrases as a unit / separately
-int trainMulti = 1; // Train single / multiple models for P,R,S
+int trainMulti = 0; // Train single / multiple models for P,R,S
 int clusterCommonSense = 25; // Number of initial clusters to use
 int clusterVP = 100; // Number of initial clusters to use
 int permuteMAP = 0; // Permute the data and compute mAP multiple times
@@ -149,8 +149,8 @@ void commonSenseWrapper(int clusterArg){
     prevValAcc = 0; 
     prevTestAcc = 0;
 
-    printf("\n\n (PCA, phrases, multi, noClusters) = (%d, %d, %d, %d)\n\n", 
-                                        usePCA, trainPhrases, trainMulti, clusterArg);
+    printf("\n\n (phrases, multi, noClusters) = (%d, %d, %d)\n\n", 
+                                        trainPhrases, trainMulti, clusterArg);
     
     int noOverfit = 1;
     // Keep refining until val performance saturates
@@ -202,8 +202,8 @@ void retrieverWrapper(){
     // Common sense task
     // Reading the file for relation word
     //featurePathVQA = "/home/satwik/VisualWord2Vec/data/vqa/vqa_psr_features.txt";
-    //featurePathCOCO = "/home/satwik/VisualWord2Vec/data/coco-cnn/PSR_features_coco.txt";
-    featurePathICCV = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
+    //featurePathCOCO = "/home/satwik/VisualWord2Vec/data/coco-cnn/PRS_features_coco.txt";
+    featurePathICCV = "/home/satwik/VisualWord2Vec/data/PRS_features.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_lemma.txt";
     //char featurePath[] = "/home/satwik/VisualWord2Vec/data/PSR_features_18.txt";
@@ -446,6 +446,9 @@ void initializeNetwork(char* embedPath){
     vocab_hash = (int*) malloc(sizeof(int) * vocab_hash_size);
     for (i = 0; i < vocab_hash_size; i++) vocab_hash[i] = -1;
 
+    // Initializing with random values
+    //unsigned long long next_random = 1;
+
     // Reading the words and feature and store them sequentially
     for (i = 0; i < vocab_size; i++){
         // Store the word
@@ -466,7 +469,6 @@ void initializeNetwork(char* embedPath){
         hash = GetWordHash(word);
         while (vocab_hash[hash] != -1) hash = (hash + 1) % vocab_hash_size;
         vocab_hash[hash] = i;
-
         // Store feature
         offset = layer1_size * i;
         for (j = 0; j < layer1_size; j++){
@@ -474,6 +476,10 @@ void initializeNetwork(char* embedPath){
                 printf("Error reading the embed file!");
                 exit(1);
             }
+
+            // Initializing with random
+            //next_random = next_random * (unsigned long long)25214903917 + 11;
+            //syn0[offset + j] = (((next_random & 0xffff) / (real)65536) - 0.5) / layer1_size;
 
             // Storing the value
             syn0[offset + j] = value;
@@ -497,11 +503,11 @@ void trainModel() {
     if (output_file[0] == 0) return;
 
     // Visual paraphrase task
-    visualParaphraseWrapper(clusterVP);
+    //visualParaphraseWrapper(clusterVP);
 
     // Common sense task
     // Pass in the number of clusters to use for refining
-    //commonSenseWrapper(clusterCommonSense);
+    commonSenseWrapper(clusterCommonSense);
     //return;
     
     // Retriever Wrapper

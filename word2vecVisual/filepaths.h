@@ -9,21 +9,21 @@
 // make clean; make
 //
 // root path to all the data for CS task
-# define ROOT_CS "/srv/share/visualw2v/data/cs/"
-// root path to all the data for VP task
-# define ROOT_VP "/srv/share/visualw2v/data/vp/"
+# define ROOT_CS "data/cs/"
 
 // Common sense assertion : CS 
 // Path to the visual features, header = dimension of the feature
-# define CS_VISUAL_FEATURE_FILE ROOT_CS "float_features.txt"
+# define CS_VISUAL_FEATURE_FILE ROOT_CS "visual_train.txt"
 // Path to PRS file for TRAIN tuples, format:<P:S:R>
-# define CS_PRS_TRAIN_FILE ROOT_CS "PSR_features.txt"
+# define CS_PRS_TRAIN_FILE ROOT_CS "PRS_train.txt"
 // Path to PRS file for TEST tuples, format:<P:R:S> gt
-# define CS_PRS_TEST_FILE ROOT_CS "test_features.txt"
+# define CS_PRS_TEST_FILE ROOT_CS "PRS_test.txt"
 // Path to PRS file for VAL tuples, format:<P:R:S> gt
-# define CS_PRS_VAL_FILE ROOT_CS "val_features.txt"
+# define CS_PRS_VAL_FILE ROOT_CS "PRS_val.txt"
  
 // Visual Paraphrase : VP
+// root path to all the data for VP task
+# define ROOT_VP "/srv/share/visualw2v/data/vp/"
 // Path to the visual feature file
 #define VP_VISUAL_FEATURE_FILE ROOT_VP "abstract_features_train.txt"
 // Path to text

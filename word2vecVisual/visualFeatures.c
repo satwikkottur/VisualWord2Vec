@@ -26,7 +26,7 @@ float *syn1P, *syn1S, *syn1R;
 
 /***************************************************************************/
 // Reading a feature file
-struct prsTuple** readPSRFeatureFile(char* filePath, long* tupleCount){
+struct prsTuple** readPRSFeatureFile(char* filePath, long* tupleCount){
     // Opening the file
     FILE* filePt = fopen(filePath, "rb");
 
@@ -41,7 +41,7 @@ struct prsTuple** readPSRFeatureFile(char* filePath, long* tupleCount){
     printf("\nReading %s...\n", filePath);
 
     // Compute the number of lines / instances and check with current existing variable
-    while(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]>\n", pWord, sWord, rWord) != EOF)
+    while(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]>\n", pWord, rWord, sWord) != EOF)
         noTuples++;
     // Rewind the stream and read again
     rewind(filePt);
@@ -52,7 +52,7 @@ struct prsTuple** readPSRFeatureFile(char* filePath, long* tupleCount){
 
     // Read and store the contents
     for(i = 0; i < noTuples; i++){
-        if(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]>\n", pWord, sWord, rWord) != EOF){
+        if(fscanf(filePt, "<%[^<>:]:%[^<>:]:%[^<>:]>\n", pWord, rWord, sWord) != EOF){
             // Getting the indices for p, s, r
             tuplesPtr[0][i].p = addFeatureWord(pWord);
             tuplesPtr[0][i].r = addFeatureWord(rWord);
@@ -78,7 +78,7 @@ struct prsTuple** readPSRFeatureFile(char* filePath, long* tupleCount){
 // Reading feature files for the common sense task
 void readRefineTrainFeatureFiles(char* refinePath, char* trainPath){
     // Read the refine tuples first
-    refineTuples = *readPSRFeatureFile(refinePath, &noRefine);
+    refineTuples = *readPRSFeatureFile(refinePath, &noRefine);
     
     if(trainPath == NULL){
         // If the second option is null, we take them to be equal
@@ -87,7 +87,7 @@ void readRefineTrainFeatureFiles(char* refinePath, char* trainPath){
     }
     else
         // else read the train tuples
-        trainTuples = *readPSRFeatureFile(trainPath, &noTrain);
+        trainTuples = *readPRSFeatureFile(trainPath, &noTrain);
 }
 
 // Reading the cluster ids
@@ -134,7 +134,7 @@ void readVisualFeatureFile(char* fileName){
 
     // Read the first line and get the feature size
     if(!fscanf(filePt, "%d", &visualFeatSize)){
-        printf("Error reading the file at %s!", fileName);
+        printf("Error reading the file at %s!\n", fileName);
         exit(1); 
     }
     printf("Visual features are of size : %d...\n", visualFeatSize);
@@ -267,8 +267,8 @@ void initMultiRefining(){
     // Initialize the last layer of weights
     for (a = 0; a < noClusters; a++) for (b = 0; b < layer1_size; b++){
         next_random = next_random * (unsigned long long)25214903917 + 11;
-        //syn1R[a * layer1_size + b] = 0;
-        syn1R[a * layer1_size + b] = (((next_random & 0xFFFF) / (real)65536) - 0.5) / layer1_size;
+        //syn1r[a * layer1_size + b] = 0;
+        syn1R[a * layer1_size + b] = (((next_random & 0xffff) / (real)65536) - 0.5) / layer1_size;
 
         next_random = next_random * (unsigned long long)25214903917 + 11;
         //syn1S[a * layer1_size + b] = 0;
