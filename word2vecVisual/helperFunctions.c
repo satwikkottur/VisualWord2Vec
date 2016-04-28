@@ -1,6 +1,136 @@
 # include "helperFunctions.h"
+
+const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
+int *vocab_hash;
+struct vocab_word *vocab;
+long long vocab_max_size = 1000;
+
+// Returns hash value of a word
+int GetWordHash(char *word) {
+  unsigned long long a, hash = 0;
+  for (a = 0; a < strlen(word); a++) hash = hash * 257 + word[a];
+  hash = hash % vocab_hash_size;
+  return hash;
+}
+
+// Returns position of a word in the vocabulary; if the word is not found, returns -1
+int SearchVocab(char *word) {
+  unsigned int hash = GetWordHash(word);
+  while (1) {
+    if (vocab_hash[hash] == -1) return -1;
+    if (!strcmp(word, vocab[vocab_hash[hash]].word)) return vocab_hash[hash];
+    hash = (hash + 1) % vocab_hash_size;
+  }
+  return -1;
+}
+
+// Adds a word to the vocabulary
+int AddWordToVocab(char *word) {
+  unsigned int hash, length = strlen(word) + 1;
+  if (length > MAX_STRING) length = MAX_STRING;
+  vocab[vocab_size].word = (char *)calloc(length, sizeof(char));
+  strcpy(vocab[vocab_size].word, word);
+  vocab[vocab_size].cn = 0;
+  vocab_size++;
+  // Reallocate memory if needed
+  if (vocab_size + 2 >= vocab_max_size) {
+    vocab_max_size += 1000;
+    vocab = (struct vocab_word *)realloc(vocab, vocab_max_size * sizeof(struct vocab_word));
+  }
+  hash = GetWordHash(word);
+  while (vocab_hash[hash] != -1) hash = (hash + 1) % vocab_hash_size;
+  vocab_hash[hash] = vocab_size - 1;
+  return vocab_size - 1;
+}
+
+// Initializing the network and read the embeddings
+void initializeEmbeddings(char* embedPath){
+    FILE* filePt = fopen(embedPath, "rb");
+    
+    long long i, j, offset;
+    long dims;
+    float value;
+    char word[MAX_STRING];
+    unsigned int hash, length;
+
+    //------------------------------------------------------------
+    // Read vocab size and number of hidden layers
+    if (!fscanf(filePt, "%lld %ld\n", &vocab_size, &dims)){
+        printf("Error reading the embed file!");
+        exit(1);
+    }
+
+    if(layer1_size != dims){
+        printf("Number of dimensions not consistent with embedding file!\n");
+        exit(1);
+    }
+    //------------------------------------------------------------
+    // Allocate memory for the intput-to-hidden parameters
+    printf("(vocab size, hidden dims): %lld %lld\n", vocab_size, layer1_size);
+    int flag = posix_memalign((void **)&syn0, 128, (long long)vocab_size * layer1_size * sizeof(float));
+    if (syn0 == NULL || flag){
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    //------------------------------------------------------------
+    // Allocating memory for reading vocab, initialize hash
+    vocab = (struct vocab_word*) malloc(vocab_size * sizeof(struct vocab_word));
+    vocab_hash = (int*) malloc(sizeof(int) * vocab_hash_size);
+
+    for (i = 0; i < vocab_hash_size; i++) vocab_hash[i] = -1;
+
+    // Initializing with random values
+    //unsigned long long next_random = 1;
+
+    // Reading the words and feature and store them sequentially
+    for (i = 0; i < vocab_size; i++){
+        // Store the word
+        if (!fscanf(filePt, "%s", word)){
+            printf("Error reading the embed file!");
+            exit(1);
+        }
+        //printf("%lld, %lld, %s\n", i, vocab_size, word);
+        
+        length = strlen(word) + 1;
+        // Truncate if needed
+        if (length > MAX_STRING) length = MAX_STRING;
+
+        vocab[i].word = (char*) calloc(length, sizeof(char));
+        strcpy(vocab[i].word, word);
+        vocab[i].cn = 0;
+
+        hash = GetWordHash(word);
+        while (vocab_hash[hash] != -1) hash = (hash + 1) % vocab_hash_size;
+        vocab_hash[hash] = i;
+        // Store feature
+        offset = layer1_size * i;
+        for (j = 0; j < layer1_size; j++){
+            if (!fscanf(filePt, "%f", &value)){
+                printf("Error reading the embed file!");
+                exit(1);
+            }
+
+            // Initializing with random
+            //next_random = next_random * (unsigned long long)25214903917 + 11;
+            //syn0[offset + j] = (((next_random & 0xffff) / (real)65536) - 0.5) / layer1_size;
+
+            // Storing the value
+            syn0[offset + j] = value;
+        }
+    }
+
+    // Close the file and exit
+    fclose(filePt);
+    printf("Done reading and initializing embeddings...\n");
+}
+
 // Saving the word2vec vectors for further use
 void saveWord2Vec(char* fileName){
+    if (syn0 == NULL){
+        printf("Embeddings not initialized! Cannot save..");
+        return;
+    }
+
     FILE* filePt = fopen(fileName, "w");
 
     if(filePt == NULL){
@@ -21,6 +151,86 @@ void saveWord2Vec(char* fileName){
         fprintf(filePt, "%f\n", syn0[offset + layer1_size - 1]);
     }
 
+    fclose(filePt);
+}
+
+// Saving the word2vec vectors for further use
+void saveWord2VecMulti(char* fileName){
+    if (syn0P == NULL || syn0R == NULL || syn0S == NULL){
+        printf("Embeddings (P, R, S) not initialized! Cannot save..");
+        return;
+    }
+
+    char* fileNameP = (char*) malloc(sizeof(char) * strlen(fileName) + 2);
+    char* fileNameR = (char*) malloc(sizeof(char) * strlen(fileName) + 2);
+    char* fileNameS = (char*) malloc(sizeof(char) * strlen(fileName) + 2);
+
+    long i, j, offset = 0;
+    for (i = 0; i < strlen(fileName); i++){
+        // Add additional _P, _S, _R to the filenames
+        if (fileName[i] == '.'){
+            fileNameP[i] = '_'; fileNameP[i+1] = 'P';
+            fileNameR[i] = '_'; fileNameR[i+1] = 'R';
+            fileNameS[i] = '_'; fileNameS[i+1] = 'S';
+            
+            offset = 2;
+        }
+
+        fileNameP[i + offset] = fileName[i];
+        fileNameR[i + offset] = fileName[i];
+        fileNameS[i + offset] = fileName[i];
+    }
+
+    FILE* filePt = fopen(fileNameP, "w");
+    // Write the vocab size and embedding dimension on the first line
+    // P
+    fprintf(filePt, "%lld %lld\n", vocab_size, layer1_size);
+    if(filePt == NULL){
+        printf("Directory doesn't exist at %s\n", fileName);
+        exit(1);
+    }
+    for (i = 0; i < vocab_size; i++){
+        offset = i * layer1_size;
+        fprintf(filePt, "%s ", vocab[i].word);
+        for (j = 0; j < layer1_size - 1; j++)
+            fprintf(filePt, "%f ", syn0P[offset + j]);
+
+        fprintf(filePt, "%f\n", syn0P[offset + layer1_size - 1]);
+    }
+    fclose(filePt);
+
+    filePt = fopen(fileNameR, "w");
+    // R
+    fprintf(filePt, "%lld %lld\n", vocab_size, layer1_size);
+    if(filePt == NULL){
+        printf("Directory doesn't exist at %s\n", fileName);
+        exit(1);
+    }
+    for (i = 0; i < vocab_size; i++){
+        offset = i * layer1_size;
+        fprintf(filePt, "%s ", vocab[i].word);
+        for (j = 0; j < layer1_size - 1; j++)
+            fprintf(filePt, "%f ", syn0R[offset + j]);
+
+        fprintf(filePt, "%f\n", syn0R[offset + layer1_size - 1]);
+    }
+    fclose(filePt);
+
+    filePt = fopen(fileNameS, "w");
+    // S
+    fprintf(filePt, "%lld %lld\n", vocab_size, layer1_size);
+    if(filePt == NULL){
+        printf("Directory doesn't exist at %s\n", fileName);
+        exit(1);
+    }
+    for (i = 0; i < vocab_size; i++){
+        offset = i * layer1_size;
+        fprintf(filePt, "%s ", vocab[i].word);
+        for (j = 0; j < layer1_size - 1; j++)
+            fprintf(filePt, "%f ", syn0S[offset + j]);
+
+        fprintf(filePt, "%f\n", syn0S[offset + layer1_size - 1]);
+    }
     fclose(filePt);
 }
 

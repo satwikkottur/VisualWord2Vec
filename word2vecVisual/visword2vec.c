@@ -37,58 +37,14 @@ int windowVP = 5; // window size for training on sentences
 enum TrainMode trainMode = SENTENCES;
 
 /***********************************************************************************/
-const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vocabulary
+char output_file[MAX_STRING], embed_file[MAX_STRING];
 
-char train_file[MAX_STRING], output_file[MAX_STRING];
-char embed_file[MAX_STRING];
-struct vocab_word *vocab;
-int num_threads = 1;
-int *vocab_hash;
-long long vocab_max_size = 1000, vocab_size = 0, layer1_size = 100;
-long long train_words = 0, word_count_actual = 0, iter = 5, file_size = 0, classes = 0;
+long long vocab_size = 0, layer1_size = 100;
 real alpha = 0.025, starting_alpha, sample = 1e-3;
 real *syn0, *syn1;
-clock_t start;
+int num_threads = 1;
 
 int* refineVocab; // Keep track of words that are being refined
-
-// Returns hash value of a word
-int GetWordHash(char *word) {
-  unsigned long long a, hash = 0;
-  for (a = 0; a < strlen(word); a++) hash = hash * 257 + word[a];
-  hash = hash % vocab_hash_size;
-  return hash;
-}
-
-// Returns position of a word in the vocabulary; if the word is not found, returns -1
-int SearchVocab(char *word) {
-  unsigned int hash = GetWordHash(word);
-  while (1) {
-    if (vocab_hash[hash] == -1) return -1;
-    if (!strcmp(word, vocab[vocab_hash[hash]].word)) return vocab_hash[hash];
-    hash = (hash + 1) % vocab_hash_size;
-  }
-  return -1;
-}
-
-// Adds a word to the vocabulary
-int AddWordToVocab(char *word) {
-  unsigned int hash, length = strlen(word) + 1;
-  if (length > MAX_STRING) length = MAX_STRING;
-  vocab[vocab_size].word = (char *)calloc(length, sizeof(char));
-  strcpy(vocab[vocab_size].word, word);
-  vocab[vocab_size].cn = 0;
-  vocab_size++;
-  // Reallocate memory if needed
-  if (vocab_size + 2 >= vocab_max_size) {
-    vocab_max_size += 1000;
-    vocab = (struct vocab_word *)realloc(vocab, vocab_max_size * sizeof(struct vocab_word));
-  }
-  hash = GetWordHash(word);
-  while (vocab_hash[hash] != -1) hash = (hash + 1) % vocab_hash_size;
-  vocab_hash[hash] = vocab_size - 1;
-  return vocab_size - 1;
-}
 
 // Function for common sense task
 void commonSenseWrapper(int clusterArg){
@@ -193,150 +149,6 @@ void visualParaphraseWrapper(int clusterArg){
     }
 }
 
-// Initializing the network and read the embeddings
-void initializeEmbeddings(char* embedPath){
-    FILE* filePt = fopen(embedPath, "rb");
-    
-    long long i, j, offset;
-    long dims;
-    float value;
-    char word[MAX_STRING];
-    unsigned int hash, length;
-
-    //------------------------------------------------------------
-    // Read vocab size and number of hidden layers
-    if (!fscanf(filePt, "%lld %ld\n", &vocab_size, &dims)){
-        printf("Error reading the embed file!");
-        exit(1);
-    }
-
-    if(layer1_size != dims){
-        printf("Number of dimensions not consistent with embedding file!\n");
-        exit(1);
-    }
-    //------------------------------------------------------------
-    // Allocate memory for the intput-to-hidden parameters
-    printf("(vocab size, hidden dims): %lld %lld\n", vocab_size, layer1_size);
-    int flag = posix_memalign((void **)&syn0, 128, (long long)vocab_size * layer1_size * sizeof(real));
-    if (syn0 == NULL || flag){
-        printf("Memory allocation failed\n");
-        exit(1);
-    }
-    //------------------------------------------------------------
-    // Allocating memory for reading vocab, initialize hash
-    vocab = (struct vocab_word*) malloc(vocab_size * sizeof(struct vocab_word));
-    vocab_hash = (int*) malloc(sizeof(int) * vocab_hash_size);
-    for (i = 0; i < vocab_hash_size; i++) vocab_hash[i] = -1;
-
-    // Initializing with random values
-    //unsigned long long next_random = 1;
-
-    // Reading the words and feature and store them sequentially
-    for (i = 0; i < vocab_size; i++){
-        // Store the word
-        if (!fscanf(filePt, "%s", word)){
-            printf("Error reading the embed file!");
-            exit(1);
-        }
-        //printf("%lld, %lld, %s\n", i, vocab_size, word);
-        
-        length = strlen(word) + 1;
-        // Truncate if needed
-        if (length > MAX_STRING) length = MAX_STRING;
-
-        vocab[i].word = (char*) calloc(length, sizeof(char));
-        strcpy(vocab[i].word, word);
-        vocab[i].cn = 0;
-
-        hash = GetWordHash(word);
-        while (vocab_hash[hash] != -1) hash = (hash + 1) % vocab_hash_size;
-        vocab_hash[hash] = i;
-        // Store feature
-        offset = layer1_size * i;
-        for (j = 0; j < layer1_size; j++){
-            if (!fscanf(filePt, "%f", &value)){
-                printf("Error reading the embed file!");
-                exit(1);
-            }
-
-            // Initializing with random
-            //next_random = next_random * (unsigned long long)25214903917 + 11;
-            //syn0[offset + j] = (((next_random & 0xffff) / (real)65536) - 0.5) / layer1_size;
-
-            // Storing the value
-            syn0[offset + j] = value;
-        }
-    }
-
-    // Close the file and exit
-    fclose(filePt);
-    printf("Done reading and initializing embeddings...\n");
-}
-
-// Saving the features done here
-void trainModel() {
-
-    //******************************************************************
-    /**************************************************************/
-    // skip writing to the file
-    /***************************************************************/
-    // Write the three models separately (P,R,S)
-    // P 
-    /*char outputP[] = "/home/satwik/VisualWord2Vec/models/p_wiki_model.txt";
-    fo = fopen(outputP, "wb");
-    syn0 = syn0P;
-    // Save the word vectors
-    fprintf(fo, "%lld %lld\n", vocab_size, layer1_size);
-    for (a = 0; a < vocab_size; a++) {
-      fprintf(fo, "%s ", vocab[a].word);
-      if (binary) for (b = 0; b < layer1_size; b++) fwrite(&syn0[a * layer1_size + b], sizeof(real), 1, fo);
-      else for (b = 0; b < layer1_size; b++) fprintf(fo, "%lf ", syn0[a * layer1_size + b]);
-      fprintf(fo, "\n");
-    }
-    fclose(fo);
-    
-    // R
-    char outputR[] = "/home/satwik/VisualWord2Vec/models/r_wiki_model.txt";
-    fo = fopen(outputR, "wb");
-    syn0 = syn0R;
-    // Save the word vectors
-    fprintf(fo, "%lld %lld\n", vocab_size, layer1_size);
-    for (a = 0; a < vocab_size; a++) {
-      fprintf(fo, "%s ", vocab[a].word);
-      if (binary) for (b = 0; b < layer1_size; b++) fwrite(&syn0[a * layer1_size + b], sizeof(real), 1, fo);
-      else for (b = 0; b < layer1_size; b++) fprintf(fo, "%lf ", syn0[a * layer1_size + b]);
-      fprintf(fo, "\n");
-    }
-    fclose(fo);
-
-    // S
-    char outputS[] = "/home/satwik/VisualWord2Vec/models/s_wiki_model.txt";
-    fo = fopen(outputS, "wb");
-    syn0 = syn0S;
-    // Save the word vectors
-    fprintf(fo, "%lld %lld\n", vocab_size, layer1_size);
-    for (a = 0; a < vocab_size; a++) {
-      fprintf(fo, "%s ", vocab[a].word);
-      if (binary) for (b = 0; b < layer1_size; b++) fwrite(&syn0[a * layer1_size + b], sizeof(real), 1, fo);
-      else for (b = 0; b < layer1_size; b++) fprintf(fo, "%lf ", syn0[a * layer1_size + b]);
-      fprintf(fo, "\n");
-    }
-    fclose(fo);
-    return;*/
-    //=================================================
-    // Code to save embeddings
-    long a, b;
-    FILE* fo = fopen(output_file, "wb");
-    // Save the word vectors
-    fprintf(fo, "%lld %lld\n", vocab_size, layer1_size);
-    for (a = 0; a < vocab_size; a++) {
-      fprintf(fo, "%s ", vocab[a].word);
-      for (b = 0; b < layer1_size; b++) fprintf(fo, "%lf ", syn0[a * layer1_size + b]);
-      fprintf(fo, "\n");
-    }
-    fclose(fo);
-}
-
 // Obtain the position of an argument in the list
 int ArgPos(char *str, int argc, char **argv) {
     int a;
@@ -387,7 +199,6 @@ int main(int argc, char **argv) {
     output_file[0] = 0;
 
     if ((i = ArgPos((char *)"-size", argc, argv)) > 0) layer1_size = atoi(argv[i + 1]);
-    //if ((i = ArgPos((char *)"-train", argc, argv)) > 0) strcpy(train_file, argv[i + 1]);
     if ((i = ArgPos((char *)"-embed-path", argc, argv)) > 0) strcpy(embed_file, argv[i + 1]);
     if ((i = ArgPos((char *)"-alpha", argc, argv)) > 0) alpha = atof(argv[i + 1]);
     if ((i = ArgPos((char *)"-output", argc, argv)) > 0) strcpy(output_file, argv[i + 1]);
@@ -398,9 +209,6 @@ int main(int argc, char **argv) {
     int performCS = 0, performVP = 0; // perform either of the task
     if ((i = ArgPos((char *)"-cs", argc, argv)) > 0) performCS = atoi(argv[i + 1]);
     if ((i = ArgPos((char *)"-vp", argc, argv)) > 0) performVP = atoi(argv[i + 1]);
-
-    vocab = (struct vocab_word *)calloc(vocab_max_size, sizeof(struct vocab_word));
-    vocab_hash = (int *)calloc(vocab_hash_size, sizeof(int));
 
     // Begin the training
     printf("Reading embedding initializations from %s\n", embed_file);
@@ -425,13 +233,14 @@ int main(int argc, char **argv) {
     if (performVP) visualParaphraseWrapper(numClusters);
 
     // Common sense task
-    // Pass in the number of clusters to use for refining
     if (performCS) commonSenseWrapper(numClusters);
     
     // Retriever Wrapper
     //retrieverWrapper();
     
-    // Saving the modified embeddings
-    saveWord2Vec(output_file);
+    // Saving the modified embeddings (either separate/shared)
+    if (trainMulti) saveWord2VecMulti(output_file);
+    else saveWord2VecMulti(output_file);
+
     return 0;
 }
