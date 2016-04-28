@@ -27,8 +27,6 @@
 extern float prevTestAcc, prevValAcc;
 extern long noTest;
 
-extern float *syn0P, *syn0S, *syn0R;
-
 // Variations 
 int trainPhrases = 0; // Handle phrases as a unit / separately
 int trainMulti = 0; // Train single / multiple models for P,R,S
@@ -44,7 +42,7 @@ const int vocab_hash_size = 30000000;  // Maximum 30 * 0.7 = 21M words in the vo
 char train_file[MAX_STRING], output_file[MAX_STRING];
 char embed_file[MAX_STRING];
 struct vocab_word *vocab;
-int num_threads = 12;
+int num_threads = 1;
 int *vocab_hash;
 long long vocab_max_size = 1000, vocab_size = 0, layer1_size = 100;
 long long train_words = 0, word_count_actual = 0, iter = 5, file_size = 0, classes = 0;
@@ -137,7 +135,7 @@ void commonSenseWrapper(int clusterArg){
     prevValAcc = 0; 
     prevTestAcc = 0;
 
-    printf("\n\n (phrases, multi, noClusters) = (%d, %d, %d)\n\n", 
+    printf("\n\n (Phrases, Multi, numClusters) = (%d, %d, %d)\n\n", 
                                         trainPhrases, trainMulti, clusterArg);
     
     int noOverfit = 1;
@@ -196,7 +194,7 @@ void visualParaphraseWrapper(int clusterArg){
 }
 
 // Initializing the network and read the embeddings
-void initializeNetwork(char* embedPath){
+void initializeEmbeddings(char* embedPath){
     FILE* filePt = fopen(embedPath, "rb");
     
     long long i, j, offset;
@@ -275,28 +273,8 @@ void initializeNetwork(char* embedPath){
     printf("Done reading and initializing embeddings...\n");
 }
 
-// Bulk of the work is done here
+// Saving the features done here
 void trainModel() {
-    printf("Reading embedding initializations from %s\n", embed_file);
-    starting_alpha = alpha;
-
-    // Read the embeddings and initializing the network
-    initializeNetwork(embed_file);
-    
-    // Ensure output file is not empty (write something out after done)
-    if (output_file[0] == 0) return;
-
-    // Visual paraphrase task
-    //visualParaphraseWrapper(clusterVP);
-
-    // Common sense task
-    // Pass in the number of clusters to use for refining
-    commonSenseWrapper(numClusters);
-    //return;
-    
-    // Retriever Wrapper
-    //retrieverWrapper();
-    return;
 
     //******************************************************************
     /**************************************************************/
@@ -388,7 +366,7 @@ int main(int argc, char **argv) {
         printf("\t-size <int>\n");
         printf("\t\tSet size of word vectors; default is 100\n");
         printf("\t-threads <int>\n");
-        printf("\t\tUse <int> threads (default 12)\n");
+        printf("\t\tUse <int> threads (default 1)\n");
         printf("\t-alpha <float>\n");
         printf("\t\tSet the learning rate; default is 0.01\n");
         printf("\t-clusters <int>\n");
@@ -397,6 +375,10 @@ int main(int argc, char **argv) {
         printf("\t\tTo train single (0) or multiple embeddings(1) (only for cs); default is 0\n");
         printf("\t-phrases <int>\n");
         printf("\t\tHandling phrases together (1) or as separate words (0); default is 0\n");
+        printf("\t-cs <int>\n");
+        printf("\t\tPerform the cs task (1); default is 0\n");
+        printf("\t-vp <int>\n");
+        printf("\t\tPerform the vp task (1); default is 0\n");
         printf("\nExamples:\n");
         printf("./word2vec -train data.txt -output vec.txt -size 200 -clusters 30\n\n");
         return 0;
@@ -411,13 +393,45 @@ int main(int argc, char **argv) {
     if ((i = ArgPos((char *)"-output", argc, argv)) > 0) strcpy(output_file, argv[i + 1]);
     if ((i = ArgPos((char *)"-threads", argc, argv)) > 0) num_threads = atoi(argv[i + 1]);
     if ((i = ArgPos((char *)"-clusters", argc, argv)) > 0) numClusters = atoi(argv[i + 1]);
-    if ((i = ArgPos((char *)"-clusters", argc, argv)) > 0) trainMulti = atoi(argv[i + 1]);
-    if ((i = ArgPos((char *)"-clusters", argc, argv)) > 0) trainPhrases = atoi(argv[i + 1]);
+    if ((i = ArgPos((char *)"-multi", argc, argv)) > 0) trainMulti = atoi(argv[i + 1]);
+    if ((i = ArgPos((char *)"-phrases", argc, argv)) > 0) trainPhrases = atoi(argv[i + 1]);
+    int performCS = 0, performVP = 0; // perform either of the task
+    if ((i = ArgPos((char *)"-cs", argc, argv)) > 0) performCS = atoi(argv[i + 1]);
+    if ((i = ArgPos((char *)"-vp", argc, argv)) > 0) performVP = atoi(argv[i + 1]);
 
     vocab = (struct vocab_word *)calloc(vocab_max_size, sizeof(struct vocab_word));
     vocab_hash = (int *)calloc(vocab_hash_size, sizeof(int));
 
     // Begin the training
-    trainModel();
+    printf("Reading embedding initializations from %s\n", embed_file);
+    starting_alpha = alpha;
+
+    // Read the embeddings and initializing the network
+    initializeEmbeddings(embed_file);
+    
+    // Ensure output file is not empty (write something out after done)
+    if (output_file[0] == 0) {
+        printf("Invalid output file!");
+        return -1;
+    }
+
+    // Ensure only one task is called atmost
+    if (performVP && performCS) {
+        printf("Cannot perform both CS and VP!");
+        return -1;
+    }
+
+    // Visual paraphrase task
+    if (performVP) visualParaphraseWrapper(numClusters);
+
+    // Common sense task
+    // Pass in the number of clusters to use for refining
+    if (performCS) commonSenseWrapper(numClusters);
+    
+    // Retriever Wrapper
+    //retrieverWrapper();
+    
+    // Saving the modified embeddings
+    saveWord2Vec(output_file);
     return 0;
 }

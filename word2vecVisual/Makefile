@@ -33,7 +33,7 @@ $(BIN)%.o : %.c
 
 cs:
 	make
-	./$(BIN)visword2vec -embed-path data/cs/word2vec_cs.bin -output cs_refined.bin -size 200 -threads 12 -clusters 25
+	./$(BIN)visword2vec -cs 1 -embed-path data/cs/word2vec_cs.bin -output cs_refined.bin -size 200 -clusters 25
 
 vp:
 	make
