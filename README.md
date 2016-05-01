@@ -59,7 +59,6 @@ two tasks correspondingly to compile and run. `make` simply compiles while
 **NOTE**: All the binaries are stored in `bin/` folder (might have to create one if 
 doesnt exist beforehand).  
 
-
 ----
 ### Tasks
 In this paper, we deal with three tasks: Common Sense Assertion Classification, Visual Paraphrasing and Text-based Image Retrieval.
@@ -91,5 +90,18 @@ By default it created a folder `data/cs` and saves the files in this folder. Thi
 Now, to run, simply:
 ```
 make
-./visword2vec -cs 
+./visword2vec -cs 1 -embed-path data/cs/word2vec_cs.bin -output cs_refined.bin -size 200 -clusters 25
+```
+You can also give in other parameters to suit your needs.
+
+**B. Visual Paraphrasing** ([Project page](https://filebox.ece.vt.edu/~linxiao/imagine/))  
+Download the dataset from their project page [here](https://filebox.ece.vt.edu/~linxiao/imagine/site_data/imagine_v1.zip).
+Also download the clipart scenes and descriptions used to train `vis-w2v` from the [clipart](https://vision.ece.vt.edu/clipart/) project page [here](http://research.microsoft.com/research/downloads/details/73537628-df14-44e2-847a-45f369131e87/details.aspx).
+
+All the scripts needed for pre-processing are available in `utils/vp` folder. We begin with:  
+
+* Lemmatizing clipart sentences for training `vis-w2v`.
+```
+cd utils/vp
+python lemmatizeVPTrain.py <path to downloaded data> <path to save the data>(optional)
 ```
