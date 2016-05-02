@@ -13,6 +13,7 @@ models/*
 word2vecVisual/modelsNdata/*
 word2vecVisual/test/*
 libs/wordvec_image/
+word2vecVisual/data/*
 
 # Ignore the vp-fitb code
 word2vecVisual/vp-fitb/

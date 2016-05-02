@@ -1,15 +1,4 @@
 % Script to save the VP trained sentences for tokenization and lemmatization
-% load(fullfile('../dumps', 'trainWord2Vec.mat'));
-
-%filePath = fullfile('../dumps', 'vp_train_sentences_raw.txt');
-%fileId = fopen(filePath, 'wb');
-
-%for i = 1:length(sentences_train)
-%    fprintf(fileId, '%s\n', sentences_train{i});
-%end
-%
-%fclose(fileId);
-
 % Load the data and split
 dataPath = '../../data/visual_paraphrasing/';
 load(fullfile(dataPath, 'dataset.mat'));
