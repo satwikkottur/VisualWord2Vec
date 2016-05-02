@@ -59,7 +59,6 @@ two tasks correspondingly to compile and run. `make` simply compiles while
 **NOTE**: All the binaries are stored in `bin/` folder (might have to create one if 
 doesnt exist beforehand).  
 
-
 ----
 ### Tasks
 In this paper, we deal with three tasks: Common Sense Assertion Classification, Visual Paraphrasing and Text-based Image Retrieval.
@@ -91,5 +90,74 @@ By default it created a folder `data/cs` and saves the files in this folder. Thi
 Now, to run, simply:
 ```
 make
-./visword2vec -cs 
+./visword2vec -cs 1 -embed-path data/cs/word2vec_cs.bin -output cs_refined.bin -size 200 -clusters 25
+```
+You can also give in other parameters to suit your needs.
+
+**B. Visual Paraphrasing** ([Project page](https://filebox.ece.vt.edu/~linxiao/imagine/))  
+Download the VP dataset from their project page [here](https://filebox.ece.vt.edu/~linxiao/imagine/site_data/imagine_v1.zip).
+Also download the clipart scenes and descriptions (ASD) used to train `vis-w2v` from the [clipart](https://vision.ece.vt.edu/clipart/) project page [here](http://research.microsoft.com/research/downloads/details/73537628-df14-44e2-847a-45f369131e87/details.aspx).
+
+All the scripts needed for pre-processing are available in `utils/vp` folder. 
+
+Follow the steps below:
+#### Training data
+Run the `fetchVPTrainData.m` function to extract relevant data for training `vis-w2v`.
+```
+cd utils/vp
+>> fetchVPTrainData(<path to ASD dataset>, <path to VP dataset>, <path to save the data>);
+
+For example:
+>> fetchVPTrainData('data/vp/AbstractScenes_v1.1', 'data/vp/imagine_v1/', 'vp/data/');
+```
+
+It does the following (not important. If you just want desired data, run the above command):
+  * Extracting visual features `abstract_features.txt` from Abstract Scene Dataset (ASD) using MATLAB script.
+  ```
+  >> cd utils/vp
+  >> extractAbstractFeatures(<path to ASD dataset>, <path to save the data>)
+  
+  For example: 
+  >> extractAbstractFeatures('data/vp/AbstractScenes_v1.1', 'data/vp/')
+  ```
+  * The alignment between ASD and VP datasets is given in two files `SceneMap.txt` and `SceneMapV1_10020.txt` present in `utils/vp/`. We will use them along with train/test split of VP and select features from training sentences only, again using MATLAB.
+  ```
+  cd utils/vp
+  >> alignAbstractFeatures(<path to VP dataset>, <path to abstract_features.txt>, <path to save the data>)
+  
+  For example:
+  >> alignAbstractFeatures('data/vp/imagine_v1/', 'data/vp/', 'data/vp/')
+  ```
+  * Get the training sentences from VP dataset (for learning `vis-w2v`). This would produce `vp_train_sentences_raw.txt`.
+  ```
+  cd utils/vp
+  >> saveVPTrainSentences(<path to VP dataset>, <path to save sentences>)
+  
+  For example:
+  >> saveVPTrainSentences('data/vp/imagine_v1/', 'data/vp')
+  ```
+
+#### Task data
+One should use our new embeddings `vis-w2v` in place of `word2vec` in visual paraphrasing task (`imagine_v1/code/feature/compute_features_vp.m` at line 32). Alternatively, we tap their other text features (co-occurance and total frequency) and use it in our code for speed and smoother interface between learning embeddings and performing the task. 
+This can be achieved my adding the following lines to `imagine_v1/code/feature/compute_features_vp.m` before line 30, and running `imagine_v1/code/script_vp.m`.
+
+```
+save('vp_txt_features.mat', 'feat_vp_text_tf_1', 'feat_vp_text_tf_2', 'feat_vp_text_coc_1', 'feat_vp_text_coc_2');
+% Escape from running remainder code
+error('Saved features, getting out!')
+```
+
+Next, we obtain all the relevant information to perform the visual paraphrasing task (using MATLAB)
+* Sentence pairs: `vp_sentences_1.txt` and `vp_sentences_2.txt`
+* Other textual features: `vp_features_coc_l.txt`, `vp_features_coc_2.txt`, `vp_features_tf_l.txt`, `vp_features_tf_2.txt`
+* Ground truth: `vp_ground_truth.txt`
+* Train / test split: `vp_split.txt`
+* Train / val split: `vp_val_inds_1k.txt`
+
+```
+cd /utils/vp
+>> fetchVPTaskData(<path to VP dataset>, <path to vp_txt_features.mat>, <path to save the files>)
+
+For example:
+>> fetchVPTaskData('data/vp/imagine_v1/', 'data/vp/imagine_v1/code/feature/', 'data/vp')
 ```
