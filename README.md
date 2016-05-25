@@ -102,7 +102,7 @@ All the scripts needed for pre-processing are available in `utils/vp` folder.
 
 Follow the steps below:
 #### Training data
-Run the `fetchVPTrainData.m` function to extract relevant data for training `vis-w2v`.
+**Step 1:** Run the `fetchVPTrainData.m` function to extract relevant data for training `vis-w2v`.
 ```
 cd utils/vp
 >> fetchVPTrainData(<path to ASD dataset>, <path to VP dataset>, <path to save the data>);
@@ -138,8 +138,8 @@ It does the following (not important. If you just want desired data, run the abo
   ```
 
 #### Task data
-One should use our new embeddings `vis-w2v` in place of `word2vec` in visual paraphrasing task (`imagine_v1/code/feature/compute_features_vp.m` at line 32). Alternatively, we tap their other text features (co-occurance and total frequency) and use it in our code for speed and smoother interface between learning embeddings and performing the task. 
-This can be achieved my adding the following lines to `imagine_v1/code/feature/compute_features_vp.m` before line 30, and running `imagine_v1/code/script_vp.m`.
+**Step 2:** One should use our new embeddings `vis-w2v` in place of `word2vec` in visual paraphrasing task (`imagine_v1/code/feature/compute_features_vp.m` at line 32). Alternatively, we can save their other text features (co-occurance and total frequency) and use it in our code for speed and smoother interface between learning embeddings and performing the task. 
+This can be achieved by adding the following lines to `imagine_v1/code/feature/compute_features_vp.m` before line 30, and running `imagine_v1/code/script_vp.m`.
 
 ```
 save('vp_txt_features.mat', 'feat_vp_text_tf_1', 'feat_vp_text_tf_2', 'feat_vp_text_coc_1', 'feat_vp_text_coc_2');
@@ -147,7 +147,7 @@ save('vp_txt_features.mat', 'feat_vp_text_tf_1', 'feat_vp_text_tf_2', 'feat_vp_t
 error('Saved features, getting out!')
 ```
 
-Next, we obtain all the relevant information to perform the visual paraphrasing task (using MATLAB)
+**Step 3**: Next, we obtain all the relevant information to perform the visual paraphrasing task (using MATLAB)
 * Sentence pairs: `vp_sentences_1.txt` and `vp_sentences_2.txt`
 * Other textual features: `vp_features_coc_l.txt`, `vp_features_coc_2.txt`, `vp_features_tf_l.txt`, `vp_features_tf_2.txt`
 * Ground truth: `vp_ground_truth.txt`
@@ -159,5 +159,7 @@ cd /utils/vp
 >> fetchVPTaskData(<path to VP dataset>, <path to vp_txt_features.mat>, <path to save the files>)
 
 For example:
->> fetchVPTaskData('data/vp/imagine_v1/', 'data/vp/imagine_v1/code/feature/', 'data/vp')
+>> fetchVPTaskData('data/vp/imagine_v1/', 'data/vp/imagine_v1/code/', 'data/vp')
 ```
+
+
