@@ -4,9 +4,10 @@ Learning visually grounded word embeddings from abstract image
 ----
 
 ####Paper
-**Satwik Kottur, Ramakrishna Vedantam, Jos&eacute; Moura, Devi Parikh**  
+**Satwik Kottur\*, Ramakrishna Vedantam\*, Jos&eacute; Moura, Devi Parikh**  
 *Visual Word2Vec (vis-w2v): Learning Visually grounded embeddings from abstract images*  
 [[ArXiv](http://arxiv.org/abs/1511.07067)] [[Project Page](https://satwikkottur.github.io/research/vis-w2v/)]  
+\* = equal contribution
 
 ----
 ### Code Structure
@@ -50,6 +51,9 @@ uncommenting code in `trainModel()`.
 
 1. `liblinearWrapper.h`:
     * Additionally, you also need to link the correct path to liblibear
+
+1. Other dependencies:
+    * NTLK is used for tokenization and lemmatization (VP task)
 
 To run either cs or vp, comment or uncomment corresponding wrapper calls in 
 `trainModel()` function of visword2vec. And then `make cs` or `make vp` for the
@@ -102,7 +106,7 @@ All the scripts needed for pre-processing are available in `utils/vp` folder.
 
 Follow the steps below:
 #### Training data
-Run the `fetchVPTrainData.m` function to extract relevant data for training `vis-w2v`.
+**Step 1:** Run the `fetchVPTrainData.m` function to extract relevant data for training `vis-w2v`.
 ```
 cd utils/vp
 >> fetchVPTrainData(<path to ASD dataset>, <path to VP dataset>, <path to save the data>);
@@ -138,8 +142,8 @@ It does the following (not important. If you just want desired data, run the abo
   ```
 
 #### Task data
-One should use our new embeddings `vis-w2v` in place of `word2vec` in visual paraphrasing task (`imagine_v1/code/feature/compute_features_vp.m` at line 32). Alternatively, we tap their other text features (co-occurance and total frequency) and use it in our code for speed and smoother interface between learning embeddings and performing the task. 
-This can be achieved my adding the following lines to `imagine_v1/code/feature/compute_features_vp.m` before line 30, and running `imagine_v1/code/script_vp.m`.
+**Step 2:** One should use our new embeddings `vis-w2v` in place of `word2vec` in visual paraphrasing task (`imagine_v1/code/feature/compute_features_vp.m` at line 32). Alternatively, we can save their other text features (co-occurance and total frequency) and use it in our code for speed and smoother interface between learning embeddings and performing the task. 
+This can be achieved by adding the following lines to `imagine_v1/code/feature/compute_features_vp.m` before line 30, and running `imagine_v1/code/script_vp.m`.
 
 ```
 save('vp_txt_features.mat', 'feat_vp_text_tf_1', 'feat_vp_text_tf_2', 'feat_vp_text_coc_1', 'feat_vp_text_coc_2');
@@ -147,7 +151,7 @@ save('vp_txt_features.mat', 'feat_vp_text_tf_1', 'feat_vp_text_tf_2', 'feat_vp_t
 error('Saved features, getting out!')
 ```
 
-Next, we obtain all the relevant information to perform the visual paraphrasing task (using MATLAB)
+**Step 3**: Next, we obtain all the relevant information to perform the visual paraphrasing task (using MATLAB)
 * Sentence pairs: `vp_sentences_1.txt` and `vp_sentences_2.txt`
 * Other textual features: `vp_features_coc_l.txt`, `vp_features_coc_2.txt`, `vp_features_tf_l.txt`, `vp_features_tf_2.txt`
 * Ground truth: `vp_ground_truth.txt`
@@ -159,5 +163,31 @@ cd /utils/vp
 >> fetchVPTaskData(<path to VP dataset>, <path to vp_txt_features.mat>, <path to save the files>)
 
 For example:
->> fetchVPTaskData('data/vp/imagine_v1/', 'data/vp/imagine_v1/code/feature/', 'data/vp')
+>> fetchVPTaskData('data/vp/imagine_v1/', 'data/vp/imagine_v1/code/', 'data/vp')
 ```
+
+**Step 4**: Finally, we tokenize and lemmatize all the sentences, i.e, `vp_sentences_1.txt`, `vp_sentences_2.txt` and `vp_train_sentences_raw.txt`.
+
+```
+cd /utils/vp
+python lemmatizeVPTrain.py <path to data> <path to save sentences>
+
+For example:
+python lemmatizeVPTrain.py data/vp/ data/vp/
+```
+Phew! That's a lot of pre-processing. Now we are all set to learn vis-w2v embeddings while performing the visual paraphrasing task.
+Like before, check all the filepaths in `filepaths.h` before proceeding.
+
+Now, to run, simply:
+```
+make
+./visword2vec -vp 1 -embed-path data/vp/word2vec_vp.bin -output vp_refined.bin -size 200 -clusters 100
+```
+You can also give in other parameters to suit your needs. 
+For VP, these are `mode` that indicates the training context and `window-size`  that indicates the size in `WINDOW` mode.
+  * `DESCRIPTIONS`: Use all the three sentences for training
+  * `SENTENCES`: Use sentences one after the other
+  * `WINDOW`: Use a context window of size `window-size` (default 5)
+  * `WORDS`: Use each word separately
+
+The program prints 100 runs with both validation and test performance. We choose the run with best validation performance and report the corresponding test result.
