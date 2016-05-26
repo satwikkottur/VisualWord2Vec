@@ -6,20 +6,22 @@ function fetchVPTaskData(vpPath, matPath, savePath)
 %   savePath - path to save all the files
 
     %--------------- Saving the ground truth ---------------
-    fprintf('Reading the VP dataset..');
-    load(fullfile(vpPath, 'data/visual_paraphrasing', 'dataset.mat'));
+    fprintf('Reading the VP dataset...\n');
+    data = load(fullfile(vpPath, 'data/visual_paraphrasing', 'dataset.mat'));
+    sentences_1 = data.sentences_1;
+    sentences_2 = data.sentences_2;
     load(fullfile(vpPath, 'data/visual_paraphrasing', 'split.mat'));
 
-    fprintf('Saving the ground truth...');
+    fprintf('Saving the ground truth...\n');
     saveId = fopen(fullfile(savePath, 'vp_ground_truth.txt'), 'wb');
-    for i = 1:length(gt)
-        fprintf(saveId, '%d\n', gt(i));
+    for i = 1:length(data.gt)
+        fprintf(saveId, '%d\n', data.gt(i));
     end
     fclose(saveId);
 
     %--------------- Saving the sentences ---------------
     % Unroll the sentences onto one line
-    fprintf('Saving the sentences...');
+    fprintf('Saving the sentences...\n');
     unroll=@(y)cellfun(@(x)cell2mat(x),y,'UniformOutput',false);
     
     sentences1 = unroll(sentences_1);
@@ -36,7 +38,7 @@ function fetchVPTaskData(vpPath, matPath, savePath)
     cellfun(@(x) fprintf(saveId, '%s\n', x), sentences2);
     fclose(saveId);
     %--------------- Saving the train / test split ---------------
-    fprintf('Saving the train / test split...');
+    fprintf('Saving the train / test split...\n');
 
     totalInst = length(testind) + length(trainind);
     isTrain = zeros(totalInst, 1);
@@ -54,10 +56,10 @@ function fetchVPTaskData(vpPath, matPath, savePath)
     % 1 from gt = 1
     % 2 from gt = 0
     % Only from traininds
-    gtInds = find(gt == 1);
+    gtInds = find(data.gt == 1);
     gtTrainInds = intersect(gtInds, trainind);
 
-    falseInds = find(gt == 0);
+    falseInds = find(data.gt == 0);
     falseTrainInds = intersect(falseInds, trainind);
 
     % Choose 1k from gtTrainInds and 2k from falseTrainInds
@@ -67,38 +69,38 @@ function fetchVPTaskData(vpPath, matPath, savePath)
 
     valInds = union(gtValInds, falseValInds);
 
-    valSet = zeros(length(gt), 1);
+    valSet = zeros(length(data.gt), 1);
     valSet(valInds) = 1;
 
     saveId = fopen(fullfile(savePath, 'vp_val_inds_1k.txt'), 'wb');
-    for i = 1:length(gt)
+    for i = 1:length(data.gt)
         fprintf(saveId, '%d\n', valSet(i));
     end
     fclose(saveId);
     %--------------- Saving the validation set ---------------
-    otherFeats = load(fullfile(matPath, 'vp_txt_features.mat');
+    otherFeats = load(fullfile(matPath, 'vp_txt_features.mat'));
 
     % Save features for sentences1
     % feat_vp_text_coc_1
     saveId = fopen(fullfile(savePath, 'vp_features_coc_1.txt'), 'w');
-    SaveFeatures(savePath, otherFeats.feat_vp_text_coc_1);
+    saveFeatures(saveId, otherFeats.feat_vp_text_coc_1);
     fclose(saveId);
 
     % Save features for sentences2
     % feat_vp_text_coc_2
     saveId = fopen(fullfile(savePath, 'vp_features_coc_2.txt'), 'w');
-    SaveFeatures(savePath, otherFeats.feat_vp_text_coc_2);
+    saveFeatures(saveId, otherFeats.feat_vp_text_coc_2);
     fclose(saveId);
 
     % Save features for sentences1
     % feat_vp_text_tf_1
     saveId = fopen(fullfile(savePath, 'vp_features_tf_1.txt'), 'w');
-    SaveFeatures(savePath, otherFeats.feat_vp_text_tf_1);
+    saveFeatures(saveId, full(otherFeats.feat_vp_text_tf_1));
     fclose(saveId);
 
     % Save features for sentences2
     % feat_vp_text_tf_2
     saveId = fopen(fullfile(savePath, 'vp_features_tf_2.txt'), 'w');
-    SaveFeatures(savePath, otherFeats.feat_vp_text_tf_2);
+    saveFeatures(saveId, full(otherFeats.feat_vp_text_tf_2));
     fclose(saveId);
 end

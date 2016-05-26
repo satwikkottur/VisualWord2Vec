@@ -1,7 +1,22 @@
 # Script to lemmatize tokens using nltk
-from nltk import word_tokenize, pos_tag
+from nltk import word_tokenize
+import nltk
+from nltk.tag.perceptron import PerceptronTagger
 from nltk.corpus import wordnet as wordnet
 from nltk.stem import WordNetLemmatizer
+import sys
+import pdb
+
+# Code adapted from stackoverflow
+def progress(count, total, suffix=''):
+    bar_len = 20
+    filled_len = int(round(bar_len * count / float(total)))
+
+    percents = round(100.0 * count / float(total), 1)
+    bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
+    sys.stdout.flush()
 
 def get_wordnet_pos(treebank_tag):
     if treebank_tag.startswith('J'):
@@ -16,71 +31,84 @@ def get_wordnet_pos(treebank_tag):
         # Return noun by default, as lemmatized has default noun
         return wordnet.NOUN
 
-if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print('Error in usage:')
-        print('python lemmatizeVPTrain.py <path to data> <path to store>(optional)');
+#-------------------------------------------------------------------------
+# Given the file to read in filePath, and file to save in savePath
+# (optionally a tokenPath to save the tokens)
+def lemmatizeSentences(filePath, savePath, tokenPath=None):
+    print('Tokenizing %s and saving at %s...' % (filePath, savePath));
 
-    dataPath = sys.argv[1];
-    if len(sys.argv) > 2:
-        savePath = sys.argv[2];
-    else:
-        # Check for existance of folders and create accordingly
-        savePath = '../../data/vp/';
-        if not os.path.isdir('../../data/'): os.makedirs('../../data/');
-        if not os.path.isdir(savePath): os.makedirs(savePath);
+    tagger = PerceptronTagger()
 
-    print('Extracting data and saving at %s...' % savePath);
-
-    #def main():
     # Read the file
-    readPath = '../dumps/vp_train_sentences_raw.txt';
-    readFile = open(dataPath, 'rb');
+    inputFileId = open(filePath, 'r');
 
-    # Saving the file back
-    savePath = '../dumps/vp_train_sentences_lemma.txt';
-    saveFile = open(savePath, 'wb');
+    # tokenize, removing full stops
+    print('\nTokenizing..')
+    tokenLines = [];
 
-    tokenPath = '../dumps/vp_train_tokens_lemma.txt';
-    tokenFile = open(tokenPath, 'wb');
-
-    # tokenize
-    rawTokenLines = [word_tokenize(i.strip('\n')) \
-                                    for i in readFile.readlines()];
-    tokenLines = [[j.lower() for j in i] \
-                                     for i in rawTokenLines];
-    readFile.close();
+    lines = [i.strip('\n').lower() \
+                            for i in inputFileId.readlines()];
+    for lineId, line in enumerate(lines):
+        if lineId % 10 == 0: progress(lineId, len(lines));
+        tokenLines.append(word_tokenize(line));
+    inputFileId.close();
 
     # First tag the sentences, get wordnet tags and then lemmatize
-    posLines = [pos_tag(i) for i in tokenLines];
-    newTags = [[(i[0], get_wordnet_pos(i[1])) for i in j] \
-                                                for j in posLines];
+    print('\nTagging POS..')
+    posLines = []; newTags = [];
+    for lineId, line in enumerate(tokenLines):
+        if lineId % 10 == 0: progress(lineId, len(tokenLines));
+
+        taggedLine = nltk.tag._pos_tag(line, None, tagger)
+        posLines.append(taggedLine);
+        newTags.append([(i[0], get_wordnet_pos(i[1])) for i in taggedLine]);
 
     # Store all the tokens after lemmatizing
     tokenSet = [];
+    tokens = [];
     # Lemmatize
+    print('\nLemmatizing..')
     lmt = WordNetLemmatizer();
-    tokens = [[lmt.lemmatize(i[0], i[1]) for i in j] \
-                                            for j in newTags];
-    [tokenSet.extend(i) for i in tokens]
-    tokenSet = list(set(tokenSet));
-    [tokenFile.write(i + '\n') for i in tokenSet];
-    tokenFile.close();
+    for lineId, tags in enumerate(newTags):
+        if lineId % 10 == 0: progress(lineId, len(newTags));
 
-    # Save sentences
+        tokens.append([lmt.lemmatize(i[0], i[1]) for i in tags]);
+
+    # Collect all the tokens for saving if tokenPath is not None
+    if tokenPath is not None:
+        tokenFile = open(tokenPath, 'wb');
+        [tokenSet.extend(i) for i in tokens]
+        tokenSet = list(set(tokenSet));
+        [tokenFile.write(i + '\n') for i in tokenSet];
+        tokenFile.close();
+
+    # Saving the tokenized, lemmatized sentences
+    saveFile = open(savePath, 'w');
+
     # check for full stops
-    for i in tokens:
-        for j in xrange(0, len(i)-1):
-            if(i[j+1] != '.'):
-                saveFile.write(i[j] + ' ');
-            else:
-                saveFile.write(i[j]);
+    for iterId, sentenceTokens in enumerate(tokens):
+        # Print progress occasionally
+        if iterId % 10 == 0: progress(iterId, len(tokens));
 
-        # No space after full stop, line break
-        print (tokens.index(i), len(i), i)
-        if len(i):
-            saveFile.write(i[-1] + '\n');
-        else:
-            saveFile.write('\n');
+        # Replace space + fullstop with just full stop
+        saveFile.write(' '.join(sentenceTokens).replace(' .', '.') + '\n');
 
     saveFile.close();
+
+#-------------------------------------------------------------------------
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print('Error in usage:')
+        print('python lemmatizeVPTrain.py <path to data> <path to store>');
+
+    dataPath = sys.argv[1];
+    savePath = sys.argv[2];
+
+    print('Extracting data and saving at %s...' % savePath);
+    lemmatizeSentences(dataPath + 'vp_train_sentences_raw.txt',\
+                        savePath + 'vp_train_full.txt');
+    lemmatizeSentences(dataPath + 'vp_sentences_1.txt',\
+                        savePath + 'vp_sentences1_lemma.txt');
+    lemmatizeSentences(dataPath + 'vp_sentences_2.txt',\
+                        savePath + 'vp_sentences2_lemma.txt');
+    print('\n Done processing!')

@@ -23,7 +23,7 @@
  
 // Visual Paraphrase : VP
 // root path to all the data for VP task
-# define ROOT_VP "/srv/share/visualw2v/data/vp/"
+# define ROOT_VP "data/vp/"
 // Path to the visual feature file
 #define VP_VISUAL_FEATURE_FILE ROOT_VP "abstract_features_train.txt"
 // Path to text

@@ -37,7 +37,7 @@ int windowVP = 5; // window size for training on sentences
 enum TrainMode trainMode = SENTENCES;
 
 /***********************************************************************************/
-char output_file[MAX_STRING], embed_file[MAX_STRING];
+char output_file[MAX_STRING], embed_file[MAX_STRING], mode[MAX_STRING];
 
 long long vocab_size = 0, layer1_size = 100;
 real alpha = 0.025, starting_alpha, sample = 1e-3;
@@ -209,6 +209,8 @@ int main(int argc, char **argv) {
     int performCS = 0, performVP = 0; // perform either of the task
     if ((i = ArgPos((char *)"-cs", argc, argv)) > 0) performCS = atoi(argv[i + 1]);
     if ((i = ArgPos((char *)"-vp", argc, argv)) > 0) performVP = atoi(argv[i + 1]);
+    if ((i = ArgPos((char *)"-mode", argc, argv)) > 0) strcpy(mode, argv[i + 1]);
+    if ((i = ArgPos((char *)"-window-size", argc, argv)) > 0) windowVP = atoi(argv[i + 1]);
 
     // Begin the training
     printf("Reading embedding initializations from %s\n", embed_file);
@@ -230,7 +232,16 @@ int main(int argc, char **argv) {
     }
 
     // Visual paraphrase task
-    if (performVP) visualParaphraseWrapper(numClusters);
+    if (performVP){
+        if (mode[0] != 0){
+            if (strcmp(mode, "DESCRIPTIONS")) trainMode = DESCRIPTIONS;
+            if (strcmp(mode, "SENTENCES")) trainMode = SENTENCES;
+            if (strcmp(mode, "WORDS")) trainMode = WORDS;
+            if (strcmp(mode, "WINDOWS")) trainMode = WINDOWS;
+        }
+        // Assign the mode
+        visualParaphraseWrapper(numClusters);
+    }
 
     // Common sense task
     if (performCS) commonSenseWrapper(numClusters);

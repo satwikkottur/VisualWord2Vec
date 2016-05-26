@@ -38,7 +38,7 @@ cs:
 
 vp:
 	make
-	./$(BIN)visword2vec -embed-path modelsNdata/vp/word2vec_coco_vp_lemma.bin -output vp_refined.bin -size 200 -threads 12 -clusters 100
+	./$(BIN)visword2vec -vp 1 -embed-path data/vp/word2vec_vp.bin -output vp_refined.bin -size 200 -threads 4 -clusters 100
 
 clean:
 	rm -rf visword2vec visualFeatures *.o $(BIN)*
