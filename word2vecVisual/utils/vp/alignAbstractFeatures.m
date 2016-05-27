@@ -51,7 +51,8 @@ function alignAbstractFeatures(vpPath, featPath, savePath)
     noTrain = size(trainFeatures, 1);
     noDims = size(trainFeatures, 2);
     saveId = fopen(fullSavePath, 'wb');
-    saveFeatures(saveId, features);
+    % save the features twice
+    saveFeatures(saveId, [trainFeatures; trainFeatures]);
 
     fclose(saveId);
     fclose(idMapFile);

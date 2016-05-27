@@ -6,7 +6,7 @@ function fetchVPTrainData(absPath, vpPath, savePath)
 %   savePath - path to save all the files
 
     % Extract all the features
-    extractAbstractFeatures(absPath, vpPath, savePath);
+    extractAbstractFeatures(absPath, savePath);
     % Consider only train features
     alignAbstractFeatures(vpPath, savePath, savePath);
     % Get the training sentences for learning vis-w2v
