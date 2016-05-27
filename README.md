@@ -98,6 +98,8 @@ make
 ```
 You can also give in other parameters to suit your needs.
 
+----
+
 **B. Visual Paraphrasing** ([Project page](https://filebox.ece.vt.edu/~linxiao/imagine/))  
 Download the VP dataset from their project page [here](https://filebox.ece.vt.edu/~linxiao/imagine/site_data/imagine_v1.zip).
 Also download the clipart scenes and descriptions (ASD) used to train `vis-w2v` from the [clipart](https://vision.ece.vt.edu/clipart/) project page [here](http://research.microsoft.com/research/downloads/details/73537628-df14-44e2-847a-45f369131e87/details.aspx).
@@ -105,14 +107,14 @@ Also download the clipart scenes and descriptions (ASD) used to train `vis-w2v` 
 All the scripts needed for pre-processing are available in `utils/vp` folder. 
 
 Follow the steps below:
-#### Training data
+**Training data** 
 **Step 1:** Run the `fetchVPTrainData.m` function to extract relevant data for training `vis-w2v`.
 ```
 cd utils/vp
 >> fetchVPTrainData(<path to ASD dataset>, <path to VP dataset>, <path to save the data>);
 
 For example:
->> fetchVPTrainData('data/vp/AbstractScenes_v1.1', 'data/vp/imagine_v1/', 'vp/data/');
+>> fetchVPTrainData('data/vp/AbstractScenes_v1.1', 'data/vp/imagine_v1/', 'data/vp/');
 ```
 
 It does the following (not important. If you just want desired data, run the above command):
@@ -141,7 +143,7 @@ It does the following (not important. If you just want desired data, run the abo
   >> saveVPTrainSentences('data/vp/imagine_v1/', 'data/vp')
   ```
 
-#### Task data
+**Task data**  
 **Step 2:** One should use our new embeddings `vis-w2v` in place of `word2vec` in visual paraphrasing task (`imagine_v1/code/feature/compute_features_vp.m` at line 32). Alternatively, we can save their other text features (co-occurance and total frequency) and use it in our code for speed and smoother interface between learning embeddings and performing the task. 
 This can be achieved by adding the following lines to `imagine_v1/code/feature/compute_features_vp.m` before line 30, and running `imagine_v1/code/script_vp.m`.
 
@@ -191,3 +193,22 @@ For VP, these are `mode` that indicates the training context and `window-size`  
   * `WORDS`: Use each word separately
 
 The program prints 100 runs with both validation and test performance. We choose the run with best validation performance and report the corresponding test result.
+
+----
+
+**C. Text-based Image Retrieval**  
+This task involves retrieving the appropriate image based on the associated tuple. We collect the data and make it available at `utils/text-ret/text_ret_tuples.pickle` along with ground truths for each image as `utils/text-ret/text_ret_gt.txt`. The goal is to retrieve correct image from the list of ground truth tuples using each of collected queries in pickle file as query.
+
+The code for this task is provided in Python in `utils/text_ret/` along with the data. To run, we need to point it to the data directory along with embedding paths. There are two modes for this task: (A) SINGLE - this uses single embedding for P, R, S. (B) MULTI - this uses three different embeddings for each of P, R, S. The inputs are given accordingly.
+
+```
+cd utils/text-ret/
+python performRetrieval.py <path to data> <path to embedding>
+  (or)
+python performRetrieval.py <path to data> <path to P embedding> <path to R embedding> <path to S embedding>
+
+For example:
+python performRetrieval.py ./ cs_refined.bin
+```
+
+For any further information/questions, feel free to email the authors at *skottur@andrew.cmu.edu* or *vrama91@vt.edu*
