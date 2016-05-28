@@ -19,8 +19,7 @@ NAMES = visword2vec.o	 \
 	vpFunctions.o	\
 	helperFunctions.o\
 	refineFunctions.o\
-	liblinearWrapper.o\
-	retriever.o
+	liblinearWrapper.o
 
 OBJ=$(NAMES:%=$(BIN)%)
 SRCS=$(NAMES:%.o=%.c)
