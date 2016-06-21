@@ -9,6 +9,14 @@ body {
   line-height: 1.5;
   color: #606c71; }
 
+figure {
+    width:47%;
+    float: left;
+    margin: 0;
+    text-align: left;
+    padding: 2%;
+}
+
 a {
   color: #1e6bb8;
   text-decoration: none; }
@@ -58,6 +66,8 @@ a {
   text-align: center;
   background-color: #159957;
   background-image: linear-gradient(120deg, #155799, #159957); }
+
+
 
 @media screen and (min-width: 64em) {
   .page-header {

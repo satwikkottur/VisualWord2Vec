@@ -20,7 +20,26 @@
 
     <section class="main-content">
     <h2>Visual Word2Vec (vis-w2v): Learning Visually Grounded Word Embeddings Using Abstract Scenes</h2>
-<b>Teaser figure here</b>
+        <figure>
+          <img src="images/fig1.jpg" alt="Teaser Figure 1">
+        </figure>
+        <figure>
+            <figcaption>We ground text-based word2vec (w2v) embeddings into vision to capture a complimentary notion of visual relatedness.
+            Our method (vis-w2v) learns to predict the visual grounding as context for a given word.
+            Although "eats" and "stares at" seem unrelated in text, they share semantics visually.
+            Eating involves staring or looking at the food that is being eaten.
+            As training proceeds, embeddings change from w2v (red) to vis-w2v (blue).</figcaption>
+        </figure>
+    <!--figure>
+        <figcaption>
+        Visualization of the clustering used to supervise vis-w2v training.
+        Relations that co-occur more often in the same cluster appear bigger than others.
+        Observe how semantically close relations co-occur the most, e.g., eat, drink, chew on for the relation "enjoy".
+        </figcaption>
+    </figure>
+    <figure>
+      <img src="images/cluster_occur.jpg" alt="Teaser Figure 2">
+    </figure-->
 
 <h3>People:</h3>
 <p>Satwik Kottur [<a href='https://satwikkottur.github.io/'>Page</a>]
@@ -29,16 +48,16 @@
     <br/>Devi Parikh [<a href='https://filebox.ece.vt.edu/~parikh/'>Page</a>]</p>
 
 <h3>Abstract:</h3>
-<b>This needs change (camera ready)!</b>
-<p>We propose a model to learn visually grounded word embeddings (vis-w2v) to capture visual notions of semantic relatedness.
+We propose a model to learn visually grounded word embeddings (vis-w2v) to capture visual notions of semantic relatedness.
 While word embeddings trained using text have been extremely successful, they cannot uncover notions of semantic relatedness implicit in our visual world.
-For instance, visual grounding can help us realize that concepts like eating and staring at are related, since when people are eating something, they also tend to stare at the food.
-Grounding a rich variety of relations like eating and stare at in vision is a challenging task, despite recent progress in vision.
-We realize the visual grounding for words depends on the semantics of our visual world, and not the literal pixels.
+For instance, although "eats" and "stares at" seem unrelated in text, they share semantics visually.
+When people are eating something, they also tend to stare at the food.
+Grounding diverse relations like "eats" and "stares at" into vision remains challenging, despite recent progress in vision.
+We note that the visual grounding of words depends on semantics, and not the literal pixels.
 We thus use abstract scenes created from clipart to provide the visual grounding.
-We find that the embeddings we learn capture fine-grained visually grounded notions of semantic relatedness.
-We show improvements over text only word embeddings (word2vec) on three tasks: common-sense assertion classification, visual paraphrasing and text-based image retrieval.</p>
-
+We find that the embeddings we learn capture fine-grained, visually grounded notions of semantic relatedness.
+We show improvements over text-only word embeddings (word2vec) on three tasks:
+common-sense assertion classification, visual paraphrasing and text-based image retrieval.</p>
 <h3>Paper:</h3>
 <p>
     Satwik Kottur*, Ramakrishna Vedantam*, Jos&eacute; M. F. Moura, Devi Parikh <br/>
