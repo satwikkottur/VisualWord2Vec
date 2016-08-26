@@ -20,7 +20,6 @@
 # include "visualFeatures.h"
 # include "vpFunctions.h"
 # include "helperFunctions.h"
-# include "retriever.h"
 # include "filepaths.h"
 /***********************************************************************************/
 // Extern variables
