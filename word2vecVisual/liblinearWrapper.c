@@ -92,11 +92,11 @@ void learnClassificationModel(struct SentencePair* sentPairs, long noPairs, int 
     printf("***************************************\n");
     
     // Also save the 10 sentences from each category based on scores
-    char* savePath = (char*) malloc(sizeof(char) * 100);
+    /*char* savePath = (char*) malloc(sizeof(char) * 100);
     if (countRun > 1){
         sprintf(savePath, "modelsNdata/vp_test_scores_%d.txt", countRun);
         saveTestScores(savePath, sentPairs);
-    }
+    }*/
 
     // Free the memory
     //free_and_destroy_model(&trainedModel);
