@@ -3,11 +3,14 @@ Learning visually grounded word embeddings from abstract image
 
 ----
 
-####Paper
+###Paper
 **Satwik Kottur\*, Ramakrishna Vedantam\*, Jos&eacute; Moura, Devi Parikh**  
 *Visual Word2Vec (vis-w2v): Learning Visually grounded embeddings from abstract images*  
 [[ArXiv](http://arxiv.org/abs/1511.07067)] [[Project Page](https://satwikkottur.github.io/research/vis-w2v/)]  
 \* = equal contribution
+
+Pre-trained Visual Word2vec Embeddings can be found [here](https://computing.ece.vt.edu/~satwik/visual_word2vec/),
+trained on wikipedia and MSCOCO captions.
 
 ----
 ### Code Structure
